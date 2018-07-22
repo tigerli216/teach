@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>定制课订单管理</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+#parse("./include/commonCss.html")
+<link href="${ctx.contextPath}/hplus/css/plugins/chosen/chosen.css"
+	rel="stylesheet">
+	<style>
+		.form-group-item {
+			position: relative;
+		}
+		.form-group-item > input{
+			position: absolute;
+			top: 4px;
+			left: 24px;
+		}
+	</style>
+</head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content animated fadeInUp">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox">
+					<div class="ibox float-e-margins">
+						<div class="ibox-title">
+							<h5>定制课订单列表</h5>
+							<div class="ibox-tools">
+								<a class="collapse-link"> <i class="fa fa-chevron-up"></i>
+								</a>
+							</div>
+						</div>
+						<div class="ibox-content">
+							<!-- 	<div class="alert alert-success alert-dismissable">
+								<button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+								可双击订单所在行，可查看订单详情。
+							</div> -->
+							<form id="grid-search-form">
+								<!-- 订单类型 -->
+						    	<input type="hidden" id="orderType" name="orderType"/>
+								<div class="profile-user-info profile-user-info-striped">
+									<div class="profile-info-row">
+										<div class="profile-info-name">订单子类型：</div>
+										<div class="profile-info-value form-group">
+											<select class="input-large" name="orderSubType">
+												<option value="0">全部</option>
+												<option value="21">定制课</option>
+												<option value="22">实习课</option>
+											</select>
+										</div>
+										<div class="profile-info-name">订单编码：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="orderCode" id="orderCode"
+												placeholder="订单编码" class="input-large"
+												onkeyup="this.value=this.value.replace(/^ +| +$/g,'')"
+												maxlength="30">
+										</div>
+										<div class="profile-info-name">订单名称：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="orderName" id="orderName"
+												placeholder="订单名称" class="input-large"
+												maxlength="120">
+										</div>
+									</div>
+									<div class="profile-info-row">
+										<div class="profile-info-name">会员账号：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="loginAccount" id="loginAccount"
+												placeholder="会员账号" class="input-large"
+												onkeyup="this.value=this.value.replace(/^ +| +$/g,'')"
+												maxlength="30">
+										</div>
+										<div class="profile-info-name">付款方式：</div>
+										<div class="profile-info-value form-group">
+											<select class="input-large" name=payType>
+												<option value="0">全部</option>
+												<option value="1">线上</option>
+												<option value="2">线下</option>
+											</select>
+										</div>
+										<div class="profile-info-name">订单状态：</div>
+										<div class="profile-info-value form-group">
+											<select class="input-large" name=orderStatus>
+												<option value="0">全部</option>
+												<option value="1">已确认</option>
+												<option value="2">已取消</option>
+												<option value="4">退款</option>
+											</select>
+										</div>
+									</div>
+									<div class="profile-info-row input-daterange">
+										<div class="profile-info-name">支付状态：</div>
+										<div class="profile-info-value form-group" >
+											<select class="input-large" name="payStatus">
+												<option value="0">全部</option>
+												<option value="1">未付款</option>
+												<option value="2">已付款</option>
+												<option value="4">已退款</option>
+											</select>
+										</div>
+										<div class="profile-info-name">创建开始时间：</div>
+										<div class="profile-info-value form-group form-group-item">
+											<input type="text" name="beginTime" id="beginTime"
+												placeholder="开始时间"
+												class="input-large form-control date-icon"
+												onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
+										</div>
+										<div class="profile-info-name">创建结束时间：</div>
+										<div class="profile-info-value form-group form-group-item">
+											<input type="text" name="endTime" id="endTime"
+												placeholder="结束时间"
+												class="input-large form-control date-icon"
+												onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
+										</div>
+									</div>
+									<div class="profile-info-row"></div>
+								</div>
+							</form>
+							<div class="btn-group hidden-xs" id="tableEventsToolbar"
+								role="group">
+								<button type="button" onClick="orderPay(1);" title="支付成功"
+									class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true">
+									    <use xlink:href="#icon-chongzhichenggong"></use>
+									</svg>
+								</button>
+								<button type="button" onClick="orderPay(2);" title="支付失败"
+									class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true">
+									    <use xlink:href="#icon-shibai"></use>
+									</svg>
+								</button>
+								<button type="button" onClick="audit()" title="切换支付方式"
+									class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true">
+									    <use xlink:href="#icon-tuikuan"></use>
+									</svg>
+								</button>
+								<button type="button" id="grid-search-btn" title="搜索"
+									class="btn btn-outline btn-default">
+									<i class="glyphicon glyphicon-search" aria-hidden="true"></i>
+								</button>
+								<button type="button" id="grid-reset-btn" title="重置"
+									class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true">
+									    <use xlink:href="#icon-zhongzhi"></use>
+									</svg>
+								</button>
+								<button type="button" id="grid-search-btn" title="导出"
+									class="btn btn-outline btn-default" onClick="exportFile()">
+									<i class="glyphicon glyphicon-download" aria-hidden="true"></i>
+								</button>
+							</div>
+							<table id="orderTable" data-mobile-responsive="false">
+								<thead>
+									<tr>
+										<th data-radio="true"></th>
+										<th data-formatter="boostrapTableSortFormatter">序号</th>
+										<th data-field="realName" data-visible="false">用户名</th>
+										<th data-field="userId" data-visible="false">会员id</th>
+										<th data-field="loginAccount">会员账号</th>
+										<th data-field="orderId" data-visible="false">订单ID</th>
+										<th data-field="busiId" data-visible="false">业务ID</th>
+										<th data-field="orderName">订单名称</th>
+										<th data-field="orderCode">订单编码</th>
+										<th data-field="orderSubTypeStr">订单子类型</th>
+										<th data-field="orderStatusStr">订单状态</th>
+										<th data-field="payStatusStr">支付状态</th>
+										<th data-field="payTypeStr" data-visible="true">付款方式</th>
+										<th data-field="origPriceStr">订单原价</th>
+										<th data-field="discountPriceStr">订单折扣价</th>
+										<th data-field="orderStatusStr" data-visible="false">订单状态</th>
+										<th data-field="createTime">订单创建时间</th>
+										<th data-field="payTime" data-visible="false">订单付款时间</th>
+										<th data-field="dealTime" data-visible="false">订单成交时间</th>
+										<th data-field="orderNotes" data-visible="false">订单附言</th>
+										<th data-field="payNotes" data-visible="false">付款备注</th>
+									</tr>
+								</thead>
+							</table>
+							#parse("./order/orderDetails.html")
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	#parse("./include/commonJs.html")
+	<script
+		src="${ctx.contextPath}/hplus/js/plugins/chosen/chosen.jquery.min.js"></script>
+</body>
+<script>
+	$(document).ready(
+		function() {
+			var dayDate = new Date();
+			dayDate.setDate(dayDate.getDate() - 6);
+			$("#beginTime").val(DateUtil.dateToStr("yyyy-MM-dd", dayDate));
+			$("#endTime").val(DateUtil.dateToStr("yyyy-MM-dd", new Date()));
+			
+			//设置查询定制课订单
+			$("#orderType").val(2);
+
+			var orderTableParams = jQuery.extend({},boostrapTableParams);
+			// table分页参数配置
+			orderTableParams.url = "${ctx.contextPath}/d-admin/order/findPaging";
+		/* 	orderTableParams.onDblClickRow = function(row, element) {
+				// 双击事件
+				$(".tabs-container #orderId").val(row.orderId);
+				$(".tabs-container #orderSplit").val(row.orderSplit);
+				$("#orderDtlLi a").click();
+				$("#orderDetails_div").removeClass("hide");
+			}; */
+			$("#orderTable").bootstrapTable(orderTableParams);
+
+			initGridSearch(); // 初始化grid搜索
+
+			$('.input-daterange').datepicker({
+				todayBtn : "linked",
+				endDate : new Date(),
+				setDate : new Date(),
+				clearBtn : true,
+				autoclose : true
+			});
+
+			$('.chosen-select').chosen({
+				allow_single_deselect : true
+			});
+
+			$(window).off('resize.chosen').on('resize.chosen',
+					function() {
+						$('.chosen-select').each(function() {
+							var $this = $(this);
+							$this.next().css({
+								'width' : 207
+							});
+						})
+					}).trigger('resize.chosen');
+	});
+
+	// bootstrap-table分页查询时的参数封装
+	function boostrapTableQueryParams(params) {
+		if (isEmpty(params)) { // 点击搜索按钮时
+			var options = $("#orderTable").bootstrapTable('getOptions');
+			$("#orderTable").bootstrapTable('refreshOptions', {
+				pageNumber : 1,
+				sortName : ""
+			});
+		} else { // 点击分页时
+			return boostrapTableSearchParams("grid-search-form", params);
+		}
+	}
+	// 修改支付方式
+	var isAudit = false;
+	function audit(){
+		var selections = $("#orderTable").bootstrapTable('getSelections');
+		if (isEmpty(selections)) {
+			common_error("请选择要修改的订单！");
+			return;
+		}		
+		var orderCode = selections[0].orderCode;
+		var payType = selections[0].payType;
+		var orderStatus = selections[0].orderStatus;
+		var payStatus = selections[0].payStatus;
+		if(orderStatus == 2){
+			common_error("此订单已取消");
+			return;
+		}
+		if(orderStatus == 3){
+			common_error("此订单无效");
+			return;
+		}
+		if(orderStatus == 4){
+			common_error("此订单已退款");
+			return;
+		}
+		if(orderStatus == 5){
+			common_error("此订单已退货");
+			return;
+		}
+		if(payStatus == 2){
+			common_error("此订单已付款");
+			return;
+		}
+		if(payStatus == 4){
+			common_error("此订单已退款");
+			return;
+		}
+		swal({
+			title :payType==1?"是否切换为线下支付（5秒后窗口关闭）":"是否切换为线上支付（5秒后窗口关闭）",
+			text : "确认修改！",
+			type : "warning",
+			showCancelButton : true,
+			confirmButtonColor : "#DD6B55",
+			cancelButtonText : "取消",
+			confirmButtonText : "确定",
+			timer : 5000,
+			closeOnConfirm : true
+		}, function() {
+			if (isAudit)
+				return;
+			
+			isAudit = true;			
+			var params = "orderCode=" + orderCode + "&payType=" + payType;		
+			$.ajax({
+				type : "POST",
+				url : "${ctx.contextPath}/d-admin/order/pay",
+				data : params,
+				dataType : "json",
+				success : function(data) {
+					if (data.success) {
+						common_success("切换成功！");
+						boostrapTableQueryParams(); // 刷新列表
+					} else {
+						common_error(data.errDesc);
+					}
+				},
+				complete : function() {
+					isAudit = false;
+				}
+			});
+		});
+	}
+	// 导出
+	function exportFile() {
+		ajaxFormExport("grid-search-form", "${ctx.contextPath}/d-admin/order/exportOrder", true);
+	}
+
+	// 导出提交
+	function ajaxFormExport(formId, url, loadingStyle) {
+		var $form = $("#" + formId);
+// 		$form.attr("async", false);
+		$form.attr("action", url);
+		$form.submit();
+	}
+	
+	// 支付成功失败控制
+	var isRechargeSuccess = false;
+	function orderPay(status) {
+		
+		var selections = $("#orderTable").bootstrapTable('getSelections');
+		if (isEmpty(selections)) {
+			common_error("请先选择要操作的订单！");
+			return;
+		}
+		
+		if (selections.length > 1) {
+			common_error("只能选择一个订单操作！");
+			return;
+		}
+
+		var payType = selections[0].payType;
+		if (payType == 1) {
+			common_error("只能修改【线下】订单！");
+			return;
+		}
+		
+		var orderStatus = selections[0].orderStatus;
+		var payStatus = selections[0].payStatus;
+		if (orderStatus != 1 || payStatus != 1) {
+			common_error("只能操作【已确认未付款】状态的订单！");
+			return;
+		}
+		
+		
+		var str = "成功";
+		if(status == 2){
+			str = "失败";
+		}
+		swal({
+			title : "确定要更改订单为支付" + str + "吗？",
+			text : "请填写备注说明信息！",
+			type : "input",
+			showCancelButton : true,
+			confirmButtonColor : "#DD6B55",
+			confirmButtonText : "提交",
+			closeOnConfirm : false
+		}, function(inputValue) {
+			if (isRechargeSuccess)
+				return;
+
+			if (isEmpty(inputValue)) {
+				swal.showInputError("必须填写备注说明信息");
+				return false;
+			}
+
+			isRechargeSuccess = true;
+			$.ajax({
+				type : "POST",
+				url : "${ctx.contextPath}/d-admin/order/orderPay",
+				data : {
+					orderCode : selections[0].orderCode,
+					notes : inputValue,
+					status : status
+				},
+				dataType : "json",
+				success : function(data) {
+					if (data.success) {
+						swal("操作成功！", "", "success");
+						boostrapTableQueryParams();
+					} else {
+						swal("操作失败！", data.errDesc, "error");
+					}
+				},
+				complete : function() {
+					isRechargeSuccess = false;
+				}
+			});
+		});
+	};
+</script>
+</html>

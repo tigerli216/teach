@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>公用业务配置</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+#parse("./include/commonCss.html")
+</head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content animated fadeInUp">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox">
+					<div class="ibox float-e-margins">
+						<div class="ibox-title">
+							<h5>基础数据配置列表</h5>
+							<div class="ibox-tools">
+								<a class="collapse-link"> <i class="fa fa-chevron-up"></i>
+								</a>
+							</div>
+						</div>
+						<div class="ibox-content">
+							<form id="grid-search-form">
+								<input type="hidden" id="orderType" name="orderType" />
+								<div class="profile-user-info profile-user-info-striped">
+									<div class="profile-info-row">
+										<div class="profile-info-name">业务名称：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="busiName" id="busiName"
+												placeholder="业务名称" class="input-large" 
+												maxlength="250">
+										</div>
+										<div class="profile-info-name">业务编码：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="busiCode" id="busiCode"
+												placeholder="业务编码" class="input-large"
+												onkeyup="this.value=this.value.replace(/^ +| +$/g,'')"
+												maxlength="60">
+										</div>
+									</div>
+									<div class="profile-info-row">
+										<div class="profile-info-name">配置类型：</div>
+										<div class="profile-info-value form-group">
+											<select name="busiType" id="busiType" class="input-large">
+												<option value="0">====请选择====</option>
+												<option value="1">定制课咨询配置</option>
+												<option value="2">活动咨询配置</option>
+											</select>
+										</div>
+										<div class="profile-info-name">状态：</div>
+										<div class="profile-info-value form-group">
+											<select name="status" id="status" class="input-large">
+												<option value="0">====请选择====</option>
+												<option value="1">启用</option>
+												<option value="2">禁用</option>
+											</select>
+										</div>
+									</div>
+								</div>
+							</form>
+							<div class="btn-group hidden-xs" id="tableEventsToolbar"
+								role="group">
+								<button type="button" onClick="addInitForm()" title="添加"
+									class="btn btn-outline btn-default">
+									<i class="glyphicon glyphicon-plus" aria-hidden="true"></i>
+								</button>
+								<button type="button" onClick="editInitForm()" title="编辑"
+									class="btn btn-outline btn-default">
+									<i class="glyphicon glyphicon-pencil" aria-hidden="true"></i>
+								</button>
+								<button type="button" onClick="updateStatus(1)" title="开启"
+									class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true">
+									    <use xlink:href="#icon-kaiqi"></use>
+									</svg>
+								</button>
+								<button type="button" onClick="updateStatus(2)" title="禁用"
+									class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true">
+									    <use xlink:href="#icon-guanbi"></use>
+									</svg>
+								</button>
+								<button type="button" id="grid-search-btn" title="搜索"
+									class="btn btn-outline btn-default">
+									<i class="glyphicon glyphicon-search" aria-hidden="true"></i>
+								</button>
+								<button type="button" id="grid-reset-btn" title="重置"
+									class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true">
+									    <use xlink:href="#icon-zhongzhi"></use>
+									</svg>
+								</button>
+							</div>
+							<table id="busiConfigTable" data-mobile-responsive="false">
+								<thead>
+									<tr>
+										<th data-radio="true"></th>
+										<th data-formatter="boostrapTableSortFormatter">序号</th>
+										<th data-field="configId" data-visible="false">配置ID</th>
+										<th data-field="busiName">业务名称</th>
+										<th data-field="busiCode">业务编码</th>
+										<th data-field="busiTypeStr">业务类型</th>
+										<th data-field="statusStr">状态</th>
+										<th data-field="params">参数配置</th>
+									</tr>
+								</thead>
+							</table>
+							#parse("./sys/form/busiConfig_form.html")
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="mask" class="sweet-overlay" tabindex="-1" style="opacity: 1; display: none;">
+		<div style="margin:20% 40%">
+			<img style="" alt="" src="${ctx.contextPath}/images/loading.gif">
+			<span style="color:white;">正在提交中...</span>
+		</div>
+	</div>
+	
+	#parse("./include/commonJs.html")
+	#parse("./include/imgUploadJs.js")
+	<script
+		src="${ctx.contextPath}/hplus/js/plugins/chosen/chosen.jquery.min.js"></script>
+</body>
+<script>
+	$(function() {
+		poundageConfigPagin();
+		judgeVerification();
+	});
+
+	function poundageConfigPagin() {
+		bingdUrserTableParams = jQuery.extend({}, boostrapTableParams); // 表单中的table参数
+		// table分页参数配置
+		boostrapTableParams.url = "${ctx.contextPath}/d-admin/busiConfig/findPaging";
+		$("#busiConfigTable").bootstrapTable(boostrapTableParams);
+		initGridSearch(); // 初始化grid搜索
+	}
+
+	// bootstrap-table分页查询时的参数封装
+	function boostrapTableQueryParams(params) {
+		if (isEmpty(params)) { // 点击搜索按钮时
+			var options = $("#busiConfigTable").bootstrapTable('getOptions');
+			$("#busiConfigTable").bootstrapTable('refreshOptions', {
+				pageNumber : 1,
+				sortName : ""
+			});
+		} else { // 点击分页时
+			return boostrapTableSearchParams("grid-search-form", params);
+		}
+	}
+
+	//点击新增按钮，初始化弹出页面
+	function addInitForm() {
+		$('.form-group').removeClass('has-error');
+		$('span[class*=help-block]').remove();
+		emptyDivInputValue('busiConfig-form-modal');
+		$('#busiConfig-form-modal #modalHeaderMsg').text('新增配置');
+		$("#busiConfig-form-modal").modal("show");
+		// 初始化上传图片
+		imgAddInit($('#qRCodeUrl'), "qRCodeFile", "qRCodeFile");
+		busiTypeChange(1);
+	}
+
+	//点击修改按钮，初始化弹出页面,将值传入页面
+	function editInitForm() {
+		var selections = $("#busiConfigTable").bootstrapTable('getSelections');
+		if (isEmpty(selections)) {
+			common_error("请先选择要编辑的配置！");
+			return;
+		}
+		if (selections.length > 1) {
+			common_error("只能选择一个配置编辑！");
+			return;
+		}
+
+		$('.form-group').removeClass('has-error');
+		$('span[class*=help-block]').remove();
+		emptyDivInputValue('busiConfig-form-modal');
+		$('#busiConfig-form-modal #modalHeaderMsg').text('编辑配置');
+		$("#busiConfig-form-modal").modal("show");
+
+		var configId = selections[0].configId;
+		busiTypeChange(selections[0].busiType);
+		$.ajax({
+			type : "POST",
+			url : "${ctx.contextPath}/d-admin/busiConfig/getBusiConfigBuId",
+			data : "configId=" + configId,
+			dataType : "json",
+			success : function(data) {
+				initParam(data, null, 'grid-thirdIpSearch-form');
+				// 初始化上传图片
+				console.log(data.qRCodeUrl);
+				if (isEmpty(data.qRCodeUrl)) {
+		            imgAddInit($('#qRCodeUrl'), "qRCodeFile", "qRCodeFile");
+		        } else {
+		        	imgEditInit($("#qRCodeUrl"), data.qRCodeUrl, "qRCodeFile", "qRCodeFile");
+		        }
+			},
+			complete : function() {
+			}
+		});
+	}
+
+	// 状态,status:1-开启；2-关闭
+	var isUpdate = false;
+	function updateStatus(status) {
+		var title = "开启";
+		if (status == 2)
+			title = "关闭";
+
+		var selections = $("#busiConfigTable").bootstrapTable('getSelections');
+
+		if (isEmpty(selections)) {
+			common_error("请先选择要" + title + "的配置！");
+			return;
+		}
+
+		if (selections[0].statusStr == title) {
+			common_error("配置" + title + "！");
+			return;
+		}
+
+		swal({
+			title : "您确定要" + title + "吗",
+			text : title + "后将无法修改，请谨慎操作！",
+			type : "warning",
+			showCancelButton : true,
+			confirmButtonColor : "#DD6B55",
+			confirmButtonText : title,
+			closeOnConfirm : false
+		}, function() {
+			if (isUpdate)
+				return;
+
+			var configId = selections[0].configId;
+			var busiType = selections[0].busiType;
+			isUpdate = true;
+			$.ajax({
+				type : "POST",
+				url : "${ctx.contextPath}/d-admin/busiConfig/upConfigStatus",
+				data : "status=" + status + "&configId=" + configId + "&busiType=" + busiType,
+				dataType : "json",
+				success : function(data) {
+					if (data.success) {
+						swal(title + "成功！", "", "success");
+						boostrapTableQueryParams();
+					} else {
+						swal(title + "失败！", data.errDesc, "error");
+					}
+				},
+				complete : function() {
+					isUpdate = false;
+				}
+			});
+
+		});
+	};
+</script>
+</html>

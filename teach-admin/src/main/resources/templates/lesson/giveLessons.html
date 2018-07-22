@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>授课管理</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+#parse("./include/commonCss.html")
+</head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content animated fadeInUp">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox">
+					<div class="ibox float-e-margins">
+						<div class="ibox-title">
+							<h5>授课列表</h5>
+							<div class="ibox-tools">
+								<a class="collapse-link"> <i class="fa fa-chevron-up"></i>
+								</a>
+							</div>
+						</div>
+						<div class="ibox-content">
+							<form id="grid-search-form">
+								<div class="profile-user-info profile-user-info-striped">
+									<div class="profile-info-row">
+										<div class="profile-info-name">课程名称：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="lessonName" placeholder="课程名称"
+												class="input-large"
+												onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
+										</div>
+										<div class="profile-info-name">用户账号：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="userLoginAccount" placeholder="用户账号"
+												class="input-large"
+												onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
+										</div>
+										<div class="profile-info-name">导师账号：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="tutorLoginAccount" placeholder="导师账号"
+												class="input-large"
+												onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
+										</div>
+									</div>
+									
+									<div class="profile-info-row input-daterange">
+										<div class="profile-info-name">开始时间：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="beginTime" id="beginTime"
+												placeholder="开始时间"
+												class="input-large form-control date-icon"
+												onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
+										</div>
+										<div class="profile-info-name">结束时间：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="endTime" id="endTime"
+												placeholder="结束时间"
+												class="input-large form-control date-icon"
+												onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
+										</div>
+									</div>
+								</div>
+							</form>
+							<div class="btn-group hidden-xs" id="tableEventsToolbar"
+								role="group">
+								<button type="button" id="grid-search-btn" title="搜索"
+									class="btn btn-outline btn-default">
+									<i class="glyphicon glyphicon-search" aria-hidden="true"></i>
+								</button>
+								<button type="button" id="grid-reset-btn" title="重置"
+									class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true">
+                                    <use xlink:href="#icon-zhongzhi"></use>
+                                </svg>
+								</button>
+							</div>
+							<table id="giveLesson" data-mobile-responsive="false">
+								<thead>
+									<tr>
+										<th data-formatter="boostrapTableSortFormatter">序号</th>
+										<th data-field="lessonId" data-visible="false">课程ID</th>
+										<th data-field="lessonName">课程名称</th>
+										<th data-field="classId" data-visible="false">课时ID</th>
+										<th data-field="className">课时名称</th>
+										<th data-field="userName">学生姓名</th>
+										<th data-field="userEmail" data-visible="false">学生账号</th>
+										<th data-field="tutorName">导师姓名</th>
+										<th data-field="tutorEmail" data-visible="false">导师账号</th>
+										<th data-field="planDuration">课时计划时长(分)</th>
+										<th data-field="realDuration">课时实际时长(分)</th>
+										<th data-field="endTime">课时结束时间</th>
+									</tr>
+								</thead>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	#parse("./include/commonJs.html")
+</body>
+<script>
+    $(document).ready(function(){
+        // table分页参数配置
+        boostrapTableParams.url = "${ctx.contextPath}/d-admin/lesson/custom/findGiveLessonsPaging";
+        $("#giveLesson").bootstrapTable(boostrapTableParams);
+
+        initGridSearch();	// 初始化grid搜索
+        
+        $('.input-daterange').datepicker({
+			todayBtn : "linked",
+			endDate : new Date(),
+			setDate : new Date(),
+			clearBtn : true,
+			autoclose : true
+		});
+    });
+
+    // bootstrap-table分页查询时的参数封装
+    function boostrapTableQueryParams(params){
+        if (isEmpty(params)) {	// 点击搜索按钮时
+            var options = $("#giveLesson").bootstrapTable('getOptions');
+            $("#giveLesson").bootstrapTable('refreshOptions', {pageNumber: 1, sortName: ""});
+        } else {	// 点击分页时
+            return boostrapTableSearchParams("grid-search-form", params);
+        }
+    }
+  
+</script>
+</html>

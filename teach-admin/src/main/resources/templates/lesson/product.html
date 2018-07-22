@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>产品管理</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    #parse("./include/commonCss.html")
+    <link href="${ctx.contextPath}/hplus/css/plugins/chosen/chosen.css" rel="stylesheet">
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInUp">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>产品列表</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <form id="grid-search-form">
+                            <div class="profile-user-info profile-user-info-striped">
+                                <div class="profile-info-row">
+                                 <div class="profile-info-name">产品名称：</div>
+                                    <div class="profile-info-value form-group">
+                                        <input type="text" name="prodName" placeholder="产品名称" class="input-large" onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
+                                    </div>
+                                    <div class="profile-info-name">业务名称：</div>
+                                    <div class="profile-info-value form-group">
+                                        <select class="input-large" name="busiId">
+                                            <option value="0">所有业务</option>
+                                            <option value="1">手机流量充值</option>
+                                            <option value="2">手机话费充值</option>
+                                            <option value="3">预存分期返还</option>
+                                            <option value="4">用户提现服务</option>
+                                            <option value="5">油卡充值</option>
+                                            <option value="6">生活缴费充值</option>
+                                            <option value="7">虚拟货币充值</option>
+                                            <option value="8">电影票购买</option>
+                                            <option value="9">火车票购买</option>
+                                            <option value="10">服务费</option>
+                                            <option value="11">活动</option>
+                                            <option value="12">新政策预购分期返还</option>
+                                        </select>
+                                    </div>
+                                    <div class="profile-info-name">有效状态：</div>
+                                    <div class="profile-info-value form-group">
+                                        <select class="input-large" name="queryType" id= "queryType">
+                                            <option value="2">全部</option>
+                                            <option value="0">有效</option>
+                                            <option value="1">无效</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="profile-info-row">
+                                 <div class="profile-info-name">产品编码：</div>
+                                    <div class="profile-info-value form-group">
+                                        <input type="text" name="prodCode" placeholder="产品编码" class="input-large" onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
+                                    </div>
+                                    
+                                   <div class="profile-info-name">发布渠道：</div>
+                                    <div class="profile-info-value form-group">
+                                        <select class="input-large" name="releaseChannel">
+                                            <option value="0">全部</option>
+                                            <option value="1">微信</option>
+                                            <option value="2">风猫经销商app</option>
+                                            <option value="3">风猫代理商app</option>
+                                            <option value="4">风猫商城APP</option>
+                                            <option value="5">风猫app</option>
+                                        </select>
+                                    </div>
+                                    <div class="profile-info-name">产品状态：</div>
+                                    <div class="profile-info-value form-group">
+                                        <select class="input-large" name="prodStatus">
+                                            <option value="0">全部</option>
+                                            <option value="1">未上架</option>
+                                            <option value="2">已上架</option>
+                                            <option value="3">已下架</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="btn-group hidden-xs" id="tableEventsToolbar" role="group">
+                            <button type="button" onClick="addInitForm()" title="添加" class="btn btn-outline btn-default">
+                                <i class="glyphicon glyphicon-plus" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" onClick="editInitForm()" title="编辑" class="btn btn-outline btn-default">
+                                <i class="glyphicon glyphicon-pencil" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" onClick="detailsInitForm()" title="查看产品详情" class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true"> <use xlink:href="#icon-icon2"></use></svg>
+									<i class="iconfont icon-quanxiantianjia" aria-hidden="true"></i>
+							</button>
+                            <button type="button" onClick="updatePro(2)" title="上架" class="btn btn-outline btn-default">
+                                <svg class="icon" aria-hidden="true">
+                                    <use xlink:href="#icon-iconfontshangpinshangjia"></use>
+                                </svg>
+                            </button>
+                            <button type="button" onClick="updatePro(3)" title="下架" class="btn btn-outline btn-default">
+                                <svg class="icon" aria-hidden="true">
+                                    <use xlink:href="#icon-xiajia"></use>
+                                </svg>
+                            </button>
+                            <button type="button" onClick="deletePro(2)" title="删除" class="btn btn-outline btn-default">
+                               <i class="glyphicon glyphicon-trash" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" id="grid-search-btn" title="搜索" class="btn btn-outline btn-default">
+                                <i class="glyphicon glyphicon-search" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" id="grid-reset-btn" title="重置" class="btn btn-outline btn-default">
+                                <svg class="icon" aria-hidden="true">
+                                    <use xlink:href="#icon-zhongzhi"></use>
+                                </svg>
+                            </button>
+                        </div>
+                        <table id="product" data-mobile-responsive="false">
+                            <thead>
+                            <tr>
+                                <th data-checkBox="true"></th>
+                                <th data-formatter="boostrapTableSortFormatter" >序号</th>
+                                <th data-field="merchant" data-visible="false">供货商</th>
+                                <th data-field="busiName">业务名称</th>
+                                <th data-field="prodCode">产品编码</th>
+                                <th data-field="prodName">产品名称</th>
+                                <th data-field="releaseChannelStr">发布渠道</th>
+                                <th data-field="prodTitle" data-visible="false">产品标题</th>
+                                <th data-field="price">产品原价</th>
+                                <th data-field="vipPrice">产品价格</th>
+                                <th data-field="prodDir" data-visible="false">产品目录</th>
+                                <th data-field="inventory" data-visible="false">库存</th>
+                                <th data-field="salesCount" data-visible="false">销量</th>
+                                <th data-field="initSales" data-visible="false">初始销量</th>
+                                <th data-field="prodStatusStr">产品状态</th>
+                                <th data-field="beginTimeStr">有效开始时间</th>
+                                <th data-field="endTimeStr">有效结束时间</th>
+                                <th data-field="queryTypeStr">是否有效</th>
+                                <th data-field="publishTimeStr">上架时间</th>
+                                <th data-field="soldOutTimeStr">下架时间</th>
+                                <th data-field="createTimeStr" data-visible="false">创建时间</th>
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+#parse("./include/commonJs.html")
+#parse("./product/form/product_form.html")
+<script src="${ctx.contextPath}/hplus/js/plugins/chosen/chosen.jquery.min.js"></script>
+</body>
+<script>
+    $(document).ready(function(){
+        // table分页参数配置
+        boostrapTableParams.url = "${ctx.contextPath}/d-admin/prod/findProPaging";
+        $("#product").bootstrapTable(boostrapTableParams);
+
+        initGridSearch();	// 初始化grid搜索
+    });
+
+    $('.chosen-select').chosen({allow_single_deselect : true});
+    $(window).off('resize.chosen').on('resize.chosen', function() {
+        $('.chosen-select').each(function() {
+            var $this = $(this);
+            $this.next().css({'width': 207});
+        })
+    }).trigger('resize.chosen');
+    // 加载服务器数据之前的处理程序
+    function respHandler(res){
+        var rows = res.list;
+        if (isEmpty(rows)) return res;
+        var pstatus = new Array("","未上架" ,"已上架","已下架");
+        var pchannel = new Array("","微信","风猫经销商app","风猫代理商app","风猫商城APP","风猫app");
+        for (i=0; i<rows.length; i++){
+            rows[i].prodStatusStr  = pstatus[rows[i].prodStatus];
+            rows[i].beginTimeStr   = formatTime(rows[i].beginTime);
+            rows[i].releaseChannelStr  = pchannel[rows[i].releaseChannel];
+    		var myDate = new Date().getTime();
+            if(myDate > new Date(rows[i].endTime).getTime() || myDate < new Date(rows[i].beginTime).getTime()){
+            	rows[i].queryTypeStr = "无效";
+            }else{
+            	rows[i].queryTypeStr = "有效";
+            }
+            rows[i].endTimeStr     = formatTime(rows[i].endTime);
+            rows[i].publishTimeStr = formatTime(rows[i].publishTime);
+            rows[i].soldOutTimeStr = formatTime(rows[i].soldOutTime);
+            rows[i].createTimeStr  = formatTime(rows[i].createTime);
+        }
+        return res;
+    }
+    //格式化时间，去掉时分秒
+    function formatTime(str){
+        if(isEmpty(str)) return str;
+
+        return str.substring(0,10);
+    }
+
+    // bootstrap-table分页查询时的参数封装
+    function boostrapTableQueryParams(params){
+        if (isEmpty(params)) {	// 点击搜索按钮时
+            var options = $("#product").bootstrapTable('getOptions');
+            $("#product").bootstrapTable('refreshOptions', {pageNumber: 1, sortName: ""});
+        } else {	// 点击分页时
+            return boostrapTableSearchParams("grid-search-form", params);
+        }
+    }
+
+    // 上架,status:2-上架；3-下架
+    var isUpdate = false;
+    function updatePro(status) {
+        var title = "上架";
+        if (status == 3) title = "下架";
+
+        var selections = $("#product").bootstrapTable('getSelections');
+        if (isEmpty(selections)) {
+            common_error("请先选择要"+ title +"的产品！");
+            return;
+        }
+        swal({
+            title: "您确定要"+ title +"吗",
+            text: title +"后将无法修改，请谨慎操作！",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: title,
+            closeOnConfirm: false
+        }, function () {
+        	if (isUpdate) return;
+        	
+            var prodIds = '';
+    		for (var i = 0; i < selections.length; i++) {
+    		    prodIds += selections[i].prodId + ","; 
+    		    var lastStatus = selections[i].prodStatus;
+          	    if (lastStatus == status) {
+                  common_error("产品编码为："+selections[i].prodCode+"，不能再次" + title);
+                  return;
+                }
+          	   
+          	    var endTime = selections[i].endTime; // 失效时间
+ 		        var endDate = new Date(endTime.replace("-", "/").replace("-", "/"));
+ 		        var cunnrDate = new Date(); // 当前时间
+ 		        if (status ==2 && cunnrDate >= endDate) {
+ 		        	 common_error("产品编码为："+selections[i].prodCode+"已失效，不能再次" + title);
+ 	                 return;
+ 		        }
+    		}
+            isUpdate = true;
+            $.ajax({
+                type:"POST",
+                url:"${ctx.contextPath}/d-admin/prod/update",
+                data:"prodIds=" + prodIds + "&prodStatus=" + status,
+                dataType:"json",
+                success:function(data){
+                    if (data.success) {
+                        swal(title + "成功！", "", "success");
+                        boostrapTableQueryParams();
+                    } else {
+                        swal(title + "失败！", data.errDesc, "error");
+                    }
+                },
+                complete:function(){
+                    isUpdate = false;
+                }
+            });
+
+        });
+    };
+	// 添加时表单初始化
+    function addInitForm() {
+    	$("#form-prod-model #prodCode").attr("disabled",false);
+        $('.form-group').removeClass('has-error');
+        $('span[class*=help-block]').remove();
+        emptyDivInputValue('product_base_attr_div');
+        emptyDivInputValue('product_base_desc_div');
+        
+
+        $('#modalHeaderMsg').text('新增产品');
+
+        $("#form-modal").modal("show");
+        
+        $("#form-prodAttr-div input:visible").val("");
+        $("#form-prodAttr-div .profile-user-info-striped").hide();
+        
+        $("#form-prod-model #largeCategory option:eq(0)").prop("selected", true);
+    }
+	
+    
+    // 产品详情
+     	var isDetailsInitFormSub = false;
+     	function detailsInitForm() {
+     		if (isEditInitFormSub)
+     			return;
+     		var selections = $("#product").bootstrapTable('getSelections');
+     		if (isEmpty(selections)) {
+     			common_error("请先选择要查看的产品！");
+     			return;
+     		}
+     		if (selections.length > 1) {
+     			common_error("只能选择一个产品查看！");
+     			return;
+     		}
+     		$('.form-group').removeClass('has-error');
+     		$('span[class*=help-block]').remove();
+     		emptyDivInputValue('productDetails_base_attr_div');
+     		emptyDivInputValue('productDetails_base_desc_div');
+
+     		$('#modalHeaderDetailsMsg').text('产品详情');
+
+     		var prodId = selections[0].prodId;
+     		isEditInitFormSub = true;
+     		$.ajax({
+     			type : "POST",
+     			url : "${ctx.contextPath}/d-admin/prod/getById",
+     			data : "prodId=" + prodId,
+     			dataType : "json",
+     			success : function(data) {
+     				// 初始化form数据
+     				initParam(data, null, 'dform-modal');
+     				$("#prodId").val(prodId);
+     				$("#formDetails-prod-model #prodCode").attr("disabled", true);
+     				$("#dform-modal").modal("show");
+     				$("#dform-prodAttr-div input:visible").val("");
+     				$("#dform-prodAttr-div .profile-user-info-striped").hide();
+     				var busiCode = data.busiCode;
+     				$("#dform-prodAttr-div div[id=" + busiCode + "]").show();
+     				$("#formDetails-prod-model #smallCategory").find("option").remove();
+		        	$("#formDetails-prod-model #smallCategory").append("<option value="+ data.smallCategory +">"+ data.busiName +"</option>");
+		        	var attrList = data.attrList;
+     				for (var i = 0; i < attrList.length; i++) {
+     					var prodAttr = attrList[i];
+     					var attrCode = prodAttr.busiAttrCode;
+     					$("#" + attrCode + "_div input").val(prodAttr.prodAttrValue);
+     				}
+     			},
+     			complete : function() {
+     				isEditInitFormSub = false;
+     			}
+     		});
+
+     	}
+	
+	// 编辑时表单初始化
+	var isEditInitFormSub = false;
+	function editInitForm() {
+		if (isEditInitFormSub)
+			return;
+
+		var selections = $("#product").bootstrapTable('getSelections');
+		if (isEmpty(selections)) {
+			common_error("请先选择要编辑的产品！");
+			return;
+		}
+		if (selections.length > 1) {
+			common_error("只能选择一个产品编辑！");
+			return;
+		}
+		if (selections[0].prodStatus == 2) {
+			common_error("上架后的产品不允许修改！");
+			return;
+		}
+		
+		$('.form-group').removeClass('has-error');
+        $('span[class*=help-block]').remove();
+        emptyDivInputValue('product_base_attr_div');
+        emptyDivInputValue('product_base_desc_div');
+        
+
+        $('#modalHeaderMsg').text('修改产品');
+        
+		var prodId = selections[0].prodId;
+		isEditInitFormSub = true;
+		$.ajax({
+			type : "POST",
+			url : "${ctx.contextPath}/d-admin/prod/getById",
+			data : "prodId=" + prodId,
+			dataType : "json",
+			success : function(data) {
+				// 初始化form数据
+				initParam(data, null, 'form-modal');
+				$("#prodId").val(prodId);
+				$("#form-prod-model #prodCode").attr("disabled",true);
+				$("#form-modal").modal("show");
+				$("#form-prodAttr-div input:visible").val("");
+		        $("#form-prodAttr-div .profile-user-info-striped").hide();
+		        var busiCode = data.busiCode;
+		        $("#form-prodAttr-div div[id="+ busiCode +"]").show();
+		        $("#form-prod-model #smallCategory").find("option").remove();
+		        $("#form-prod-model #smallCategory").append("<option value="+ data.smallCategory +">"+ data.busiName +"</option>");
+		        var attrList = data.attrList;
+		        for (var i=0; i<attrList.length; i++) {
+		        	var prodAttr = attrList[i];
+		        	var attrCode = prodAttr.busiAttrCode;
+		        	$("#" + attrCode + "_div input").val(prodAttr.prodAttrValue);
+		        }
+			},
+			complete : function() {
+				isEditInitFormSub = false;
+			}
+		});
+	}
+	
+	/**删除产品*/
+	var isDeleteProSub = false;
+	function deletePro(status) {
+        var selections = $("#product").bootstrapTable('getSelections');
+        if (isEmpty(selections)) {
+            common_error("请先选择要删除的产品！"); 
+            return;
+        }
+        swal({
+            title: "您确定要删除吗?",
+            text: "删除后将无法显示，请谨慎操作！",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "您确定要删除吗?",
+            closeOnConfirm: false
+        }, function () {
+        	if (isDeleteProSub) return;
+        	
+            var prodIds = '';
+    		for (var i = 0; i < selections.length; i++) {
+    		    prodIds += selections[i].prodId + ","; 
+    		    var lastStatus = selections[i].prodStatus;
+          	   if (lastStatus == 2) {
+                  common_error("产品编码为："+selections[i].prodCode+"，已上架的产品不能删除");
+                  return;
+               }
+    		}
+    		isDeleteProSub = true;
+            $.ajax({
+                type:"POST",
+                url:"${ctx.contextPath}/d-admin/prod/bachProStatus",
+                data:"prodIds=" + prodIds + "&status=" + status,
+                dataType:"json",
+                success:function(data){
+                    if (data.success) {
+                        swal("已成功删除!", "", "success");
+                        boostrapTableQueryParams();
+                    } else {
+                        swal("删除失败！", data.errDesc, "error");
+                    }
+                },
+                complete:function(){
+                	isDeleteProSub = false;
+                }
+            });
+
+        });
+    };
+</script>
+</html>

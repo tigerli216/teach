@@ -1,0 +1,37 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<div class="float-e-margins">
+	<div class="ibox-content">
+		 #if("" == $amountChangeList || $amountChangeList.size() == 0)
+		 <div style="text-align:center">无火车票业务资金变动记录</div>
+  		 	 #else
+		<table class="table table-bordered">
+			<thead>
+				<tr>
+					<!-- <th>变动ID</th> -->
+					<th style="text-align:center;">变动类型</th>
+					<th style="text-align:center;">变动说明</th>
+					<th style="text-align:center;">冲账订单编码</th>
+					<th style="text-align:center;">订单变动金额</th>
+					<th style="text-align:center;">奖励变动金额</th>
+					<th style="text-align:center;">变动时间</th>
+					<th style="text-align:center;">备注</th>
+				</tr>
+			</thead>
+			<tbody>
+				#foreach($amountChange in $amountChangeList)
+				<tr>
+					<!-- 		            <th>$!{amountChange.changeId}</th> -->
+					<td>$!{amountChange.changeTypeStr}</td>
+					<td>$!{amountChange.changeDesc}</td>
+					<th>$!{amountChange.linkOrderCode}</th>
+					<td>$!{amountChange.orderChangeAmountStr}</td>
+					<td>$!{amountChange.rewardChangeAmountStr}</td>
+					<td>$!{amountChange.changeTimeStr}</td>
+					<td>$!{amountChange.notes}</td>
+				</tr>
+				#end
+			</tbody>
+		</table>
+		 #end
+	</div>
+</div>

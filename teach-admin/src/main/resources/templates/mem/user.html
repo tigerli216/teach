@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>会员信息管理</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+#parse("./include/commonCss.html")
+<link href="${ctx.contextPath}/hplus/css/plugins/chosen/chosen.css"
+	rel="stylesheet">
+<link href="${ctx.contextPath}/js/webupload/webuploader.css"
+	type="text/css" rel="stylesheet" />
+</head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content animated fadeInUp">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox">
+					<div class="ibox float-e-margins">
+						<div class="ibox-title">
+							<h5>学生信息列表</h5>
+							<div class="ibox-tools">
+								<a class="collapse-link"> <i class="fa fa-chevron-up"></i>
+								</a>
+							</div>
+						</div>
+						<div class="ibox-content">
+							<!-- 	<div class="alert alert-success alert-dismissable">
+								<button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+								可双击订单所在行，可查看订单详情。
+							</div> -->
+							<form id="grid-search-form">
+								<!-- 订单类型 -->
+								<input type="hidden" id="orderType" name="orderType" />
+								<input type="hidden" id="status" name="status"/>
+<!-- 								<div class="profile-info-name">状态：</div>
+										<div class="profile-info-value form-group">
+											<select type="text" name="status" id="status"
+												placeholder="用户级别" class="input-large">
+												<option value="1">有效</option>
+												<option value="2">无效</option>
+											</select>
+										</div> -->
+								<div class="profile-user-info profile-user-info-striped">
+									<div class="profile-info-row">
+										<!-- <div class="profile-info-name">学生ID：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="userId" id="userId"
+												placeholder="学生ID" class="input-large"
+												onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
+										</div> -->
+										<div class="profile-info-name">登录账号：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="loginAccount" id="loginAccount"
+												placeholder="登录账号" class="input-large"
+												maxlength="30">
+										</div>
+										<div class="profile-info-name">绑定手机：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="bindMobile" id="bindMobile"
+												placeholder="绑定手机" class="input-large"
+												onkeyup="this.value=this.value.replace(/^ +| +$/g,'')"
+												maxlength="15">
+										</div>
+										<div class="profile-info-name">真实姓名：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="realName" id="realName"
+												placeholder="真实姓名" class="input-large"
+												maxlength="60">
+										</div>
+									</div>
+									<div class="profile-info-row">
+										<div class="profile-info-name">用户级别：</div>
+										<div class="profile-info-value form-group">
+											<select type="text" name="userLevel" id="userLevel"
+												placeholder="用户级别" class="input-large">
+												<option value="">====请选择====</option>
+												<option value="1">普通用户</option>
+												<option value="2">VIP</option>
+											</select>
+										</div>										
+										<div class="profile-info-name">性别：</div>
+										<div class="profile-info-value form-group">
+											<select type="text" name="sex" id="sex" placeholder="性别"
+												class="input-large">
+												<option value="0">====请选择====</option>
+												<option value="1">男</option>
+												<option value="2">女</option>
+											</select>
+										</div>
+									</div>
+									<div class="profile-info-row">
+										<div class="profile-info-name">国家：</div>
+										<div class="profile-info-value form-group">
+											<select class="chosen-select" name="country" id="country"
+												onChange="regionChange(this.value)">
+												<option value="">====请选择====</option> #foreach($regionDTO in
+												$regionList)
+												<option value="${regionDTO.regionName}">${regionDTO.regionName}
+												</option> #end
+											</select>
+										</div>
+										<div class="profile-info-name">学校：</div>
+										<div class="profile-info-value form-group">
+											<select type="text" name="school" id="school"
+												placeholder="学校" class="chosen-select">
+												<option value="">====请选择====</option>
+											</select>
+										</div>
+									</div>
+								</div>
+							</form>
+							<div class="btn-group hidden-xs" id="tableEventsToolbar"
+								role="group">
+								<button type="button" onClick="editInitForm()" title="编辑"
+									class="btn btn-outline btn-default">
+									<i class="glyphicon glyphicon-pencil" aria-hidden="true"></i>
+								</button>
+								<button type="button" onClick="detailsInitForm()" title="学生详情"
+									class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true"> <use
+											xlink:href="#icon-icon2"></use></svg>
+									<i class="iconfont icon-quanxiantianjia" aria-hidden="true"></i>
+								</button>
+								<button type="button" id="grid-search-btn" title="搜索"
+									class="btn btn-outline btn-default">
+									<i class="glyphicon glyphicon-search" aria-hidden="true"></i>
+								</button>
+								<button type="button" id="grid-reset-btn" title="重置"
+									class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true">
+									    <use xlink:href="#icon-zhongzhi"></use>
+									</svg>
+								</button>
+							</div>
+							<table id="userTable" data-mobile-responsive="false">
+								<thead>
+									<tr>
+										<th data-radio="true"></th>
+										<th data-formatter="boostrapTableSortFormatter">序号</th>
+										<th data-field="userId" data-visible="false">用户ID</th>
+										<th data-field="loginAccount">登录账号</th>
+										<th data-field="nickName">昵称</th>
+										<th data-field="realName">真实姓名</th>
+										<th data-field="bindMobile">绑定手机</th>
+										<th data-field="email">邮箱</th>
+										<th data-field="userLevelStr">用户级别</th>
+										<th data-field="sexStr">性别</th>
+										<th data-field="country" data-visible="false">国家</th>
+										<th data-field="school" data-visible="false">学校</th>
+										<th data-field="grade" data-visible="false">年级</th>
+										<th data-field="recommendCode" data-visible="false">推荐码</th>
+
+										<!-- <th data-field="password" data-visible="false">登录密码</th>
+										<th data-field="payPassword" data-visible="false">支付密码</th> -->
+										<th data-field="regTypeStr" data-visible="false">注册方式</th>
+										<th data-field="userTypeStr" data-visible="false">用户类型</th>
+										<th data-field="pwdSecurityLevel" data-visible="false">密码安全级别</th>
+										<th data-field="deputyLoginSource" data-visible="false">第三方登陆来源</th>
+										<th data-field="deputyLoginAccount" data-visible="false">第三方登陆账号</th>
+										<th data-field="finishTime" data-visible="false">毕业时间</th>
+										<th data-field="resume" data-visible="false">简历</th>
+										<th data-field="offer" data-visible="false">offer</th>
+										<th data-field="regTime" data-visible="false">注册时间</th>
+										
+									</tr>
+								</thead>
+							</table>
+							#parse("./mem/form/user_form.html")
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="mask" class="sweet-overlay" tabindex="-1" style="opacity: 1; display: none;">
+		<div style="margin:20% 40%">
+			<img style="" alt="" src="${ctx.contextPath}/images/loading.gif">
+			<span style="color:white;">正在提交中...</span>
+		</div>
+	</div>
+	
+	#parse("./include/commonJs.html") 
+	#parse("./include/fileUploadJs.js")
+	<script
+		src="${ctx.contextPath}/hplus/js/plugins/chosen/chosen.jquery.min.js"></script>
+	<script type="text/javascript"
+		src="${ctx.contextPath}/js/webupload/webuploader.js"></script>
+</body>
+<script>
+	$(function() {
+		poundageConfigPagin();
+		initChosenSelect();
+	});
+	
+	$("#grid-reset-btn").click(function(){
+		$("#grid-search-form #country").val("");
+		$("#grid-search-form #country").trigger("chosen:updated");
+		$("#grid-search-form #school").html('<option value="">====请选择====</option>');
+		$("#grid-search-form #school").trigger("chosen:updated");
+	});
+	
+	function initChosenSelect(){
+		$('.chosen-select').chosen({
+			allow_single_deselect : true
+		});
+		$(window).off('resize.chosen').on('resize.chosen', function() {
+			$('.chosen-select').each(function() {
+				var $this = $(this);
+				$this.next().css({
+					'width' : 207
+				});
+			})
+		}).trigger('resize.chosen');
+	}
+
+	function poundageConfigPagin() {
+		bingdUrserTableParams = jQuery.extend({}, boostrapTableParams); // 表单中的table参数
+		// table分页参数配置
+		boostrapTableParams.url = "${ctx.contextPath}/d-admin/mem/user/findPaging";
+		$("#userTable").bootstrapTable(boostrapTableParams);
+		initGridSearch(); // 初始化grid搜索
+	}
+
+	// bootstrap-table分页查询时的参数封装
+	function boostrapTableQueryParams(params) {
+		if (isEmpty(params)) { // 点击搜索按钮时
+			var options = $("#userTable").bootstrapTable('getOptions');
+			$("#userTable").bootstrapTable('refreshOptions', {
+				pageNumber : 1,
+				sortName : ""
+			});
+		} else { // 点击分页时
+			return boostrapTableSearchParams("grid-search-form", params);
+		}
+	}
+
+	//点击修改按钮，初始化弹出页面,将值传入页面
+	function editInitForm() {
+		var selections = $("#userTable").bootstrapTable('getSelections');
+		if (isEmpty(selections)) {
+			common_error("请先选择要编辑的配置！");
+			return;
+		}
+		if (selections.length > 1) {
+			common_error("只能选择一个配置编辑！");
+			return;
+		}
+
+		$('.form-group').removeClass('has-error');
+		$('span[class*=help-block]').remove();
+		emptyDivInputValue('user-form-modal');
+		$('#user-form-modal #modalHeaderMsg').text('修改用户信息');
+		$("#user-form-modal").modal("show");
+
+		//将信息填充到弹出页中
+		var userId = selections[0].userId;
+		$.ajax({
+			type : "POST",
+			url : "${ctx.contextPath}/d-admin/mem/user/getUser",
+			data : "userId=" + userId,
+			dataType : "json",
+			success : function(data) {
+				initParam(data, null, 'form-edit');
+				wordFileEditInit($('#resumeFileDiv'), data.resume, "resumeFile",
+						"resumeFile");
+				wordFileEditInit($('#offerFileDiv'), data.offer, "offerFile",
+						"offerFile");
+			},
+			complete : function() {
+			}
+		});
+	}
+	
+	// 课程详情
+	var isDetailsInitFormSub = false;
+	function detailsInitForm() {
+		var selections = $("#userTable").bootstrapTable('getSelections');
+		if (isEmpty(selections)) {
+			common_error("请先选择要编辑的配置！");
+			return;
+		}
+		if (selections.length > 1) {
+			common_error("只能选择一个配置查看！");
+			return;
+		}
+
+		var userId = selections[0].userId;
+		var url = "${ctx.contextPath}/d-admin/mem/user/viewInitForm?userId="
+				+ userId;
+		window.location.href = url;
+	}
+	
+	// 地区改变学校联动事件
+	function regionChange(regionName) {
+		var tutorHtml = getRegionSchoolByRegionName(regionName);
+		$("#grid-search-form select[id=school]").each(function() {
+			$(this).html(tutorHtml);
+			$(this).trigger("chosen:updated");
+		});
+		thisTutorsHtml = tutorHtml;
+	}
+
+	// 根据地区获取行业
+	var thisTutorsHtml = "";
+	function getRegionSchoolByRegionName(regionName) {
+		var html = '<option value="">====请选择====</option>';
+		$.ajax({
+			type : "POST",
+			async : false,
+			url : "${ctx.contextPath}/d-admin/mem/user/findRegionSchoolList",
+			data : "regionName=" + regionName,
+			dataType : "json",
+			success : function(data) {
+				if (data.length > 0) {
+					for (var i = 0; i < data.length; i++) {
+						html += '<option value='+data[i].schoolName+'>'
+								+ data[i].schoolName + '</option>';
+					}
+				}
+			}
+		});
+
+		return html;
+	}
+</script>
+</html>

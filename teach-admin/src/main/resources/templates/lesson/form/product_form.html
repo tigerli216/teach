@@ -1,0 +1,592 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!--  产品添加和修改    -->
+<div class="modal inmodal" id="form-modal" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal" type="button">×</button>
+                <h4 id="modalHeaderMsg" class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="form-prod-model" class="form-horizontal">
+                    <div class="profile-user-info profile-user-info-striped" id="product_base_attr_div">
+                        <input type="hidden" id="prodId" name="prodId"/>
+                        <div class="profile-info-row">
+                            <div class="profile-info-name"><span style="color:red">*</span> 业务大类型：</div>
+                            <div class="profile-info-value form-group">
+	                            <select name="largeCategory" id="largeCategory" data-placeholder="选择业务大类型..." class="input-large">
+	                                   <option value="">==选择业务大类==</option>
+	                                   #foreach($largeCate in $largeCateGoryList)
+	                                   <option value="${largeCate.largeCategory}">${largeCate.busiName}
+	                                   </option>
+	                                   #end
+	                            </select>
+                            </div>
+
+                            <div class="profile-info-name"><span style="color:red">*</span> 业务小类型：</div>
+                            <div class="profile-info-value form-group">
+                                <select class="input-large" name="smallCategory" id="smallCategory">
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="profile-info-row">
+                            <div class="profile-info-name"><span style="color:red">*</span>产品名称：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="prodName" name="prodName" class="input-large" />
+                            </div>
+
+                            <div class="profile-info-name"><span style="color:red">*</span>产品编码：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="prodCode" name="prodCode" class="input-large layer-date laydate-icon" />
+                            </div>
+                        </div>
+                        <div class="profile-info-row">
+                            <div class="profile-info-name">产品标题：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="prodTitle" name="prodTitle" class="input-large layer-date laydate-icon"/>
+                            </div>
+                            <div class="profile-info-name"><span style="color:red">*</span>产品级别：</div>
+                            <div class="profile-info-value form-group">
+                                <select class="input-large" name="prodLevel" id="prodLevel">
+                                    <option value="">==选择产品级别==</option>
+                                    <option value="1">自定义产品</option>
+                                    <option value="2">系统产品</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="profile-info-row input-daterange">
+                            <div class="profile-info-name"><span style="color:red">*</span>产品有效时间：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="beginTime" name="beginTime" placeholder="产品有效时间"
+                                       class="input-large form-control date-icon">
+                            </div>
+                            <div class="profile-info-name"><span style="color:red">*</span>产品失效时间：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="endTime" name="endTime" placeholder="产品失效时间"
+                                       class="input-large form-control date-icon">
+                            </div>
+                        </div>
+                        <div class="profile-info-row">
+                            <div class="profile-info-name">初始销售量：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="initSales" name="initSales" class="input-large layer-date laydate-icon" />
+                            </div>
+                            <div class="profile-info-name">销售量：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="salesCount" name="salesCount" class="input-large layer-date laydate-icon" />
+                            </div>
+                        </div>
+                        <div class="profile-info-row">
+                            <div class="profile-info-name">是否推荐：</div>
+                            <div class="profile-info-value form-group">
+                                <select class="input-large" name="isRecommend" id="isRecommend">
+                                    <option value="2">不推荐</option>
+                                    <option value="1">推荐</option>
+                                </select>
+                            </div>
+                            <div class="profile-info-name">是否需要物流：</div>
+                            <div class="profile-info-value form-group">
+                                <select class="input-large" name="isLogistics" id="isLogistics">
+                                    <option value="1">是</option>
+                                    <option value="2">否</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="profile-info-row">
+                            <div class="profile-info-name">是否可退换：</div>
+                            <div class="profile-info-value form-group">
+                                <select class="input-large" name="isBackOrder" id="isBackOrder">
+                                    <option value="1">是</option>
+                                    <option value="2">否</option>
+                                </select>
+                            </div>
+                            <div class="profile-info-name">权重（倒序）：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="priority" name="priority" class="input-large layer-date laydate-icon" />
+                            </div>
+                        </div>
+                        <div class="profile-info-row">
+                            <div class="profile-info-name"><span style="color:red">*</span>发布渠道：</div>
+                            <div class="profile-info-value form-group">
+                                <select class="input-large" name="releaseChannel" id="releaseChannel">
+                                    <option value="1">微信</option>
+                                    <option value="2">风猫经销商app</option>
+                                    <option value="3">风猫代理商app</option>
+                                    <option value="4">风猫商城APP</option>
+                                    <option value="5">风猫app</option>
+                                </select>
+                            </div>
+                            <div class="profile-info-name"><span style="color:red">*</span>库存：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="inventory" name="inventory" class="input-large layer-date laydate-icon"/>
+                            </div>
+                         </div> 
+                    </div>
+                    <div class="profile-user-info profile-user-info-striped"  id="product_base_desc_div">
+						<div class="profile-info-row">
+							<div class="profile-info-name">产品描述：</div>
+							<div class="profile-info-value form-group">
+								<textarea id="prodDesc" name="prodDesc" maxlength="1024" class="col-sm-9"></textarea>
+							</div>
+						</div>
+					</div>
+					<div class="hr-line-dashed"></div>
+					<div id="form-prodAttr-div">
+					</div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" onClick="formSubmit();">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--产品详情页面 -->
+
+<div class="modal inmodal" id="dform-modal" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal" type="button">×</button>
+                <h4 id="modalHeaderDetailsMsg" class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formDetails-prod-model" class="form-horizontal">
+                    <div class="profile-user-info profile-user-info-striped" id="productDetails_base_attr_div">
+                        <input type="hidden" id="prodId" name="prodId"/>
+                        <div class="profile-info-row">
+                            <div class="profile-info-name">业务大类型：</div>
+                            <div class="profile-info-value form-group">
+	                            <select name="largeCategory" id="largeCategory" data-placeholder="选择业务大类型..." class="input-large"
+	                            style="border:0;"  disabled="disabled" >
+	                                   <option value="">==选择业务大类==</option>
+	                                   #foreach($largeCate in $largeCateGoryList)
+	                                   <option value="${largeCate.largeCategory}">${largeCate.busiName}
+	                                   </option>
+	                                   #end
+	                            </select>
+                            </div>
+
+                            <div class="profile-info-name">业务小类型：</div>
+                            <div class="profile-info-value form-group">
+                                <select class="input-large" name="smallCategory" id="smallCategory"
+                                style="border:0;"  disabled="disabled" >
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="profile-info-row">
+                            <div class="profile-info-name">产品名称：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="prodName" name="prodName" class="input-large"  style="border:0;"  disabled="disabled"  />
+                            </div>
+
+                            <div class="profile-info-name">产品编码：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="prodCode" name="prodCode" class="input-large layer-date laydate-icon" style="border:0;"  disabled="disabled" />
+                            </div>
+                        </div>
+                        <div class="profile-info-row">
+                            <div class="profile-info-name">产品标题：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="prodTitle" name="prodTitle" class="input-large layer-date laydate-icon" style="border:0;"  disabled="disabled" />
+                            </div>
+                            <div class="profile-info-name">产品级别：</div>
+                            <div class="profile-info-value form-group">
+                                <select class="input-large" name="prodLevel" id="prodLevel" style="border:0;"  disabled="disabled" >
+                                    <option value="">==选择产品级别==</option>
+                                    <option value="1">自定义产品</option>
+                                    <option value="2">系统产品</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="profile-info-row">
+                            <div class="profile-info-name">产品有效时间：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="beginTime" name="beginTime" placeholder="产品有效时间"
+                                		class="input-large layer-date laydate-icon" style="border:0;"  disabled="disabled" >
+                            </div>
+                            <div class="profile-info-name">产品失效时间：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="endTime" name="endTime" placeholder="产品失效时间"
+                                       class="input-large layer-date laydate-icon" style="border:0;"  disabled="disabled" >
+                            </div>
+                        </div>
+                        <div class="profile-info-row">
+                            <div class="profile-info-name">初始销售量：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="initSales" name="initSales" class="input-large layer-date laydate-icon" style="border:0;"  disabled="disabled" />
+                            </div>
+                            <div class="profile-info-name">销售量：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="salesCount" name="salesCount" class="input-large layer-date laydate-icon"
+                                style="border:0;"  disabled="disabled" />
+                            </div>
+                        </div>
+                        <div class="profile-info-row">
+                            <div class="profile-info-name">是否推荐：</div>
+                            <div class="profile-info-value form-group">
+                                <select class="input-large" name="isRecommend" id="isRecommend" style="border:0;"  disabled="disabled" >
+                                    <option value="2">不推荐</option>
+                                    <option value="1">推荐</option>
+                                </select>
+                            </div>
+                            <div class="profile-info-name">是否需要物流：</div>
+                            <div class="profile-info-value form-group">
+                                <select class="input-large" name="isLogistics" id="isLogistics" style="border:0;"  disabled="disabled" >
+                                    <option value="1">是</option>
+                                    <option value="2">否</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="profile-info-row">
+                            <div class="profile-info-name">是否可退换：</div>
+                            <div class="profile-info-value form-group">
+                                <select class="input-large" name="isBackOrder" id="isBackOrder" style="border:0;"  disabled="disabled" >
+                                    <option value="1">是</option>
+                                    <option value="2">否</option>
+                                </select>
+                            </div>
+                            <div class="profile-info-name">权重（倒序）：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="priority" name="priority" class="input-large layer-date laydate-icon" style="border:0;"  disabled="disabled" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="profile-user-info profile-user-info-striped"  id="productDetails_base_desc_div">
+						<div class="profile-info-row">
+							<div class="profile-info-name">产品描述：</div>
+							<div class="profile-info-value form-group">
+								<textarea id="prodDesc" name="prodDesc" maxlength="1024" class="col-sm-9" style="border:0;"  disabled="disabled" ></textarea>
+							</div>
+						</div>
+					</div>
+					<div class="hr-line-dashed"></div>
+					<div id="dform-prodAttr-div">
+					</div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function(){
+		judgeVerification();
+		initProdAttr();
+		initProdAttr1();
+		
+		$('#form-prod-model #beginTime').datetimepicker({
+            language:  'zh-CN',
+            todayBtn:  true,
+            clearBtn: true,
+            autoclose: true,
+            startDate: new Date()
+        }).on("changeDate", function(){
+        	var endTime = $('#form-prod-model  #endTime').val();
+        	$('#form-prod-model #beginTime').datetimepicker("setEndDate", endTime);
+        });
+        $('#form-prod-model  #endTime').datetimepicker({
+            language:  'zh-CN',
+            todayBtn:  true,
+            clearBtn: true,
+            autoclose: true
+        }).on("changeDate", function(){
+        	var beginTime = $('#form-prod-model  #beginTime').val();
+        	$('#form-prod-model #endTime').datetimepicker("setStartDate", beginTime);
+        });
+    })
+     // 初始化产品属性详情
+    function initProdAttr1() {
+    	var busiAttrMap = eval('(${busiAttrMap})');
+    	for (var busiCode in busiAttrMap) {
+    		var html = '<div id="'+ busiCode +'" class="profile-user-info profile-user-info-striped" style="display:none;">';
+    		var busiAttrList = busiAttrMap[busiCode];
+    		for (var j=0; j<busiAttrList.length; j++) {
+    			var busiAttr = busiAttrList[j];
+    			if (j % 2 == 0) {
+    				if (j != 0) {
+    					html += '</div>';
+    				}
+    				html += '<div class="profile-info-row">';
+    			}
+    			html += '<div class="profile-info-name">'+ busiAttr.attrName +'：</div>\
+					<div class="profile-info-value form-group" id="'+ busiAttr.attrCode +'_div">\
+						<input type="text" id="prodAttrValue" placeholder="'+ busiAttr.attrDesc +'" class="input-large layer-date laydate-icon" style="border:0;"  disabled="disabled"/>\
+					</div>\
+					<input type="hidden" id="prodAttrName" value="'+ busiAttr.attrName +'"/>\
+					<input type="hidden" id="busiAttrCode" value="'+ busiAttr.attrCode +'"/>\
+					<input type="hidden" id="attrDataType" value="'+ busiAttr.attrDataType +'"/>\
+					<input type="hidden" id="busiAttrId" value="'+ busiAttr.attrId +'"/>';
+    		}
+    		if (busiAttrList.length % 2  != 0) {
+    			html += '</div>';
+    		}
+    		html += '</div>';
+    		$("#dform-prodAttr-div").append(html);
+    	}
+    }
+    
+    /** 产品详情 根据业务大类获取业务小类 */
+    $("#dform-prod-model #largeCategory").change(function(){
+        $("#dform-prod-model #smallCategory").find("option").remove();
+        var largeCategory = $("#dform-prod-model #largeCategory").find("option:selected").val();
+        $.ajax({
+            type : "POST",
+            url : "${ctx.contextPath}/d-admin/prod/busi/getBusiSmallCategory",
+            data:"largeCategory=" + largeCategory,
+            dataType : "json",
+            success : function(data) {
+                if (data.success) {
+                    var largeCategoryList = data.result;
+                    for (var i=0; i< largeCategoryList.length; i++) {
+                        $("#dform-prod-model #smallCategory").append("<option value="+ largeCategoryList[i].smallCategory +">"+ largeCategoryList[i].busiName +"</option>");
+                    }
+                    smallCategoryChange();
+                } else {
+                    swal("失败！", data.errDesc, "error");
+                }
+            },
+            complete : function() {
+                isBusiLimit = false;
+            }
+        });
+    });
+    /** 根据业务小类获取业务属性 */
+    $("#dform-prod-model #smallCategory").change(function(){
+    	smallCategoryChanged();
+    });
+    
+    function smallCategoryChanged() {
+    	var smallCategory = $("#smallCategory option:selected").val();
+    	if (!isEmpty(smallCategory)) {
+    		$("#dform-prodAttr-div .profile-user-info-striped").hide();
+        	$("#dform-prodAttr-div div[id="+ smallCategory +"]").show();
+    	}
+    }
+    // 初始化产品属性
+    function initProdAttr() {
+    	var busiAttrMap = eval('(${busiAttrMap})');
+    	for (var busiCode in busiAttrMap) {
+    		var html = '<div id="'+ busiCode +'" class="profile-user-info profile-user-info-striped" style="display:none;">';
+    		var busiAttrList = busiAttrMap[busiCode];
+    		for (var j=0; j<busiAttrList.length; j++) {
+    			var busiAttr = busiAttrList[j];
+    			if (j % 2 == 0) {
+    				if (j != 0) {
+    					html += '</div>';
+    				}
+    				html += '<div class="profile-info-row">';
+    			}
+    			html += '<div class="profile-info-name">'+ busiAttr.attrName +'：</div>\
+					<div class="profile-info-value form-group" id="'+ busiAttr.attrCode +'_div">\
+						<input type="text" id="prodAttrValue" placeholder="'+ busiAttr.attrDesc +'" class="input-large layer-date laydate-icon" />\
+					</div>\
+					<input type="hidden" id="prodAttrName" value="'+ busiAttr.attrName +'"/>\
+					<input type="hidden" id="busiAttrCode" value="'+ busiAttr.attrCode +'"/>\
+					<input type="hidden" id="attrDataType" value="'+ busiAttr.attrDataType +'"/>\
+					<input type="hidden" id="busiAttrId" value="'+ busiAttr.attrId +'"/>';
+    		}
+    		if (busiAttrList.length % 2  != 0) {
+    			html += '</div>';
+    		}
+    		html += '</div>';
+    		$("#form-prodAttr-div").append(html);
+    	}
+    }
+    // 表单提交
+    var isFormSubmit = false;
+    function formSubmit() {
+        if (isFormSubmit) return;
+        var beginTime = $("#form-prod-model #beginTime").val();
+        var endTime = $("#form-prod-model #endTime").val();
+        var beginDate = new Date(beginTime.replace("-", "/").replace("-", "/"));
+        var endDate = new Date(endTime.replace("-", "/").replace("-", "/"));
+        if (beginDate >= endDate) {
+        	 common_error("失效时间不能小于或等于有效时间!");
+        	 return;
+        }
+        var prodCode = $("#form-prod-model #prodCode").val();
+        var pCode = /^[a-zA-Z0-9_]{0,}$/;
+        if (!pCode.test(prodCode)) {
+        	common_error("产品编码不能含有中文或特殊字符!");
+            return;
+        }
+        if(!$('#form-modal #form-prod-model').valid()) return;
+        
+        $("#form-prodAttr-div input").removeAttr("name");
+        var showDiv = $("#form-prodAttr-div .profile-user-info-striped:visible");
+        var listIndex = 0;
+        showDiv.find("input").each(function(index){
+        	if (index % 5 == 0 && index != 0) {
+        		listIndex ++;
+        	}
+        	$(this).attr("name", "attrList[" + listIndex + "]." + $(this).attr("id"));
+        });
+        isFormSubmit = true;
+        $.ajax({
+            type:"POST",
+            url:"${ctx.contextPath}/d-admin/prod/saveOrUpdate",
+            data : $("#form-modal #form-prod-model").serialize(),
+            dataType:"json",
+            success:function(data){
+                if (data.success) {
+                    common_success("保存成功！");
+                    $("#form-modal").modal("hide");
+                    boostrapTableQueryParams();	// 刷新列表
+                } else {
+                    common_error(data.errDesc);
+                }
+            },
+            complete:function(){
+                isFormSubmit = false;
+            }
+        });
+    }
+
+    /** 根据业务大类获取业务小类 */
+    $("#form-prod-model #largeCategory").change(function(){
+        $("#form-prod-model #smallCategory").find("option").remove();
+        var largeCategory = $("#form-prod-model #largeCategory").find("option:selected").val();
+        $.ajax({
+            type : "POST",
+            url : "${ctx.contextPath}/d-admin/prod/busi/getBusiSmallCategory",
+            data:"largeCategory=" + largeCategory,
+            dataType : "json",
+            success : function(data) {
+                if (data.success) {
+                    var largeCategoryList = data.result;
+                    for (var i=0; i< largeCategoryList.length; i++) {
+                        $("#form-prod-model #smallCategory").append("<option value="+ largeCategoryList[i].smallCategory +">"+ largeCategoryList[i].busiName +"</option>");
+                    }
+                    smallCategoryChange();
+                } else {
+                    swal("失败！", data.errDesc, "error");
+                }
+            },
+            complete : function() {
+                isBusiLimit = false;
+            }
+        });
+    });
+    
+    /** 根据业务小类获取业务属性 */
+    $("#form-prod-model #smallCategory").change(function(){
+    	smallCategoryChange();
+    });
+    
+    function smallCategoryChange() {
+    	var smallCategory = $("#smallCategory option:selected").val();
+    	if (!isEmpty(smallCategory)) {
+    		$("#form-prodAttr-div .profile-user-info-striped").hide();
+        	$("#form-prodAttr-div div[id="+ smallCategory +"]").show();
+    	}
+    }
+    
+    
+ 	// form表单校验
+    function judgeVerification() {
+        var icon = "<i class='fa fa-times-circle'></i> ";
+        $('#form-modal  #form-prod-model').validate({
+            rules: {
+            	largeCategory: {
+                    required: true
+                },
+                smallCategory: {
+                    required: true
+                },
+                prodName: {
+                    required: true
+                },
+                prodCode: {
+                    required: true
+                },
+                prodLevel: {
+                    required: true
+                },
+                beginTime: {
+                    required: true
+                },
+                endTime: {
+                    required: true
+                },
+                releaseChannel: {
+                    required: true
+                },
+                inventory: {
+                    required: true,
+                    minlength:0,
+                    maxlength : 16,
+    				isNumber : "#form-prod-model #inventory"
+                },
+                initSales: {
+                	maxlength: 20,
+					minlength:0,
+    				isNumber : "#form-prod-model #initSales"
+                },
+                salesCount: {
+    				maxlength: 20,
+					minlength:0,
+    				isNumber : "#form-prod-model #salesCount"
+                },
+                prodDesc: {
+                	required: true,
+                	maxlength: 128,
+					minlength:0
+                }
+            },
+            messages: {
+            	largeCategory: {
+                    required: icon + "请选择业务大类！"
+                },
+                smallCategory: {
+                    required: icon + "请选择业务小类！"
+                },
+                prodName: {
+                    required: icon + "产品名称不能为空！"
+                },
+                prodCode: {
+                    required: icon + "产品编码不能为空！"
+                },
+                prodLevel: {
+                    required: icon + "请选择产品级别！"
+                },
+                beginTime: {
+                    required: icon + "请选择产品有时间！"
+                },
+                endTime: {
+                    required: icon + "请选择产品失效时间！"
+                },
+                releaseChannel: {
+                    required: icon + "请选择产品发布渠道！"
+                },
+                inventory: {
+                    required: icon + "请填写库存！",
+                    maxlength: icon + "不能大于16位数字",
+                    isDigital: icon + "请您填写数字！"
+                },
+                initSales: {
+                	minlength: "最短为0个数字！",
+                    maxlength: icon + "不能大于20位数字",
+                    isDigital: icon + "请您填写数字！"
+                },
+                salesCount: {
+                	minlength: "最短为0个数字！",
+                    maxlength: icon + "不能大于20位数字",
+                    isDigital: icon + "请您填写数字！"
+                },
+                prodDesc: {
+                	required: icon + "请输入产品描述！",
+                	minlength: "最短为0个数字！",
+                    maxlength: icon + "不能大于128个字符"
+                }
+            }
+        });
+    };
+
+</script>

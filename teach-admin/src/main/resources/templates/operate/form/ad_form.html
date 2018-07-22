@@ -1,0 +1,152 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<div class="modal inmodal" id="ad-form-modal" role="dialog"
+	aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button class="close" data-dismiss="modal" type="button">×</button>
+				<h5 id="modalHeaderMsg" class="modal-title"></h5>
+			</div>
+			<div class="modal-body">
+				<form id="grid-thirdIpSearch-form">
+					<input hidden="hidden" id="adId" name="adId">
+					<div class="profile-user-info profile-user-info-striped">
+						<div class="profile-info-row">
+							<div class="profile-info-name">广告位：</div>
+							<div class="profile-info-value form-group">
+								<select class="input-large" name="adPosition" id="adPosition">
+									<option value="1">首页banner</option>
+								</select>
+							</div>
+							<div class="profile-info-name">权重：</div>
+							<div class="profile-info-value form-group">
+								<input type="text" name="weight" id="weight" placeholder="权重"
+									class="input-large"
+									onkeyup="this.value=this.value.replace(/^ +| +$/g,'')"
+									maxlength="10">
+							</div>
+						</div>
+						<div class="profile-info-row input-daterange">
+							<div class="profile-info-name">广告链接：</div>
+							<div class="profile-info-value form-group">
+								<input type="text" name="adUrl" id="adUrl" placeholder="广告链接"
+									class="input-large"
+									onkeyup="this.value=this.value.replace(/^ +| +$/g,'')"
+									maxlength="500">
+							</div>
+							<div class="profile-info-name">广告名称：</div>
+							<div class="profile-info-value form-group">
+								<input type="text" name="adName" id="adName" placeholder="广告名称"
+									class="input-large"
+									maxlength="120">
+							</div>
+						</div>
+						<div class="profile-info-row">
+							<div class="profile-info-name">有效期：</div>
+							<div class="profile-info-value form-group">
+								<input type="text" name="validTime" id="validTime"
+									placeholder="有效期" class="input-large form-control date-icon"
+									onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
+							</div>
+							<div class="profile-info-name">状态：</div>
+							<div class="profile-info-value form-group">
+								<select class="input-large" name="adStatus" id="adStatus">
+									<option value="1">有效</option>
+									<option value="2">无效</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="profile-user-info profile-user-info-striped"
+						id="custom-div">
+						<div class="profile-info-row">
+							<div class="profile-info-name">广告图片：</div>
+							<div class="profile-info-value form-group">
+								<div type="text" name="adPic" id="adPic" class="col-sm-4"
+									style="padding-left: 0px; width: 222px;"></div>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+				<button type="button" class="btn btn-primary"
+					onclick="saveOrUpdate()">保存</button>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+
+<script type="text/javascript">
+	// 表单提交
+	function saveOrUpdate() {
+
+		if (!$('#grid-thirdIpSearch-form').valid())
+			return;
+		
+		var adPic = $("#adPic").val();
+		if(adPic == null){
+			common_error("请上传图片");
+			return;
+		}
+		
+		$("#grid-thirdIpSearch-form").ajaxSubmit({
+			type : "POST",
+			async : false,
+			timeout : 5000,
+			url : "${ctx.contextPath}/d-admin/operate/ad/saveOrUpdate",
+			data : $("#ad-form-modal #grid-thirdIpSearch-form").serialize(),
+			dataType : "json",
+			success : function(data) {
+				if (data.success) {
+					common_success("操作成功！");
+					$("#ad-form-modal").modal("hide");
+					boostrapTableQueryParams();
+				} else {
+					common_error(data.errDesc);
+				}
+			},
+			complete : function() {
+			}
+		});
+	}
+	
+	// form表单校验
+	function judgeVerification() {
+		var icon = "<i class='fa fa-times-circle'></i> ";
+		$('#ad-form-modal #grid-thirdIpSearch-form').validate({
+			rules : {
+				weight : {
+					required : true,
+					positive : "#ad-form-modal #weight"
+				},
+				adUrl : {
+					required : true
+				},
+				adName : {
+					required : true
+				},
+				validTime : {
+					required : true
+				}
+			},
+
+			messages : {
+				weight : {
+					required : icon + "请输入权重！"
+				},
+				adUrl : {
+					required : icon + "请输入广告链接！"
+				},
+				adName : {
+					required : icon + "请输入广告名称！"
+				},
+				validTime : {
+					required : icon + "请输入有效期！"
+				}
+			}
+		});
+	};
+</script>

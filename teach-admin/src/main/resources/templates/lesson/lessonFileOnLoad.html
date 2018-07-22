@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>直播课课件管理</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+#parse("./include/commonCss.html")
+<link href="${ctx.contextPath}/hplus/css/plugins/chosen/chosen.css" rel="stylesheet">
+<link href="${ctx.contextPath}/js/webupload/webuploader.css" type="text/css" rel="stylesheet"/>
+<link href="${ctx.contextPath}/hplus/css/demo/webuploader-demo.css" type="text/css" rel="stylesheet"/>
+</head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content animated fadeInUp">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox">
+					<div class="ibox float-e-margins">
+						<div class="ibox-title">
+							<h5>直播课列表</h5>
+							<div class="ibox-tools">
+								<a class="collapse-link"><i class="fa fa-chevron-up"></i>
+								</a>
+							</div>
+						</div>
+						<div class="ibox-content">
+							<form id="grid-search-form">
+								<div class="profile-user-info profile-user-info-striped">
+									<input type="hidden" id="lessonId" name="lessonId" />
+									<input type="hidden" id="lessonType" name="lessonType" value="2"/>
+									<div class="profile-info-row">
+										<div class="profile-info-name">课程名称：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="lessonName" placeholder="课程名称" class="input-large" maxlength="60">
+										</div>
+										<div class="profile-info-name">讲师名称：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="tutorName" placeholder="讲师名称" class="input-large" maxlength="60">
+										</div>
+										<div class="profile-info-name">行业：</div>
+										<div class="profile-info-value form-group">
+											<select class="input-large" name="industryId" id="industryId">
+												<option value="0">全部</option>
+												#foreach($industry in $industrys)
+												<option value="${industry.industryId}">${industry.industryName}</option>
+												#end
+											</select>
+										</div>
+									</div>
+									<div class="profile-info-row">
+										<div class="profile-info-name">访问权限：</div>
+										<div class="profile-info-value form-group">
+											<select class="input-large" name="visitAuth">
+												<option value="0">全部</option>
+												<option value="1">游客</option>
+												<option value="2">普通用户</option>
+												<option value="3">VIP</option>
+											</select>
+										</div>
+									</div>
+								</div>
+							</form>
+							<div class="btn-group hidden-xs" id="tableEventsToolbar" role="group">
+								<button type="button" onClick="imgUpload()" title="图片上传" class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true">
+									   <use xlink:href="#icon-shenpi"></use>
+									</svg>
+								</button>
+								<button type="button" id="grid-search-btn" title="搜索" class="btn btn-outline btn-default">
+									<i class="glyphicon glyphicon-search" aria-hidden="true"></i>
+								</button>
+								<button type="button" id="grid-reset-btn" title="重置" class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true">
+                                        <use xlink:href="#icon-zhongzhi"></use>
+                                    </svg>
+								</button>
+							</div>
+							<table id="lesson" data-mobile-responsive="false">
+								<thead>
+									<tr>
+										<th data-radio="true"></th>
+										<th data-formatter="boostrapTableSortFormatter">序号</th>
+										<th data-field="lessonId" data-visible="false">课程ID</th>
+										<th data-field="lessonName">课程名称</th>
+										<th data-field="lessonTypeStr">课程分类</th>
+										<th data-field="seriesName" data-visible="false">系列名称</th>
+										<th data-field="origPriceStr">课程原价</th>
+										<th data-field="discountPriceStr">课程折扣价</th>
+										<th data-field="validDuration">有效时长（月）</th>
+										<th data-field="visitAuthStr">访问权限</th>
+										<th data-field="shelfStatusStr">上架状态</th>
+										<th data-field="isTopStr">是否置顶</th>
+										<th data-field="weight">权重(倒序)</th>
+										<th data-field="tutorName">讲师</th>
+										<th data-field="industry">所属行业</th>
+										<!-- <th data-field="validTime">有效期</th> -->
+										<th data-field="createTime" data-visible="false">创建时间</th>
+										<th data-field="createOp" data-visible="false">创建人</th>
+										<th data-field="modifyTime" data-visible="false">修改时间</th>
+										<th data-field="modifyOp" data-visible="false">修改人</th>
+									</tr>
+								</thead>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="mask" class="sweet-overlay" tabindex="-1" style="opacity: 1; display: none; z-index: 9999;">
+		<div style="margin: 20% 40%">
+			<img style="" alt="" src="${ctx.contextPath}/images/loading.gif">
+			<span style="color: white;">正在提交中...</span>
+		</div>
+	</div>
+	
+	#parse("./include/commonJs.html")
+	#parse("./lesson/form/live_img.html")
+	<script type="text/javascript" src="${ctx.contextPath}/js/webupload/webuploader.js"></script>
+	<script src="${ctx.contextPath}/hplus/js/plugins/chosen/chosen.jquery.min.js"></script>
+</body>
+<script>
+	$(document).ready(function() {
+		// table分页参数配置
+		boostrapTableParams.url = "${ctx.contextPath}/d-admin/lesson/public/findPaging";
+		$("#lesson").bootstrapTable(boostrapTableParams);
+		initGridSearch(); // 初始化grid搜索
+
+	});
+
+	// bootstrap-table分页查询时的参数封装
+	function boostrapTableQueryParams(params) {
+		if (isEmpty(params)) { // 点击搜索按钮时
+			var options = $("#lesson").bootstrapTable('getOptions');
+			$("#lesson").bootstrapTable('refreshOptions', {
+				pageNumber : 1,
+				sortName : ""
+			});
+		} else { // 点击分页时
+			return boostrapTableSearchParams("grid-search-form", params);
+		}
+	}
+	
+	var coursewarePic = null;
+	var classStatus = 1;
+	function imgUpload() {
+		var selections = $("#lesson").bootstrapTable('getSelections');
+		if (isEmpty(selections)) {
+			common_error("请先选择要上传图片的课程！");
+			return;
+		}
+		if (selections.length > 1) {
+			common_error("只能选择一个课程上传图片！");
+			return;
+		}
+		var lessonId = selections[0].lessonId;
+		
+		 $("#imgUpload-modal").modal("show");
+
+		 if (uploader == null) {
+			initWebUploader();
+		 } else {
+			// 移除所有缩略图并将上传文件移出上传序列
+	        for (var i = 0; i < uploader.getFiles().length; i++) {
+	            // 将图片从上传序列移除
+	            uploader.removeFile(uploader.getFiles()[i]);
+	            // 将图片从缩略图容器移除
+	            var $li = $('#' + uploader.getFiles()[i].id);
+	            $li.off().remove();
+	        }
+	         
+	        // 重置uploader，目前只重置了文件队列
+	        uploader.reset();
+	        // 重置上传按钮
+	        $("#uploader .btns .uploadBtn").attr("class", "uploadBtn");
+		}
+		// 上传时把供货商ID传过去
+		uploader.options.formData.lessonId = lessonId;
+		
+		$("#imgUpload-modal #lessonId").val(lessonId);
+		// 清空图片集合
+		coursewarePic = null;
+		classStatus = 1;
+		// 获取已上传的图片列表
+		$.ajax({
+            type:"POST",
+            url:"${ctx.contextPath}/d-admin/lesson/fileOnload/findImgList",
+            data:"lessonId=" + lessonId,
+            dataType:"json",
+            success:function(data){
+            	$(".panel .uploader .filelist").html("");
+            	if (isEmpty(data)) {
+            		return;
+            	}
+            	coursewarePic = data["imgList"];
+            	classStatus = data["classStatus"];
+
+            	$("#filePicker").show();
+            	$("#dndArea p").html("或将照片拖到这里，单次最多可选300张");
+            	if (classStatus == 3) {
+            		$("#filePicker").hide();
+            		$("#dndArea p").html("已结束的课时不能上传图片");
+            	}
+            	
+            	if (!isEmpty(coursewarePic)) {
+            		var html = '';
+            		for (var i=0; i<coursewarePic.length; i++) {
+            			var img = coursewarePic[i];
+            			html += '<li id="img_li_' + i + '" style="height:200px; width:350px;">' +
+            	                '<p class="title">第' + (i + 1) + '张图</p>' +
+            	                '<p class="imgWrap" style="height:200px; width:350px;"><img style="height:200px;width:350px;" src="'+ img +'" /></p>' +
+            	                '<p class="progress"><span></span></p>' +
+            	                '<div class="file-panel">' +
+            	                	'<span class="cancel" onclick="deleteImg(' + i + ')">删除</span>' +
+            	                '</div>' +
+            	                '</li>';
+            		}
+    	            $(".panel .uploader .filelist").html(html);
+    	            
+      	          	// 已成功上传图片的获取焦点、离开焦点事件
+      	          	var success_img_lis = $(".panel .uploader .filelist li");
+      	          	success_img_lis.each(function(){
+      	          		var img_li = $(this);
+	      	          	img_li.on( 'mouseenter', function() {
+		      	          	img_li.find(".file-panel").stop().animate({height: 30});
+      	          		});
+	      	          	
+	      	            img_li.on( 'mouseleave', function() {
+		      	          	img_li.find(".file-panel").stop().animate({height: 0});
+    	          		});
+      	          	});
+            	}
+            }
+        });
+	}
+</script>
+</html>

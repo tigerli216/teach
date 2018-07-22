@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>WST</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="shortcut icon" href="${ctx.contextPath}/images/mddr.ico">
+<link href="${ctx.contextPath}/hplus/css/bootstrap.min.css?v=3.3.6" rel="stylesheet" />
+<link href="${ctx.contextPath}/hplus/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+<style>
+   @media screen and (min-width:375px) and (max-width:767px) {
+       #main{
+           width: 90%;
+       }
+   }
+   @media screen and (min-width:768px) {
+       #main{
+           width: 60%;
+       }
+   }
+</style>
+</head>
+
+<body>
+    <div style="border-bottom: 1px solid #999">
+        <div style="margin:20px 0 0 10%;height: 90px;">
+            <a href="http://wallstreettequila.org/">
+                <img src="${ctx.contextPath}/images/wst-logo.png" alt="" >
+            </a>
+            <a href="http://wallstreettequila.org/" style="float:right;line-height: 45px;text-decoration: none;margin-right: 5%;color:#337AB7">
+                Home Page
+            </a>
+        </div>
+    </div>
+    <div>
+        <span style="height: 25px;display: block;text-align: center;margin-top: 50px">
+            <img src="${ctx.contextPath}/images/activation/activate.png" alt="" style="">
+        </span>
+        <p style="color: #1989fa;font-size: 14px;text-align: center">Mailbox retrieves the password</p>
+    </div>
+    <div id="main" style="padding: 30px 0;margin: 0 auto 40px;
+                 border-radius: 3px;background-color: #faebeb;
+                 border-color: #f5d7d7;color: #e55c5c;text-align: center;">
+        <h4>Hi,</h4>
+        <p style="padding:0 15px 0 15px;">Thank you for using the education network platform, you are getting the login password through the registered mailbox.</p>
+        #if ($restPwdResult)
+            <p id="resultMsg" style="padding:0 15px 0 15px">${restPwdResult}</p>
+        #else
+        <div id="restPwdform">
+           <div class="flow-input">
+         	   <label for="" style="font-size: 14px;color:#000">Login&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Account&nbsp;:</label>
+               <input type="text" name="u" id="u" value="${u}" style="width:250px" disabled="disabled"/>
+           </div>
+           <div class="flow-input">
+               <label for="" style="font-size: 14px;color:#000">New&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Password&nbsp;:</label>
+               <input type="password" name="password" id="password"  placeholder="8~18 bit number and letter combination" style="width:250px" />
+           </div>
+           <div class="flow-input">
+               <label for="" style="font-size: 14px;color:#000">Confirm Password&nbsp;:</label>
+               <input type="password" name="confirmPassword" id="confirmPassword" placeholder="8~18 bit number and letter combination"  style="width:250px" />
+           </div>
+           <button onClick="restPwdSubmit();" style="color: #fff;background-color: #1989fa;border-color: #1989fa;width:60px;margin-top: 30px">
+           		Submit
+           </button>
+           #end
+        </div>
+    </div>
+    <div style="text-align: center;">
+        <p style="color:#666;">@© 2017 WST team. all rights reserved.</p>
+    </div>
+    <script src="${ctx.contextPath}/hplus/js/jquery.min.js?v=2.1.4"></script>
+<script src="${ctx.contextPath}/hplus/js/plugins/sweetalert/sweetalert.min.js"></script>
+</body>
+
+<script type="text/javascript">
+function restPwdSubmit() {
+    var password = $("#password").val();
+    // 请输入新密码
+    if (password == "") {
+    	swal("please enter new password!");
+    	return false;
+    }
+
+    // 请输入确认密码
+    var confirmPassword = $("#confirmPassword").val();
+    if (confirmPassword == "") {
+    	swal("Please enter the confirmation password!");
+        return false;
+    }
+    
+    // 两次输入密码不一致!
+    if (password != confirmPassword) {
+        swal("Two input password inconsistencies!");
+        return false;
+    }
+	
+    // 请输入正确的新密码!
+    var pwdRule = /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{8,18}$/;
+    if (!pwdRule.test(password)) {
+        swal("Please enter the correct new password!");
+        return false;
+    }
+
+    // 请输入正确的新密码!
+    if (!pwdRule.test(confirmPassword)) {
+        swal("Please enter the correct new password!");
+        return false;
+    }
+
+    $.ajax({
+        type : "POST",
+        url : "${ctx.contextPath}/d-app/doRestPwd",
+        data : {"t":"${t}", "id":"${id}", "u":"${u}", "p":"${p}", "password":password, "confirmPassword":confirmPassword},
+        dataType : "json",
+        success : function(data, textStatus) {
+            if (data.success) {
+            	// 密码找回成功，请登录使用！
+            	swal("The password has been recovered successfully, please log in and use it!");
+            	$("#restPwdform").html("<p>The password has been recovered successfully, please log in and use it!</p>");
+            } else {
+            	swal(data.errDesc);
+            }
+        }
+    });
+}
+</script>
+
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+#parse("./include/commonCss.html")
+<style>
+.modal-footer {
+	border-top: 0px;
+}
+</style>
+</head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content animated fadeInUp">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox">
+					<div class="ibox float-e-margins">
+						<div class="ibox-title" id="form-modal" role="dialog"
+							aria-hidden="true">
+							<h5>查看课程</h5>
+							<form id="form-prod-model" class="form-horizontal">
+								<div class="profile-user-info profile-user-info-striped"
+									id="product_base_attr_div">
+									<input type="hidden" id="lessonId" name="lessonId" />
+									<div class="profile-info-row">
+										<div class="profile-info-name">用户：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="loginAccount" placeholder="用户" class="input-large"
+												 style="border:0;"  disabled="disabled">
+										</div>
+										<div class="profile-info-name">所属行业：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="industry" class="input-large" style="border:0;"  disabled="disabled"/>
+										</div>
+									</div>
+									
+									<div class="profile-info-row">
+										<div class="profile-info-name">创建时间：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="createTime" placeholder="创建时间"
+												class="input-large" style="border:0;"  disabled="disabled">
+										</div>
+									</div>
+									
+									<div class="profile-info-row">
+										<div class="profile-info-name">课程名称：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" id="lessonName" name="lessonName" class="input-large" style="border:0;"  disabled="disabled"/>
+										</div>
+										<div class="profile-info-name">课程分类：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="lessonTypeStr" class="input-large" style="border:0;"  disabled="disabled"/>
+										</div>
+									</div>
+									
+									<div class="profile-info-row">
+										<div class="profile-info-name">课程价格：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="lessonPriceStr" class="input-large" style="border:0;"  disabled="disabled"/>
+										</div>
+									</div>
+												
+									<div class="profile-info-row">	
+										<div class="profile-info-name">总课时（分钟）：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="totalClass" class="input-large" style="border:0;"  disabled="disabled"/>
+										</div>								
+										<div class="profile-info-name">已完成课时（分钟）：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="finishClass" class="input-large" style="border:0;"  disabled="disabled"/>
+										</div>
+									</div>
+									
+									<div class="profile-info-row">
+										<div class="profile-info-name">购买时间：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="buyTime" placeholder="购买时间"
+												class="input-large" style="border:0;"  disabled="disabled">
+										</div>
+									</div>
+									<div class="profile-info-row">									
+										<div class="profile-info-name">开始时间：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="beginTime" placeholder="开始时间"
+												class="input-large" style="border:0;"  disabled="disabled">
+										</div>
+										<div class="profile-info-name">结束时间：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="endTime" placeholder="结束时间"
+												class="input-large" style="border:0;"  disabled="disabled">
+										</div>
+									</div>
+								</div>
+								<div class="profile-user-info profile-user-info-striped"
+									id="product_base_desc_div">
+									<div class="profile-info-row">
+										<div class="profile-info-name">课程介绍：</div>
+										<div class="profile-info-value form-group">
+											<textarea id="lessonRcmdStr" name="lessonRcmdStr"
+												style="float: left; width: 100%; height: 120px;" disabled="disabled"></textarea>
+										</div>
+									</div>
+								</div>
+								<div class="hr-line-dashed"></div>
+								<div id="form-prodAttr-div"></div>
+								<br> <br> <br>
+							</form>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-white" onClick="formCancel();">返回</button>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	#parse("./include/commonJs.html")
+</body>
+<script>
+	$(function(){
+		initFormData();
+	})
+	
+	// 初始化表单数据
+	function initFormData(){
+		
+		var url = window.location.search;
+		var lessonId = url.split("=")[1];
+        if (lessonId == 0 || lessonId == null){
+        	common_error("关联ID不能为空!");
+       	 	return;
+        } 
+
+        $.ajax({
+			type : "POST",
+			url : "${ctx.contextPath}/d-admin/lesson/custom/getById",
+			data : "lessonId=" + lessonId,
+			dataType : "json",
+			success : function(custom) {
+				var html='';
+				for (var i = 0; i < custom.attrList.length; i++) {
+					var lessonAttr = custom.attrList[i];
+					// 转换后台时间返回null置空
+					var dateTime=lessonAttr.dateTime!=null?lessonAttr.dateTime:"";//约课时间
+					var beginTime=lessonAttr.beginTime!=null?lessonAttr.beginTime:"";//开始时间
+					var endTime=lessonAttr.endTime!=null?lessonAttr.endTime:"";//结束时间
+						 html += '<div">'
+							+ '<div class="profile-user-info profile-user-info-striped">'
+							+ '<input type="hidden" name="attrList['+i+'].identifying" value="1"/>'
+							+'<input type="hidden" name="attrList['+i+'].classId" value="'+ lessonAttr.classId +'" />'
+							+ '<div  class="profile-info-row">'
+							+ '<div class="profile-info-name">课时名称：</div>'
+							+ '<div class="profile-info-value form-group">'
+							+ '    <input type="text" name="attrList['+i+'].className" value="'+ lessonAttr.className +'" class="input-large" style="border:0;" disabled="disabled"/>'
+							+ '</div>'
+							+ '<div class="profile-info-name">导师：</div>'
+							+ '<div class="profile-info-value form-group">'
+							+ '	   <input type="text" name="attrlist['+i+'].tutorName" value="'+ lessonAttr.tutorName +'" class="input-large" style="border:0;" disabled="disabled"/>'
+							+ '</div>'
+							+ '<div class="profile-info-name">课时状态：</div>'
+							+ '<div class="profile-info-value form-group">'
+							+ '	   <input type="text" name="attrlist['+i+'].classStatusStr" value="'+ lessonAttr.classStatusStr +'" style="border:0;" class="input-large" disabled="disabled"/>'
+							+ '</div>'
+							+ '</div>'
+							+ '<div class="profile-info-row">'
+							+ '<div class="profile-info-name">计划上课时间：</div>'
+							+ '<div class="profile-info-value form-group">'
+							+ '    <input type="text"  name="attrList['+i+'].planTime" value="'+ lessonAttr.planTime +'" style="border:0;" disabled="disabled" class="input-large" />'
+							+ '</div>'
+							+ '<div class="profile-info-name">计划时长(分钟)：</div>'
+							+ '<div class="profile-info-value form-group">'
+							+ '    <input type="text"  name="attrList['+i+'].planDuration" value="'+ lessonAttr.planDuration +'"' 
+							+ '		 style="border:0;" class="input-large" disabled="disabled"/>'
+							+ '</div>'
+							+ '<div class="profile-info-name">实际时长(分钟)：</div>'
+							+ '<div class="profile-info-value form-group">'
+							+ '    <input type="text"  name="attrList['+i+'].realDuration" value="'+ lessonAttr.realDuration +'"' 
+							+ '		 style="border:0;" class="input-large" disabled="disabled"/>'
+							+ '</div>'
+							+ '</div>'
+							+ '<div class="profile-info-row">'
+							+ '<div class="profile-info-name">约课时间：</div>'
+							+ '<div class="profile-info-value form-group">'
+							+ '    <input type="text"  name="attrList['+i+'].dateTime" value="'+ dateTime +'" style="border:0;" disabled="disabled" class="input-large" />'
+							+ '</div>'
+							+ '<div class="profile-info-name">开始时间：</div>'
+							+ '<div class="profile-info-value form-group">'
+							+ '    <input type="text"  name="attrList['+i+'].beginTime" value="'+ beginTime +'"' 
+							+ '		 style="border:0;" class="input-large" disabled="disabled"/>'
+							+ '</div>'
+							+ '<div class="profile-info-name">结束时间：</div>'
+							+ '<div class="profile-info-value form-group">'
+							+ '    <input type="text"  name="attrList['+i+'].endTime" value="'+ endTime +'"' 
+							+ '		 style="border:0;" class="input-large" disabled="disabled"/>'
+							+ '</div>'
+							+ '</div>'
+							+ '</div>'
+							+ '<div class="profile-user-info profile-user-info-striped">'
+							+ '<div class="profile-info-row">'
+							+ '<div class="profile-info-name">课时介绍：</div>'
+							+ '<div class="profile-info-value form-group">'
+							+ '<textarea  name="attrList['+i+'].classRcmd"'
+							+ 'maxlength="1024" class="col-sm-10" style="border:0;" disabled="disabled">'+lessonAttr.classRcmd+'</textarea>'
+							+ '</div>'
+							+ '</div>'
+							+ '</div>'
+							+ '</div>';
+				}
+				$("#form-prodAttr-div").html(html);
+				// 初始化form数据
+				initParam(custom, null, 'form-modal');
+			},
+			complete : function() {
+				isEditInitFormSub = false;
+				data.attrList
+			}
+		});
+		
+	}
+	
+	// 表单取消 返还
+	function formCancel() {
+		window.location.href="${ctx.contextPath}/d-admin/lesson/custom/index";
+	}
+		
+</script>
+</html>

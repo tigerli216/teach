@@ -1,0 +1,132 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<div class="modal inmodal" id="user-form-modal" role="dialog"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal" type="button">×</button>
+                <h4 id="modalHeaderMsg" class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="form-edit" class="form-horizontal">
+                   <!--  <div class="profile-user-info profile-user-info-striped">
+                        <div class="profile-info-row">
+                        	<div class="profile-info-name">登录账号：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="loginAccount" name="loginAccount"
+                                       class="input-large" readonly="readonly" />
+                            </div>
+                            <div class="profile-info-name">手机号码：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="bindMobile" name="bindMobile"
+                                       class="input-large" readonly="readonly" />
+                            </div>
+                        </div>
+                        <div class="profile-info-row">
+                            <div class="profile-info-name">邮箱：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="email" name="email"
+                                       class="input-large" readonly="readonly" />
+                            </div>
+                        	<div class="profile-info-name">用户级别：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="userLevelStr" name="userLevelStr"
+                                       class="input-large" readonly="readonly" />
+                            </div>
+                         </div>
+                         <div class="profile-info-row">
+                            <div class="profile-info-name">用户类型：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id=userTypeStr name="userTypeStr"
+                                       class="input-large" readonly="readonly" />
+                            </div>
+                            <div class="profile-info-name">注册时间：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="regTime" name="regTime"
+                                       class="input-large" readonly="readonly" />
+                            </div>
+                        </div>
+                    </div>-->                    
+                    <input type="hidden" id="userId" name="userId" value=""/>
+                    <div class="profile-user-info profile-user-info-striped">
+                        <div class="profile-info-row">
+                            <div class="profile-info-name">真实姓名：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="realName" name="realName"
+                                       class="input-large"
+                                       maxlength="60"/>
+                            </div>
+                            <div class="profile-info-name">昵称：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="nickName" name="nickName"
+                                       class="input-large"
+                                       maxlength="30"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="profile-user-info profile-user-info-striped">
+                        <div class="profile-info-row">
+                            <div class="profile-info-name">简历：</div>
+                            <div class="profile-info-value form-group">
+                            	<div id="resumeFileDiv" class="input-xlarge"></div>
+                            </div>
+	                    </div>
+	                    <div class="profile-info-row">
+                            <div class="profile-info-name">Offer：</div>
+                            <div class="profile-info-value form-group">
+                            	<div id="offerFileDiv" class="input-xlarge"></div>
+                            </div>
+	                    </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary"
+                        onClick="formSubmit();">保存
+                </button>
+                <a ></a>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    // 表单提交
+    var isFormSubmit = false;
+    function formSubmit() {
+        if (isFormSubmit)
+            return;
+
+        if (!$('#form-edit').valid())
+            return;
+
+        isFormSubmit = true;
+        
+        $("#mask").show();
+        var url = "${ctx.contextPath}/d-admin/mem/user/edit";
+		// 提交表单
+		$("#user-form-modal #form-edit").ajaxSubmit({
+			url: url,
+			async : false,
+			timeout : 500000,
+			type : "POST",
+			dataType: "json",
+			success : function(data, status) {
+				if (data.success) {
+                    common_success("保存成功！");
+                    $("#user-form-modal").modal("hide");
+                    boostrapTableQueryParams(); // 刷新列表
+                } else {
+                    common_error(data.errDesc);
+                }
+			},
+			complete : function() {
+				isFormSubmit = false;
+				 $("#mask").hide();
+			}
+		});
+    }
+    
+</script>

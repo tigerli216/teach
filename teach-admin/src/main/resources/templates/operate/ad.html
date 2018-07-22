@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>运营广告管理</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+#parse("./include/commonCss.html")
+<link href="${ctx.contextPath}/hplus/css/plugins/chosen/chosen.css"
+	rel="stylesheet">
+</head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content animated fadeInUp">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox">
+					<div class="ibox float-e-margins">
+						<div class="ibox-title">
+							<h5>广告列表</h5>
+							<div class="ibox-tools">
+								<a class="collapse-link"> <i class="fa fa-chevron-up"></i>
+								</a>
+							</div>
+						</div>
+						<div class="ibox-content">
+							<!-- 	<div class="alert alert-success alert-dismissable">
+								<button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+								可双击订单所在行，可查看订单详情。
+							</div> -->
+							<form id="grid-search-form">
+								<!-- 订单类型 -->
+								<input type="hidden" id="orderType" name="orderType" />
+								<div class="profile-user-info profile-user-info-striped">
+									<div class="profile-info-row">
+										<div class="profile-info-name">广告名称：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="adName" id="adName"
+												placeholder="广告名称" class="input-large"
+												maxlength="120" >
+										</div>
+										<div class="profile-info-name">广告链接：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="adUrl" id="adUrl"
+												placeholder="广告链接" class="input-large"
+												maxlength="500">
+										</div>
+										<div class="profile-info-name">状态：</div>
+										<div class="profile-info-value form-group">
+											<select id="adStatus" name="adStatus" class="input-large">
+												<option value="">==请选择==</option>
+												<option value="1">有效</option>
+												<option value="2">无效</option>
+											</select>
+										</div>
+									</div>
+								</div>
+							</form>
+							<div class="btn-group hidden-xs" id="tableEventsToolbar"
+								role="group">
+								<button type="button" onClick="addInitForm()" title="添加"
+									class="btn btn-outline btn-default">
+									<i class="glyphicon glyphicon-plus" aria-hidden="true"></i>
+								</button>
+								<button type="button" onClick="editInitForm()" title="编辑"
+									class="btn btn-outline btn-default">
+									<i class="glyphicon glyphicon-pencil" aria-hidden="true"></i>
+								</button>
+								<button type="button" onClick="deletePro(2)" title="删除"
+									class="btn btn-outline btn-default">
+									<i class="glyphicon glyphicon-trash" aria-hidden="true"></i>
+								</button>
+								<button type="button" id="grid-search-btn" title="搜索"
+									class="btn btn-outline btn-default">
+									<i class="glyphicon glyphicon-search" aria-hidden="true"></i>
+								</button>
+								<button type="button" id="grid-reset-btn" title="重置"
+									class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true">
+									    <use xlink:href="#icon-zhongzhi"></use>
+									</svg>
+								</button>
+							</div>
+							<table id="adTable" data-mobile-responsive="false">
+								<thead>
+									<tr>
+										<th data-radio="true"></th>
+										<th data-formatter="boostrapTableSortFormatter">序号</th>
+										<th data-field="adId" data-visible="false">广告id</th>
+										<!-- <th data-field="adPosition">广告位</th> -->
+										<th data-field="adPic" data-visible="false">广告图片</th>
+										<th data-field="adUrl">广告链接</th>
+										<th data-field="adName">广告名称</th>
+										<th data-field="weight">权重</th>
+										<th data-field="createTime" data-visible="false">创建时间</th>
+										<th data-field="modifyTime" data-visible="false">修改时间</th>
+										<th data-field="validTime">有效期</th>
+										<th data-field="adStatusStr">状态</th>
+									</tr>
+								</thead>
+							</table>
+							#parse("./operate/form/ad_form.html")
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	#parse("./include/commonJs.html")
+	#parse("./include/imgUploadJs.js")
+	<script
+		src="${ctx.contextPath}/hplus/js/plugins/chosen/chosen.jquery.min.js"></script>
+</body>
+<script>
+	$(function() {
+		$('#grid-thirdIpSearch-form #validTime').datetimepicker({
+			language : 'zh-CN',
+			todayBtn : true,
+			clearBtn : true,
+			autoclose : true,
+			format : "yyyy-mm-dd",
+			minView : "month"
+		});
+
+		judgeVerification();
+		
+		poundageConfigPagin();
+	});
+
+	function poundageConfigPagin() {
+		bingdUrserTableParams = jQuery.extend({}, boostrapTableParams); // 表单中的table参数
+		// table分页参数配置
+		boostrapTableParams.url = "${ctx.contextPath}/d-admin/operate/ad/finndPaging";
+		$("#adTable").bootstrapTable(boostrapTableParams);
+	    initGridSearch(); // 初始化grid搜索
+	}
+
+	// bootstrap-table分页查询时的参数封装
+	function boostrapTableQueryParams(params) {
+		if (isEmpty(params)) { // 点击搜索按钮时
+			var options = $("#adTable").bootstrapTable('getOptions');
+			$("#adTable").bootstrapTable('refreshOptions', {
+				pageNumber : 1,
+				sortName : ""
+			});
+		} else { // 点击分页时
+			return boostrapTableSearchParams("grid-search-form", params);
+		}
+	}
+
+	//点击新增按钮，初始化弹出页面
+	function addInitForm() {
+		$('.form-group').removeClass('has-error');
+		$('span[class*=help-block]').remove();
+		emptyDivInputValue('ad-form-modal');
+		$('#ad-form-modal #modalHeaderMsg').text('新增广告');
+		$("#ad-form-modal").modal("show");
+		// 初始化上传图片
+		imgAddInit($('#adPic'), "adPicFile", "adPicFile");
+	}
+
+	//点击修改按钮，初始化弹出页面,将值传入页面
+	function editInitForm() {
+		var selections = $("#adTable").bootstrapTable('getSelections');
+		if (isEmpty(selections)) {
+			common_error("请先选择要编辑的配置！");
+			return;
+		}
+		if (selections.length > 1) {
+			common_error("只能选择一个配置编辑！");
+			return;
+		}
+
+		$('.form-group').removeClass('has-error');
+		$('span[class*=help-block]').remove();
+		emptyDivInputValue('ad-form-modal');
+		$('#ad-form-modal #modalHeaderMsg').text('编辑广告');
+		$("#ad-form-modal").modal("show");
+
+		var adId = selections[0].adId;
+		$.ajax({
+			type : "POST",
+			url : "${ctx.contextPath}/d-admin/operate/ad/getAd",
+			data : "adId=" + adId,
+			dataType : "json",
+			success : function(data) {
+				initParam(data, null, 'grid-thirdIpSearch-form');
+				if (isEmpty(data.adPic)) {
+		            imgAddInit($('#adPic'), "adPicFile", "adPicFile");
+		        } else {
+		        	imgEditInit($('#adPic'), data.adPic, "adPicFile", "adPicFile");
+		        }
+			},
+			complete : function() {
+			}
+		});
+	}
+	
+	/**删除配置*/
+	var isDeleteProSub = false;
+	function deletePro(status) {
+        var selections = $("#adTable").bootstrapTable('getSelections');
+        if (isEmpty(selections)) {
+            common_error("请先选择要删除的配置！"); 
+            return;
+        }
+        swal({
+            title: "您确定要删除吗?",
+            text: "删除后将无法显示，请谨慎操作！",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "确定",
+            closeOnConfirm: false
+        }, function () {
+        	if (isDeleteProSub) return;
+            isDeleteProSub = true;
+            
+            var adId = selections[0].adId;
+            $.ajax({
+                type:"POST",
+                url:"${ctx.contextPath}/d-admin/operate/ad/delete",
+                data:"adId=" + adId,
+                dataType:"json",
+                success:function(data){
+                    if (data.success) {
+                    	common_success("操作成功！");
+    					boostrapTableQueryParams();
+    				} else {
+    					common_error(data.errDesc);
+                    }
+                },
+                complete:function(){
+                	isDeleteProSub = false;
+                }
+            });
+            $(".cancel").click();
+        });
+    };
+</script>
+</html>

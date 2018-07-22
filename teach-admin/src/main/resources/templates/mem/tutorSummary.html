@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>导师信息总览</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+#parse("./include/commonCss.html")
+<link href="${ctx.contextPath}/hplus/css/plugins/chosen/chosen.css"
+	rel="stylesheet">
+</head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content animated fadeInUp">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox">
+					<div class="ibox float-e-margins">
+						<div class="ibox-title">
+							<h5>导师信息列表</h5>
+							<div class="ibox-tools">
+								<a class="collapse-link"> <i class="fa fa-chevron-up"></i>
+								</a>
+							</div>
+						</div>
+						<div class="ibox-content">
+							<div class="alert alert-success alert-dismissable">
+                      			<button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+                       				可双击导师所在行，可查看更多信息。
+                  		 	</div>
+							<form id="grid-search-form">
+								<input type="hidden" id="orderType" name="orderType" />
+								<div class="profile-user-info profile-user-info-striped">
+									<div class="profile-info-row">	
+											<div class="profile-info-name">登录账号：</div>
+											<div class="profile-info-value form-group">
+												<input type="text" name="loginAccount" id="loginAccount"
+													placeholder="登录账号" class="input-large"
+													maxlength="30">
+											</div>
+											<div class="profile-info-name">真实姓名：</div>
+											<div class="profile-info-value form-group">
+												<input type="text" name="realName" id="realName"
+													placeholder="真实姓名" class="input-large"
+													maxlength="60">
+											</div>
+											<div class="profile-info-name">绑定手机：</div>
+											<div class="profile-info-value form-group">
+												<input type="text" name="bindMobile" id="bindMobile"
+													placeholder="绑定手机" class="input-large"
+													onkeyup="this.value=this.value.replace(/^ +| +$/g,'')"
+													maxlength="15">
+											</div>
+										</div>
+									<div class="profile-info-row">										
+											<div class="profile-info-name">国家：</div>
+											<div class="profile-info-value form-group">
+												<select class="chosen-select" name="country" id="country"
+													onChange="regionChange(this.value)">
+													<option value="">====请选择====</option> #foreach($regionDTO in
+													$regionList)
+													<option value="${regionDTO.regionName}">${regionDTO.regionName}
+													</option> #end
+												</select>
+											</div>										
+										<div class="profile-info-name">所在行业：</div>
+										<div class="profile-info-value form-group">
+											<select class="input-large" name="industryId" id="industryId">
+												<option value="">====请选择====</option> #foreach($industry in
+												$industryList)
+												<option value="${industry.industryId}">${industry.industryName}
+												</option> #end
+											</select>
+										</div>
+										<div class="profile-info-name">状态：</div>
+										<div class="profile-info-value form-group">
+											<select id="validStatus" name="validStatus"  class="input-large">
+												<option value="1">有效</option>
+												<option value="2">无效</option>
+											</select>
+										</div>
+									</div>
+									<div class="profile-info-row">
+										<div class="profile-info-name">审核状态：</div>
+										<div class="profile-info-value form-group">
+											<select name="examineStatus" name="examineStatus" class="input-large">
+												<option value="">==请选择==</option>
+												<option value="1">未审核</option>
+												<option value="2">审核通过</option>
+												<option value="3">审核拒绝</option>
+											</select>
+										</div>
+										<div class="profile-info-name">性别：</div>
+										<div class="profile-info-value form-group">
+											<select type="text" name="sex" id="sex" placeholder="性别"
+												class="input-large" >
+												<option value="0">====请选择====</option>
+												<option value="1">男</option>
+												<option value="2">女</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								
+							</form>
+							<div class="btn-group hidden-xs" id="tableEventsToolbar"
+								role="group">
+								<button type="button" id="grid-search-btn" title="搜索"
+									class="btn btn-outline btn-default">
+									<i class="glyphicon glyphicon-search" aria-hidden="true"></i>
+								</button>
+								<button type="button" id="grid-reset-btn" title="重置"
+									class="btn btn-outline btn-default" onclick="resetBtn();">
+									<svg class="icon" aria-hidden="true">
+									    <use xlink:href="#icon-zhongzhi"></use>
+									</svg>
+								</button>
+							</div>
+							<table id="tutorTable" data-mobile-responsive="false">
+								<thead>
+									<tr>
+										<th data-formatter="boostrapTableSortFormatter">序号</th>
+										<th data-field="loginAccount">登录账号</th>
+										<th data-field="realName">真实姓名</th>
+										<th data-field="sexStr">性别</th>
+										<th data-field="country">地区</th>
+										<th data-field="bindMobile">手机号码</th>
+										<th data-field="graduateSchool" >毕业院校</th>
+										<th data-field="industryName">所在行业</th>
+										<th data-field="newlyJob">最近一份工作</th>
+										<th data-field="email">邮箱</th>
+										<th data-field="position">职位</th>
+										
+										<th data-field="tutorId" data-visible="false">导师ID</th>
+										<th data-field="nickName" data-visible="false">昵称</th>
+										<th data-field="tutorTypeStr" data-visible="false">导师类型</th>
+										<th data-field="linkedinUri" data-visible="false">领英链接</th>
+										<th data-field="receiveTypeStr" data-visible="false">收款方式</th>
+										<th data-field="receiveAccount" data-visible="false">收款账户</th>
+										<th data-field="tutorSalaryStr" data-visible="false">导师薪资(美元)</th>
+										<th data-field="contractUrl" data-visible="false">合同路径</th>
+										<th data-field="createTime" data-visible="false">创建时间</th>
+										<!-- <th data-field="password" data-visible="false">登录密码</th> -->
+										<th data-field="regTypeStr" data-visible="false" data-visible="false">注册方式</th>
+										<th data-field="examineStatusStr" data-visible="false">审核状态</th>
+										<th data-field="examineTime" data-visible="false">审核时间</th>
+										<th data-field="examineOp" data-visible="false">审核人</th>
+										<th data-field="validStatusStr" data-visible="false">有效状态</th>
+									</tr>
+								</thead>
+							</table>
+							#parse("./mem/form/tutorExtension.html")
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	#parse("./include/commonJs.html")
+	<script
+		src="${ctx.contextPath}/hplus/js/plugins/chosen/chosen.jquery.min.js"></script>
+</body>
+<script>
+	$(function() {
+		poundageConfigPagin();
+		initChosenSelect();
+	});
+
+	function initChosenSelect() {
+		$('.chosen-select').chosen({
+			allow_single_deselect : true
+		});
+		$(window).off('resize.chosen').on('resize.chosen', function() {
+			$('.chosen-select').each(function() {
+				var $this = $(this);
+				$this.next().css({
+					'width' : 207
+				});
+			})
+		}).trigger('resize.chosen');
+	}
+
+	var onDblClickRowtutorId = "0";
+	function poundageConfigPagin() {
+		bingdUrserTableParams = jQuery.extend({}, boostrapTableParams); // 表单中的table参数
+		// table分页参数配置
+		boostrapTableParams.url = "${ctx.contextPath}/d-admin/mem/tutor/findPaging";
+		
+		boostrapTableParams.onDblClickRow = function(row, element) {
+			if (onDblClickRowtutorId == row.tutorId || row.tutorId == 0) {
+				return;
+			}
+        	// 双击事件
+            $(".tabs-container #tutor").val(row.tutorId);
+            $("#base_div a").click();
+            $("#tutorExtension_div").removeClass("hide");
+            onDblClickRowtutorId = row.tutorId;
+        };
+        
+		$("#tutorTable").bootstrapTable(boostrapTableParams);
+		initGridSearch(); // 初始化grid搜索
+	}
+
+	// bootstrap-table分页查询时的参数封装
+	function boostrapTableQueryParams(params) {
+		if (isEmpty(params)) { // 点击搜索按钮时
+			var options = $("#tutorTable").bootstrapTable('getOptions');
+			$("#tutorTable").bootstrapTable('refreshOptions', {
+				pageNumber : 1,
+				sortName : ""
+			});
+		} else { // 点击分页时
+			return boostrapTableSearchParams("grid-search-form", params);
+		}
+	}
+	
+	function resetBtn() {
+		$("#grid-search-form #country").val("");
+		$("#grid-search-form #country").trigger("chosen:updated");
+	}
+</script>
+</html>

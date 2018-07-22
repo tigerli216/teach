@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>注册导师审核</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+#parse("./include/commonCss.html")
+<link href="${ctx.contextPath}/hplus/css/plugins/chosen/chosen.css"
+	rel="stylesheet">
+</head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content animated fadeInUp">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox">
+					<div class="ibox float-e-margins">
+						<div class="ibox-title">
+							<h5>导师审核列表</h5>
+							<div class="ibox-tools">
+								<a class="collapse-link"> <i class="fa fa-chevron-up"></i>
+								</a>
+							</div>
+						</div>
+						<div class="ibox-content">
+							<!-- 	<div class="alert alert-success alert-dismissable">
+								<button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+								可双击订单所在行，可查看订单详情。
+							</div> -->
+							<form id="grid-search-form">
+								<input type="hidden" id="validStatus" name="validStatus"
+									value="1" />
+									<div class="profile-user-info profile-user-info-striped">
+									<div class="profile-info-row">
+										<div class="profile-info-name">登录账号：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="loginAccount" id="loginAccount"
+												placeholder="登录账号" class="input-large"
+												maxlength="30">
+										</div>
+										<div class="profile-info-name">导师姓名：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="realName" id="realName"
+												placeholder="导师姓名" class="input-large"
+												maxlength="60">
+										</div>
+										<div class="profile-info-name">审核状态：</div>
+										<div class="profile-info-value form-group">
+											<select name="examineStatus" name="examineStatus" class="input-large">
+												<option value="1">未审核</option>
+												<option value="2">审核通过</option>
+												<option value="3">审核拒绝</option>
+											</select>
+										</div>
+									</div>
+									<div class="profile-info-row input-daterange">
+										<div class="profile-info-name">提交开始时间：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="beginTime" id="beginTime"
+												placeholder="开始时间"
+												class="input-large form-control date-icon datetimepicker"
+												onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
+										</div>
+										<div class="profile-info-name">提交结束时间：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="endTime" id="endTime"
+												placeholder="结束时间"
+												class="input-large form-control date-icon datetimepicker"
+												onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
+										</div>
+									</div>
+								</div>
+							</form>
+							<div class="btn-group hidden-xs" id="tableEventsToolbar"
+								role="group">
+								<button type="button" onClick="editInitForm()" title="审核"
+									class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true">
+										<use xlink:href="#icon-shenpi"></use>
+									</svg>
+								</button>
+								<button type="button" id="grid-search-btn" title="搜索"
+									class="btn btn-outline btn-default">
+									<i class="glyphicon glyphicon-search" aria-hidden="true"></i>
+								</button>
+								<button type="button" id="grid-reset-btn" title="重置"
+									class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true">
+									    <use xlink:href="#icon-zhongzhi"></use>
+									</svg>
+								</button>
+							</div>
+							<table id="tutorTable" data-mobile-responsive="false">
+								<thead>
+									<tr>
+										<th data-radio="true"></th>
+										<th data-formatter="boostrapTableSortFormatter">序号</th>
+										<th data-field="loginAccount">登录账号</th>
+										<th data-field="realName">真实姓名</th>
+										<th data-field="sexStr">性别</th>
+										<th data-field="country">地区</th>
+										<th data-field="bindMobile">手机号码</th>
+										<th data-field="graduateSchool" >毕业院校</th>
+										<th data-field="industryName">所在行业</th>
+										<th data-field="newlyJob">最近一份工作</th>
+										<th data-field="email">邮箱</th>
+										<th data-field="position">职位</th>
+										
+										<th data-field="tutorId" data-visible="false">导师ID</th>
+										<th data-field="nickName" data-visible="false">昵称</th>
+										<th data-field="tutorTypeStr" data-visible="false">导师类型</th>
+										<th data-field="linkedinUri" data-visible="false">领英链接</th>
+										<th data-field="receiveTypeStr" data-visible="false">收款方式</th>
+										<th data-field="receiveAccount" data-visible="false">收款账户</th>
+										<th data-field="tutorSalaryStr" data-visible="false">导师薪资(美元)</th>
+										<th data-field="contractUrl" data-visible="false">合同路径</th>
+										<th data-field="createTime" data-visible="false">创建时间</th>
+										<!-- <th data-field="password" data-visible="false">登录密码</th> -->
+										<th data-field="regTypeStr" data-visible="false" data-visible="false">注册方式</th>
+										<th data-field="examineStatusStr" data-visible="false">审核状态</th>
+										<th data-field="examineTime" data-visible="false">审核时间</th>
+										<th data-field="examineOp" data-visible="false">审核人</th>
+										<th data-field="validStatusStr" data-visible="false">有效状态</th>
+									</tr>
+								</thead>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	#parse("./include/commonJs.html")
+	#parse("./mem/form/tutor_examine_form.html")
+	<script
+		src="${ctx.contextPath}/hplus/js/plugins/chosen/chosen.jquery.min.js"></script>
+</body>
+<script>
+	$(function() {
+		$('#grid-search-form #beginTime').datetimepicker({
+			language : 'zh-CN',
+			todayBtn : true,
+			clearBtn : true,
+			autoclose : true,
+			endDate : new Date(),
+			setDate : new Date(),
+			format:"yyyy-mm-dd",
+	 	    minView: "month"
+		});
+
+		$('#grid-search-form #endTime').datetimepicker({
+			language : 'zh-CN',
+			todayBtn : true,
+			clearBtn : true,
+			autoclose : true,
+			endDate : new Date(),
+			setDate : new Date(),
+			format:"yyyy-mm-dd",
+	 	    minView: "month"
+		})
+		
+		poundageConfigPagin();
+	});
+
+	function poundageConfigPagin() {
+		bingdUrserTableParams = jQuery.extend({}, boostrapTableParams); // 表单中的table参数
+		// table分页参数配置
+		boostrapTableParams.url = "${ctx.contextPath}/d-admin/mem/tutor/findPaging";
+		$("#tutorTable").bootstrapTable(boostrapTableParams);
+		initGridSearch(); // 初始化grid搜索
+	}
+
+	// bootstrap-table分页查询时的参数封装
+	function boostrapTableQueryParams(params) {
+		if (isEmpty(params)) { // 点击搜索按钮时
+			var options = $("#tutorTable").bootstrapTable('getOptions');
+			$("#tutorTable").bootstrapTable('refreshOptions', {
+				pageNumber : 1,
+				sortName : ""
+			});
+		} else { // 点击分页时
+			return boostrapTableSearchParams("grid-search-form", params);
+		}
+	}
+	
+	function editInitForm() {
+		var selections = $("#tutorTable").bootstrapTable('getSelections');
+		if (isEmpty(selections)) {
+			common_error("请先选择要编辑的配置！");
+			return;
+		}
+		if (selections.length > 1) {
+			common_error("只能选择一个配置编辑！");
+			return;
+		}
+		if (selections[0].examineStatus == 2) {
+			common_error("审核已通过！");
+			return;
+		}
+		$('.form-group').removeClass('has-error');
+		$('span[class*=help-block]').remove();
+		emptyDivInputValue('tutor-examine-form-modal');
+		$('#tutor-examine-form-modal #modalHeaderMsg').text('导师审核');
+		$("#tutor-examine-form-modal").modal("show");
+		
+		var tutorId = selections[0].tutorId;
+		$.ajax({
+			type : "POST",
+			url : "${ctx.contextPath}/d-admin/mem/tutor/getTutor",
+			data : "tutorId=" + tutorId,
+			dataType : "json",
+			success : function(data) {
+				initParam(data, null, 'form-edit');
+			},
+			complete : function() {
+			}
+		});
+	}
+</script>
+</html>

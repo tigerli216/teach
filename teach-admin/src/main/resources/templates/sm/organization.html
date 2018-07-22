@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>组织管理</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+#parse("./include/commonCss.html")
+
+	<!-- 自定义 -->
+	<link href="/admin/css/index.css" rel="stylesheet">
+
+</head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content animated fadeInUp">
+		<div class="row">
+			<div class="col-sm-2 show-bg show-padding">
+				<div class="ibox-title show-padding">
+				<div class="widget-body scrollable-horizontal show-height">
+					<div class="widget-main">
+						<div id="orgTree" class="ztree"></div>
+					</div>
+				</div>
+				</div>
+			</div>
+			<div class="col-sm-10">
+				<div class="ibox">
+					<div class="ibox float-e-margins">
+						<div class="ibox-title">
+							<h5>组织信息</h5>
+							<div class="ibox-tools">
+								<a class="collapse-link"> <i class="fa fa-chevron-up"></i>
+								</a>
+							</div>
+						</div>
+						<div class="ibox-content">
+							<form id="grid-search-form">
+								<div class="profile-user-info profile-user-info-striped">
+									<input type="hidden" id="parentId" name="parentId" value="1">
+									<div class="profile-info-row">
+										<div class="profile-info-name">组织名称：</div>
+										<div id="orgName" class="profile-info-value"></div>
+										<div class="profile-info-name">是否权限组织：</div>
+										<div id="isDataControlStr" class="profile-info-value"></div>
+									</div>
+								</div>
+								<div class="profile-user-info profile-user-info-striped">
+									<div class="profile-info-row">
+										<div class="profile-info-name">组织描述：</div>
+										<div id="orgDesc" class="profile-info-value"></div>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+				<div class="ibox">
+					<div class="ibox float-e-margins">
+						<div class="ibox-title">
+							<h5>子组织信息</h5>
+							<div class="ibox-tools">
+								<a class="collapse-link"> <i class="fa fa-chevron-up"></i>
+								</a>
+							</div>
+						</div>
+						<div class="ibox-content">
+							<div class="example">
+								<div class="btn-group hidden-xs" id="tableEventsToolbar"
+									role="group">
+									<button type="button" onClick="addInitForm()" title="添加"
+										class="btn btn-outline btn-default">
+										<i class="glyphicon glyphicon-plus" aria-hidden="true"></i>
+									</button>
+									<button type="button" onClick="editInitForm()" title="编辑"
+										class="btn btn-outline btn-default">
+										<i class="glyphicon glyphicon-pencil" aria-hidden="true"></i>
+									</button>
+									<button type="button" id="grid-search-btn" title="搜索"
+										class="btn btn-outline btn-default">
+										<i class="glyphicon glyphicon-search" aria-hidden="true"></i>
+									</button>
+								</div>
+								<table id="orgtable" data-height="520"
+									data-mobile-responsive="true">
+									<thead>
+										<tr>
+											<th data-radio="true"></th>
+											<th data-formatter="boostrapTableSortFormatter">序号</th>
+											<th data-field="orgName">组织名称</th>
+											<th data-field="isDataControl">是否权限组织</th>
+											<th data-field="orgDesc">组织描述</th>
+										</tr>
+									</thead>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	#parse("./include/commonJs.html")
+	#parse("./sm/form/organization_form.html")
+</body>
+<script>
+	$(document).ready(function() {
+		initOrgTree();
+		
+		boostrapTableParams.url = "${ctx.contextPath}/d-admin/org/findPaging";
+		$("#orgtable").bootstrapTable(boostrapTableParams);
+		initGridSearch(); // 初始化grid搜索
+	});
+	
+	var setting = {
+			data : {
+				simpleData : {
+					enable : true
+				}
+			},
+			callback: {
+				onCheck: zTreeOnCheck,
+				onClick: function(event, treeId, treeNode){
+					var treeObj = $.fn.zTree.getZTreeObj("orgTree");
+					treeObj.selectNode(treeNode);	// 选中节点
+					orgIndex(treeNode.id);
+					$('#grid-search-form #parentId').val(treeNode.id);
+					boostrapTableQueryParams();
+				}
+			}
+		};
+
+	// 初始化功能菜单树
+	function initOrgTree() {
+		$.fn.zTree.init($("#orgTree"), setting, ${orgTree});
+	}
+	
+    // 选中节点
+	function selectNode(id) {
+		var treeObj = $.fn.zTree.getZTreeObj("orgTree");
+		var node = treeObj.getNodeByParam("id", id);
+		treeObj.checkNode(node, true, false);
+		orgIndex(id);
+	}
+    
+	// 触发事件
+	function zTreeOnCheck(event, treeId, treeNode){
+		orgIndex(treeNode.id);
+		$('#grid-search-form #parentId').val(treeNode.id);
+		boostrapTableQueryParams();
+	}
+	
+	// 首页信息
+	function orgIndex(id) {
+		$.ajax({
+			type : "POST",
+			url : "${ctx.contextPath}/d-admin/org/getOrganizationByOrgId",
+			data : "orgId=" + id,
+			dataType : "json",
+			success : function(data) {
+				$('#grid-search-form #parentId').val(data.orgId);
+				$('#grid-search-form #orgName').html(data.orgName);
+				$('#grid-search-form #orgDesc').html(data.orgDesc);
+				$('#grid-search-form #isDataControlStr').html(data.isDataControl == 0 ? '否' : '是');
+			},
+			complete : function() {
+				isEditInitForm = false;
+			}
+		});
+	}
+
+	// 加载服务器数据之前的处理程序
+	function respHandler(res) {
+		var rows = res.list;
+		if (isEmpty(rows))
+			return res;
+
+		var pstatus = new Array("否", "是");
+		for (i = 0; i < rows.length; i++) {
+			rows[i].isDataControl = pstatus[rows[i].isDataControl];
+		}
+		return res;
+	}
+
+	// bootstrap-table分页查询时的参数封装
+	function boostrapTableQueryParams(params) {
+		if (isEmpty(params)) { // 点击搜索按钮时
+			var options = $("#orgtable").bootstrapTable('getOptions');
+			$("#orgtable").bootstrapTable('refreshOptions', {
+				pageNumber : 1,
+				sortName : ""
+			});
+		} else { // 点击分页时
+			return boostrapTableSearchParams("grid-search-form", params);
+		}
+	}
+
+	// form新增时初始化
+	function addInitForm() {
+		$('.form-group').removeClass('has-error');
+		$('span[class*=help-block]').remove();
+		emptyDivInputValue('form-modal');
+		$('#modalHeaderMsg').text('新增组织');
+		var parentId = $('#grid-search-form #parentId').val();
+		if(isEmpty(parentId)){
+			return;
+		}
+		$('#parentName').val($('#changeResourceTitle').val());
+		var resourceType = $('#changeResourceType').val()
+		if(resourceType == 3){
+			return;
+		}
+		$('#form-edit #parentId').val(parentId);
+		$("#form-modal").modal("show");
+	};
+
+	// form修改时初始化
+	var isEditInitForm = false;
+	function editInitForm() {
+		if (isEditInitForm)
+			return;
+
+		var selections = $("#orgtable").bootstrapTable('getSelections');
+		if (isEmpty(selections)) {
+			common_error("请先选择要编辑的行！");
+			return;
+		}
+		if (selections.length > 1) {
+			common_error("只能选择一行编辑！");
+			return;
+		}
+
+		var orgId = selections[0].orgId;
+		$('.form-group').removeClass('has-error');
+		$('span[class*=help-block]').remove();
+		emptyDivInputValue('form-modal');
+
+		$('#modalHeaderMsg').text('修改组织');
+
+		isEditInitForm = true;
+
+		$.ajax({
+			type : "POST",
+			url : "${ctx.contextPath}/d-admin/org/getOrganizationByOrgId",
+			data : "orgId=" + orgId,
+			dataType : "json",
+			success : function(data) {
+				// 初始化form数据
+				initParam(data, null, 'form-modal');
+				$("#form-modal").modal("show");
+			},
+			complete : function() {
+				isEditInitForm = false;
+			}
+		});
+	};
+	
+	// 组织树
+	function orgTree(id) {
+		$.ajax({
+			type : "POST",
+			url : "${ctx.contextPath}/d-admin/org/findOrganizationTree",
+			data : "treeOpen=true",
+			dataType : "json",
+			success : function(data) {
+				$.fn.zTree.init($("#orgTree"), setting, data);
+			},
+			complete : function() {
+				isEditInitForm = false;
+			}
+		});
+	}
+</script>
+</html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>网课课程管理</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+#parse("./include/commonCss.html")
+<link href="${ctx.contextPath}/css/wangEditor-fullscreen-plugin.css"
+	rel="stylesheet">
+</head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content animated fadeInUp">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox">
+					<div class="ibox float-e-margins">
+						<div class="ibox-title">
+							<h5>网课课程列表</h5>
+							<div class="ibox-tools">
+								<a class="collapse-link"> <i class="fa fa-chevron-up"></i>
+								</a>
+							</div>
+						</div>
+						<div class="ibox-content">
+							<form id="grid-search-form">
+								<div class="profile-user-info profile-user-info-striped">
+									<input type="hidden" id="lessonId" name="lessonId" />
+									<div class="profile-info-row">
+										<div class="profile-info-name">课程名称：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="lessonName" placeholder="课程名称"
+												class="input-large" maxlength="60">
+										</div>
+										<div class="profile-info-name">课程分类：</div>
+										<div class="profile-info-value form-group">
+											<select class="input-large" name="lessonType">
+												<option value="0">全部</option>
+												<option value="1">录播课</option>
+												<option value="2">直播课</option>
+											</select>
+										</div>
+										<div class="profile-info-name">行业：</div>
+										<div class="profile-info-value form-group">
+											<select class="input-large" name="industryId" id="industryId">
+												<option value="0">全部</option>
+												 #foreach($industry in $industrys)
+												<option value="${industry.industryId}">${industry.industryName}</option>
+												#end
+											</select>
+										</div>
+										
+									</div>
+									<div class="profile-info-row">
+										<div class="profile-info-name">讲师名称：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="tutorName" placeholder="讲师名称"
+												class="input-large" maxlength="60">
+										</div>
+										<div class="profile-info-name">访问权限：</div>
+										<div class="profile-info-value form-group">
+											<select class="input-large" name="visitAuth">
+												<option value="0">全部</option>
+												<option value="1">游客</option>
+												<option value="2">普通用户</option>
+												<option value="3">VIP</option>
+											</select>
+										</div>
+										<div class="profile-info-name">上架状态：</div>
+										<div class="profile-info-value form-group">
+											<select class="input-large" name="shelfStatus">
+												<option value="0">全部</option>
+												<option value="1">已上架</option>
+												<option value="2">未上架</option>
+											</select>
+										</div>
+									</div>
+								</div>
+							</form>
+							<div class="btn-group hidden-xs" id="tableEventsToolbar"
+								role="group">
+								<button type="button" onClick="addInitForm()" title="添加"
+									class="btn btn-outline btn-default">
+									<i class="glyphicon glyphicon-plus" aria-hidden="true"></i>
+								</button>
+								<button type="button" onClick="editInitForm()" title="编辑"
+									class="btn btn-outline btn-default">
+									<i class="glyphicon glyphicon-pencil" aria-hidden="true"></i>
+								</button>
+								<button type="button" onClick="detailsInitForm()" title="查看课程详情"
+									class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true"> <use
+											xlink:href="#icon-icon2"></use></svg>
+									<i class="iconfont icon-quanxiantianjia" aria-hidden="true"></i>
+								</button>
+								<button type="button" onClick="updatePro(1)" title="上架"
+									class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true">
+                                    <use
+											xlink:href="#icon-iconfontshangpinshangjia"></use>
+                                </svg>
+								</button>
+								<button type="button" onClick="updatePro(2)" title="下架"
+									class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true">
+                                    <use xlink:href="#icon-xiajia"></use>
+                                </svg>
+								</button>
+								<button type="button" onClick="watchVideo()" title="查看视频"
+									class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true">
+											    <use xlink:href="#icon-tongbusynchronize4"></use>
+											</svg>
+								</button>
+								<button type="button" id="grid-search-btn" title="搜索"
+									class="btn btn-outline btn-default">
+									<i class="glyphicon glyphicon-search" aria-hidden="true"></i>
+								</button>
+								<button type="button" id="grid-reset-btn" title="重置"
+									class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true">
+                                    <use xlink:href="#icon-zhongzhi"></use>
+                                </svg>
+								</button>
+							</div>
+							<table id="lesson" data-mobile-responsive="false">
+								<thead>
+									<tr>
+										<th data-checkbox="true"></th>
+										<th data-formatter="boostrapTableSortFormatter">序号</th>
+										<th data-field="lessonId" data-visible="false">课程ID</th>
+										<th data-field="lessonName">课程名称</th>
+										<th data-field="lessonTypeStr">课程分类</th>
+										<th data-field="seriesName" data-visible="false">系列名称</th>
+										<th data-field="origPriceStr">课程原价</th>
+										<th data-field="discountPriceStr">课程折扣价</th>
+										<th data-field="validDuration">有效时长（月）</th>
+										<th data-field="visitAuthStr">访问权限</th>
+										<th data-field="shelfStatusStr">上架状态</th>
+										<th data-field="isTopStr">是否置顶</th>
+										<th data-field="weight">权重(倒序)</th>
+										<th data-field="tutorName">讲师</th>
+										<th data-field="industry">所属行业</th>
+										<!-- <th data-field="validTime">有效期</th> -->
+										<th data-field="createTime" data-visible="false">创建时间</th>
+										<th data-field="createOp" data-visible="false">创建人</th>
+										<th data-field="modifyTime" data-visible="false">修改时间</th>
+										<th data-field="modifyOp" data-visible="false">修改人</th>
+									</tr>
+								</thead>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	#parse("./include/commonJs.html")
+	#parse("./lesson/form/lessonPublic_form.html")
+</body>
+<script>
+	$(document)
+			.ready(
+					function() {
+						// table分页参数配置
+						boostrapTableParams.url = "${ctx.contextPath}/d-admin/lesson/public/findPaging";
+						$("#lesson").bootstrapTable(boostrapTableParams);
+
+						initGridSearch(); // 初始化grid搜索
+					});
+
+	// bootstrap-table分页查询时的参数封装
+	function boostrapTableQueryParams(params) {
+		if (isEmpty(params)) { // 点击搜索按钮时
+			var options = $("#lesson").bootstrapTable('getOptions');
+			$("#lesson").bootstrapTable('refreshOptions', {
+				pageNumber : 1,
+				sortName : ""
+			});
+		} else { // 点击分页时
+			return boostrapTableSearchParams("grid-search-form", params);
+		}
+	}
+
+	// 上架,status:2-上架；3-下架
+	var isUpdate = false;
+	function updatePro(status) {
+		var title = "上架";
+		if (status == 2)
+			title = "下架";
+
+		var selections = $("#lesson").bootstrapTable('getSelections');
+		if (isEmpty(selections)) {
+			common_error("请先选择要" + title + "的课程！");
+			return;
+		}
+		swal({
+			title : "您确定要" + title + "吗",
+			text : title + "后将无法修改，请谨慎操作！",
+			type : "warning",
+			showCancelButton : true,
+			confirmButtonColor : "#DD6B55",
+			confirmButtonText : title,
+			closeOnConfirm : false
+		}, function() {
+			if (isUpdate)
+				return;
+
+			var lessonIds = '';
+			for (var i = 0; i < selections.length; i++) {
+				lessonIds += selections[i].lessonId + ",";
+				var lastStatus = selections[i].shelfStatus;
+				if (lastStatus == status) {
+					common_error("课程名称为：" + selections[i].lessonName + "，不能再次"
+							+ title);
+					return;
+				}
+				if (selections[i].status == 2) {
+					common_error("课程名称为：" + selections[i].lessonName
+							+ "已失效，不能再次" + title);
+					return;
+				}
+			}
+			isUpdate = true;
+			$.ajax({
+				type : "POST",
+				url : "${ctx.contextPath}/d-admin/lesson/public/update",
+				data : "lessonIds=" + lessonIds + "&shelfStatus=" + status,
+				dataType : "json",
+				success : function(data) {
+					if (data.success) {
+						swal(title + "成功！", "", "success");
+						boostrapTableQueryParams();
+					} else {
+						swal(title + "失败！", data.errDesc, "error");
+					}
+				},
+				complete : function() {
+					isUpdate = false;
+				}
+			});
+
+		});
+	};
+
+	// 添加时表单初始化
+	function addInitForm() {
+		window.location.href = "${ctx.contextPath}/d-admin/lesson/public/addInitForm";
+	}
+    
+    // 课程详情
+   	var isDetailsInitFormSub = false;
+   	function detailsInitForm() {
+   		if (isEditInitFormSub)
+   			return;
+   		var selections = $("#lesson").bootstrapTable('getSelections');
+   		if (isEmpty(selections)) {
+   			common_error("请先选择要查看的课程！");
+   			return;
+   		}
+   		if (selections.length > 1) {
+   			common_error("只能选择一个课程查看！");
+   			return;
+   		}
+
+		var lessonId = selections[0].lessonId;
+		var url = "${ctx.contextPath}/d-admin/lesson/public/viewInitForm?lessonId="
+				+ lessonId;
+		window.location.href = url;
+	}
+
+	// 编辑时表单初始化
+	var isEditInitFormSub = false;
+	function editInitForm() {
+		if (isEditInitFormSub)
+			return;
+		
+		var selections = $("#lesson").bootstrapTable('getSelections');
+		if (isEmpty(selections)) {
+			common_error("请先选择要编辑的课程！");
+			return;
+		}
+		if (selections.length > 1) {
+			common_error("只能选择一个课程编辑！");
+			return;
+		}
+		if (selections[0].shelfStatus == 1) {
+			common_error("上架后的课程不允许修改！");
+			return;
+		} 
+
+		var lessonId = selections[0].lessonId;
+		var url = "${ctx.contextPath}/d-admin/lesson/public/editInitForm?lessonId="
+				+ lessonId;
+		window.location.href = url;
+	}
+	
+	function watchVideo() {
+		if (isEditInitFormSub)
+			return;
+		
+		var selections = $("#lesson").bootstrapTable('getSelections');
+		if (isEmpty(selections)) {
+			common_error("请先选择要查看的课程！");
+			return;
+		}
+		if (selections.length > 1) {
+			common_error("只能选择一个课程查看！");
+			return;
+		}
+
+		var lessonId = selections[0].lessonId;
+		var url = "${ctx.contextPath}/d-admin/lesson/public/watchVideo?lessonId="
+				+ lessonId;
+		window.location.href = url;
+	}
+</script>
+</html>

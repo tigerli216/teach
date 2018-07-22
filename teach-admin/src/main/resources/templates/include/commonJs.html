@@ -1,0 +1,222 @@
+<!-- 全局js -->
+<script src="${ctx.contextPath}/hplus/js/jquery.min.js?v=2.1.4"></script>
+<script src="${ctx.contextPath}/hplus/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="${ctx.contextPath}/hplus/js/plugins/bootstrap-table/bootstrap-table.min.js?v=1.11.0"></script>
+<script src="${ctx.contextPath}/hplus/js/plugins/bootstrap-table/bootstrap-table-mobile.min.js"></script>
+<script src="${ctx.contextPath}/hplus/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js?v=1.11.0"></script>
+<script src="${ctx.contextPath}/js/jquery/jquery.form.js"></script>
+<!-- 日期插件 -->
+<script src="${ctx.contextPath}/hplus/js/plugins/datapicker/bootstrap-datepicker.js" charset="UTF-8"></script>
+<script src="${ctx.contextPath}/hplus/js/plugins/datapicker/bootstrap-datetimepicker.min.js" charset="UTF-8"></script>
+<script src="${ctx.contextPath}/hplus/js/plugins/datapicker/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+
+<!-- 弹窗提示插件 -->
+<script src="${ctx.contextPath}/hplus/js/plugins/toastr/toastr.min.js"></script>
+<script src="${ctx.contextPath}/hplus/js/plugins/sweetalert/sweetalert.min.js"></script>
+
+<!-- 表单校验插件 -->
+<script src="${ctx.contextPath}/hplus/js/plugins/validate/jquery.validate.min.js"></script>
+<script src="${ctx.contextPath}/hplus/js/plugins/validate/messages_zh.min.js"></script>
+<script src="${ctx.contextPath}/js/validation.js"></script>
+
+ <!-- 自定义js -->
+<script src="${ctx.contextPath}/hplus/js/content.js?v=1.0.0"></script>
+<script src="${ctx.contextPath}/js/ajax_filter.js" type="text/javascript"></script>
+<script src="${ctx.contextPath}/js/base.js" type="text/javascript"></script>
+<script src="${ctx.contextPath}/js/commonBase.js" type="text/javascript"></script>
+<script src="${ctx.contextPath}/js/dateUtil.js"></script>
+
+<!-- 阿里巴巴cdn，在线矢量图标库 -->
+<script src="//at.alicdn.com/t/font_3tolk74xvkt3ayvi.js" type="text/javascript"></script>
+<!-- ztree -->
+<script type="text/javascript" src="${ctx.contextPath}/ztree/js/jquery.ztree.core.js"></script>
+<script type="text/javascript" src="${ctx.contextPath}/ztree/js/jquery.ztree.excheck.js"></script>
+
+<script type="text/javascript">
+
+	// 公用的成功弹窗提示
+	function common_success(content, title) {
+		toastr.options.timeOut = 5000;	// 显示时间为5秒
+		toastr.success(content, title);
+		if (isEmpty(title)) {	// 标题为空时调整content位置
+			$(".toast-message").css("font-size", "14px").css("margin-top", "4px");
+			$(".toast-top-center").css("top", "5%");// 调整位置，避免与modal重叠
+		}
+	}
+	// 公用的失败弹窗提示
+	function common_error(content, title) {
+		toastr.options.timeOut = 6000;	// 延迟显示时间为6秒
+		toastr.error(content, title);
+		if (isEmpty(title)) {	// 标题为空时调整content位置
+			$(".toast-message").css("font-size", "14px").css("margin-top", "4px");
+			$(".toast-top-center").css("top", "5%");// 调整位置，避免与modal重叠
+		}
+	}
+	toastr.options = {
+        "closeButton": true, //是否显示关闭按钮
+        "debug": false, //是否使用debug模式
+        "positionClass": "toast-top-center",// 弹出窗的位置
+        "progressBar": true,	// 进度条
+        "showDuration": "300",//显示的动画时间
+        "hideDuration": "1000",//消失的动画时间
+        "timeOut": "5000", //展现时间
+        "extendedTimeOut": "2000",//加长展示时间
+        "showEasing": "swing",//显示时的动画缓冲方式
+        "hideEasing": "linear",//消失时的动画缓冲方式
+        "showMethod": "fadeIn",//显示时的动画方式
+        "hideMethod": "fadeOut" //消失时的动画方式
+    };
+	
+	// boostrapTable分页参数配置
+	var boostrapTableParams = {
+		method: "post",	// post请求方式
+		contentType: "application/x-www-form-urlencoded",	// 发送到服务器的数据编码类型
+		queryParams: "boostrapTableQueryParams",	// 重写查询参数
+		responseHandler: "respHandler",	// 加载服务器数据之前的处理程序
+		dataType: "json",	// 服务端返回数据类型
+		striped: true,	// 隔行变色效果
+		pagination: true,	// 底部显示分页条 
+		sidePagination: "server",	// 在服务端进行分页
+		pageList:"[5, 10, 20, 50, 100, 200]",	// 可供选择的页面数据条数
+		showRefresh: true,	// 显示刷新按钮
+		showColumns: true,	// 显示内容列下拉框
+		clickToSelect: true,	// 在点击行时，自动选择rediobox 和 checkbox
+		sortable: true,	// 支持排序
+		dataField: "list",	// 设置返回数据集的属性名
+		iconSize: 'outline',
+		toolbar: '#tableEventsToolbar',
+		icons: {
+	      paginationSwitchDown: 'glyphicon-collapse-down icon-chevron-down',
+       	  paginationSwitchUp: 'glyphicon-collapse-up icon-chevron-up',
+		  refresh: 'glyphicon-repeat',
+		  toggle: 'glyphicon-list-alt',
+		  columns: 'glyphicon-list',
+		  detailOpen: 'glyphicon-plus icon-plus',
+          detailClose: 'glyphicon-minus icon-minus'
+		},
+		ajax: $.ajax	// 重写ajax方法，默认新请求时会abort原ajax请求，目前是避免重复提交，新请求不处理
+	};
+	function respHandler(res) {return res;};
+	
+	// bootstrap-table自增长序号
+	function boostrapTableSortFormatter(value, row, index){
+		return index + 1;
+	}
+	// 列排序时的显示格式化，主要是为了兼容排序，注意data-field与data-sort-name反着配置才能兼容
+	function columnSortFormatter(value, row, index) {
+		return row[this.sortName];
+	}
+	
+	// bootstrap-table根据formId返回需要提交的query对象
+	function boostrapTableSearchParams(formId, params) {
+		var paramArray = $("#" + formId).serializeArray();
+		var queryParam = {};
+		for (var i=0; i<paramArray.length; i++) {
+			var param = paramArray[i];
+			if (!isEmpty(param.value)) {
+				queryParam[param.name] = trim(param.value);
+			}
+		}
+		if (!isEmpty(params)) {	// 封装分页参数
+			queryParam.offset = params.offset;
+			queryParam.limit = params.limit;
+			if (!isEmpty(params.sort)) {	// 排序
+				queryParam.sort = params.sort;
+				queryParam.order = params.order;
+			}
+		}
+		return queryParam;
+	}
+	
+	/*
+	*初始化搜索，btnId-搜索按钮ID；formId-搜索表单ID；searchFun-搜索执行函数
+	*初始化按钮点击事件，表单enter事件
+	*默认：btnId(grid-search-btn)、formId(grid-search-form)、searchFun(grid_search_fun)
+	*/
+	function initGridSearch(btnId, formId, searchFun) {
+		if (isEmpty(btnId))	btnId = "grid-search-btn";
+		if (isEmpty(formId))	formId = "grid-search-form";
+		if (isEmpty(searchFun))	searchFun = "boostrapTableQueryParams";
+		
+		// 初始化搜索按钮的click事件
+		var searchBtn = $("#" + btnId);
+		if (searchBtn.length > 0) {
+			searchBtn.click(function(){
+				eval(searchFun + "()");
+			});
+		}
+		
+		var searchForm = $("#" + formId);
+		if (searchForm.length > 0) {
+			// input的enter事件
+			searchForm.find("input").on("keypress", function(event){
+				if(event.keyCode == "13") {
+					eval(searchFun + "()");
+	            }
+			});
+			// select的change事件，校验改变前的值
+			searchForm.find("select").data("last", this.value).change(function(){
+				var oldValue = $(this).data("last");//改变之前的值
+				var newValue = $(this).val();	// 当前值
+				if (oldValue != newValue) {
+					$(this).data("last", newValue);// 改变都附加上去，以便下次变化时获取
+					eval(searchFun + "()");
+				}
+			});
+		}
+	}
+	// 重置按钮
+	$(function(){
+		var resetIcon = $("button[id=grid-reset-btn] .icon");
+		if (resetIcon.length > 0) {
+			var resetBtn = resetIcon.parent();
+			resetBtn.each(function(){
+				$(this).click(function(){
+					var form = $(this).closest(".bootstrap-table").prev("form");
+					if (form.length > 0) {
+						form[0].reset();
+					}
+				});
+			});
+		}
+	})
+	
+	// 表单file文件校验（动态更改name属性）
+	function form_fileValid(id) {
+		$("#" + id + " input[type=file]").each(function(){
+			if (isEmpty($(this).val())){
+				$(this).removeAttr("name");
+			} else {
+				if (isEmpty($(this).attr("name"))) {
+					$(this).attr("name", $(this).attr("id"));
+				}
+			}
+		})
+	}
+	
+	// 是否需要时间查询
+	function isNeedTimeQuery(paramSelectorArr, beginTimeSelector, endTimeIdSelector){
+		if(paramSelectorArr != null){
+			for(var i=0;i<paramSelectorArr.length;i++){
+				var paramSelector = paramSelectorArr[i];
+				if(!isEmpty($(paramSelector).val())){
+					return null;
+				}
+			}
+		}
+		var beginTime = $(beginTimeSelector).val();
+		var endTime = $(endTimeIdSelector).val();
+		if(isEmpty(beginTime)){
+			return "请选择开始时间";
+		}
+		if(isEmpty(endTime)){
+			return "请选择结束时间";
+		}
+		var dateNum=DateUtil.dateDiff("d",DateUtil.strToDate(beginTime),DateUtil.strToDate(endTime));
+		if(dateNum>90 || dateNum<0){
+			return "开始时间和结束时间不能超过3个月";
+		}
+		return null;
+	}
+
+</script>

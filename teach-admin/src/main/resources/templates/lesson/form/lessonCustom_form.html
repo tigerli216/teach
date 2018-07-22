@@ -1,0 +1,96 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<!--  购买课程弹框    -->
+<div class="modal inmodal" id="buy-form-modal" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal" type="button">×</button>
+                <h4 class="modal-title">购买课程</h4>
+            </div>
+            <div class="modal-body">
+                <form id="buy-form" class="form-horizontal">
+					<div class="profile-user-info profile-user-info-striped">
+						<input type="hidden" id="lessonId" name="lessonId" />
+						<div class="profile-info-row">
+							<div class="profile-info-name">课程名称：</div>
+							<div class="profile-info-value form-group">
+								<input type="text" id="lessonName" class="input-large"
+									disabled="disabled maxlength="120"">
+							</div>
+							<div class="profile-info-name">课程价格(元)：</div>
+							<div class="profile-info-value form-group">
+								<input type="text" id="lessonPriceStr" class="input-large"
+									disabled="disabled" maxlength="20"/>
+							</div>
+						</div>
+						<div class="profile-info-row">
+							<div class="profile-info-name">支付方式：</div>
+							<div class="profile-info-value form-group">
+								<select class="input-large" name="payType" id="payType">
+									<option value="2">线下</option>
+									<option value="1">线上</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="profile-user-info profile-user-info-striped" >
+						<div class="profile-info-row">
+							<div class="profile-info-name">购买备注：</div>
+							<div class="profile-info-value form-group">
+								<textarea id="orderNote" name="orderNote" maxlength="1024" class="col-sm-10" maxlength="1000"></textarea>
+							</div>
+						</div>
+					</div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" onClick="buyFormSubmit()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    
+ 	// 购买定制课提交 
+	var isFormSubmit = false;
+	function buyFormSubmit() {
+		if (isFormSubmit) return;
+	    var lessonId=$("#buy-form #lessonId").val();
+	    var payType  = $("#buy-form #payType").val(); 
+	    var payStr=["","线上","线下"];
+	    var orderNote  = $("#buy-form #orderNote").val(); 
+	     swal({
+	         title: "确定购买"+ $("#buy-form #lessonName").val() +"？",
+	         text: "支付方式为：" + payStr[payType],
+	         type: "warning",
+	         showCancelButton: true,
+	         confirmButtonColor: "#DD6B55",
+	         confirmButtonText: "确定",
+	         closeOnConfirm: false
+	     }, function () {
+		     isFormSubmit = true;
+	         $.ajax({
+	             type:"POST",
+	             url:"${ctx.contextPath}/d-admin/lesson/custom/buyLesson",
+	             data: "lessonId=" + lessonId + "&payType=" + payType + "&orderNote=" + orderNote,
+	             dataType:"json",
+	             success:function(data){
+	                 if (data.success) {
+	                     swal("购买成功！", "", "success");
+	                     boostrapTableQueryParams();
+	                     $("#buy-form-modal").modal("hide");
+	                 } else {
+	                     swal("购买失败！", data.errDesc);
+	                 }
+	             },
+	             complete:function(){
+	            	 isFormSubmit = false;
+	             }
+	         });
+	     })
+	};
+
+</script>

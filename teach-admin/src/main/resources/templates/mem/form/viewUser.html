@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+#parse("./include/commonCss.html")
+<style>
+.modal-footer {
+	border-top: 0px;
+}
+</style>
+</head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content animated fadeInUp">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox">
+					<div class="ibox float-e-margins">
+						<div class="ibox-title" id="form-modal" role="dialog"
+							aria-hidden="true">
+							<h5>查看学生详情</h5>
+							<form id="form-prod-model" class="form-horizontal">
+								<div class="profile-user-info profile-user-info-striped"
+									id="product_base_attr_div">
+									<input type="hidden" id="lessonId" name="lessonId" />
+									<div class="profile-info-row">
+										<div class="profile-info-name">学生ID：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="userId" id="userId" class="input-large" style="border:0;"  disabled="disabled">
+										</div>
+										<div class="profile-info-name">登录账号：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" id="loginAccount" name="loginAccount" class="input-large" style="border:0;"  disabled="disabled"/>
+										</div>
+										<div class="profile-info-name">昵称：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="nickName" id="nickName" class="input-large" style="border:0;"  disabled="disabled"/>
+										</div>
+									</div>
+									<div class="profile-info-row">
+										<div class="profile-info-name">真实姓名：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="realName" class="input-large" style="border:0;"  disabled="disabled"/>
+										</div>
+										<div class="profile-info-name">绑定手机：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="bindMobile" class="input-large" style="border:0;"  disabled="disabled"/>
+										</div>
+										<div class="profile-info-name">邮箱：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="email" class="input-large" style="border:0;"  disabled="disabled">
+										</div>
+									</div>
+									<div class="profile-info-row">
+										
+										<div class="profile-info-name">注册方式：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="regTypeStr" class="input-large" style="border:0;"  disabled="disabled"/>
+										</div>
+										<div class="profile-info-name">用户类型：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="userTypeStr" class="input-large" style="border:0;"  disabled="disabled"/>
+										</div>
+										<div class="profile-info-name">用户级别：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="userLevelStr" class="input-large" style="border:0;"  disabled="disabled">
+										</div>
+									</div>
+									<div class="profile-info-row">
+									<div class="profile-info-name">性别：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="sexStr" class="input-large" style="border:0;"  disabled="disabled"/>
+										</div>
+										<div class="profile-info-name">国家：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="country" class="input-large" style="border:0;"  disabled="disabled"/>
+										</div>
+										<div class="profile-info-name">学校：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="school" class="input-large" style="border:0;"  disabled="disabled">
+										</div>
+									</div>
+								</div>
+								<div class="profile-user-info profile-user-info-striped"
+									id="product_base_desc_div">
+									<div class="profile-info-row">
+										<div class="profile-info-name">年级：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="grade" class="input-large" style="border:0;"  disabled="disabled"/>
+										</div>
+										<div class="profile-info-name">毕业时间：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="finishTime" class="input-large" style="border:0;"  disabled="disabled"/>
+										</div>
+										<div class="profile-info-name">注册时间：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="regTime" class="input-large" style="border:0;"  disabled="disabled"/>
+										</div>
+									</div>
+								</div>
+								<div class="hr-line-dashed"></div>
+								<div id="form-prodAttr-div"></div>
+								<br> <br> <br>
+							</form>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-white" onclick="formCancel()" >返回</button>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	#parse("./include/commonJs.html")
+</body>
+<script>
+
+isEditInitFormSub = true;
+$(function() {
+
+	var url = window.location.search;
+	var userId = url.split("=")[1];
+	if (userId == 0 || userId == null) {
+		common_error("关联ID不能为空!");
+		return;
+	}
+			$.ajax({
+				type : "POST",
+				url : "${ctx.contextPath}/d-admin/mem/user/getUser",
+				data : "userId=" + userId,
+				dataType : "json",
+				success : function(data) {
+					// 初始化form数据
+					initParam(data, null, 'form-modal');
+				},
+				complete : function() {
+				}
+			});
+})
+
+/*设置默认选中项*/
+function defaultSelected() {
+	$('.my-default-choose').each(function() {
+		if ($(this).attr('value') == 1) { //否
+			$(this).find('option:eq(0)').attr('selected', true);
+		} else if ($(this).attr('value') == 2) { //是
+			$(this).find('option:eq(1)').attr('selected', true);
+		}
+	})
+}
+
+// 表单取消 返还
+function formCancel() {
+	window.location.href = "${ctx.contextPath}/d-admin/lesson/public/index";
+}
+
+//表单取消 返还
+function formCancel() {
+	window.location.href="${ctx.contextPath}/d-admin/mem/user/index";
+}
+</script>
+</html>

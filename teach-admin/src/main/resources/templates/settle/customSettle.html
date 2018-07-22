@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>定制课程结算记录列表</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+#parse("./include/commonCss.html")
+<link href="${ctx.contextPath}/hplus/css/plugins/chosen/chosen.css"
+	rel="stylesheet">
+	<style>
+		.form-group-item {
+			position: relative;
+		}
+		.form-group-item > input{
+			position: absolute;
+			top: 4px;
+			left: 25px;
+		}
+	</style>
+</head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content animated fadeInUp">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox">
+					<div class="ibox float-e-margins">
+						<div class="ibox-title">
+							<h5>定制课程薪资结算</h5>
+							<div class="ibox-tools">
+								<a class="collapse-link"> <i class="fa fa-chevron-up"></i>
+								</a>
+							</div>
+						</div>
+						<div class="ibox-content">
+							<!-- 	<div class="alert alert-success alert-dismissable">
+								<button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+								可双击订单所在行，可查看订单详情。
+							</div> -->
+							<form id="grid-search-form">
+								<div class="profile-user-info profile-user-info-striped">
+									<div class="profile-info-row">
+										<div class="profile-info-name">导师名称：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="realName" id=""realName""
+												placeholder="导师名称" class="input-large" maxlength="30">
+										</div>
+										<div class="profile-info-name">课程名称：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="lessonName" id="lessonName"
+												placeholder="课程名称" class="input-large" maxlength="120">
+										</div>
+										<div class="profile-info-name">课时名称：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="className" id="className"
+												placeholder="课程名称" class="input-large" maxlength="120">
+										</div>
+									</div>
+									<div class="profile-info-row input-daterange">
+										<div class="profile-info-name">结算状态：</div>
+										<div class="profile-info-value form-group">
+											<select class="input-large" name="settleStatus"
+												id="settleStatus">
+												<option value="1">未结算</option>
+												<option value="2">已结算</option>
+											</select>
+										</div>
+										<div class="profile-info-name">开始时间：</div>
+										<div class="profile-info-value form-group form-group-item">
+											<input type="text" name="beginTime" id="beginTime"
+												placeholder="开始时间"
+												class="input-large form-control date-icon"
+												onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
+										</div>
+										<div class="profile-info-name">结束时间：</div>
+										<div class="profile-info-value form-group form-group-item">
+											<input type="text" name="endTime" id="endTime"
+												placeholder="结束时间"
+												class="input-large form-control date-icon"
+												onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
+										</div>
+									</div>
+								</div>
+							</form>
+							<div class="btn-group hidden-xs" id="tableEventsToolbar"
+								role="group">
+								<button type="button" onClick="audit();" title="强制结算"
+									class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true">
+									    <use xlink:href="#icon-tuikuan"></use>
+									</svg>
+								</button>
+								<button type="button" id="grid-search-btn" title="搜索"
+									class="btn btn-outline btn-default">
+									<i class="glyphicon glyphicon-search" aria-hidden="true"></i>
+								</button>
+								<button type="button" id="grid-reset-btn" title="重置"
+									class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true">
+									    <use xlink:href="#icon-zhongzhi"></use>
+									</svg>
+								</button>
+
+							</div>
+							<table id="customNoSettleTable" data-mobile-responsive="false">
+								<thead>
+									<tr>
+										<th data-radio="true"></th>
+										<th data-formatter="boostrapTableSortFormatter">序号</th>
+										<th data-field="recordId" data-visible="false">记录ID</th>
+										<th data-field="realName">导师名称</th>
+										<th data-field="loginAccount">导师账号</th>
+										<th data-field="lessonId" data-visible="false">课程ID</th>
+										<th data-field="lessonName">课程名称</th>
+										<th data-field="classId" data-visible="false">课时ID</th>
+										<th data-field="className">课时名称</th>
+										<th data-field="settleDuration">结算时长(分钟)</th>
+										<th data-field="settlePriceStr">结算单价(美元)</th>
+										<th data-field="createTime" data-visible="false">创建时间</th>
+										<th data-field="settleStatusStr">结算状态</th>
+										<th data-field="payStatusStr">付款状态</th>
+									</tr>
+								</thead>
+							</table>
+							</div>							
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	#parse("./include/commonJs.html")
+	<script src="${ctx.contextPath}/hplus/js/plugins/chosen/chosen.jquery.min.js"></script>
+	<script type="text/javascript" src="${ctx.contextPath}/js/ace/ace.min.js"></script>
+	<script type="text/javascript" src="${ctx.contextPath}/js/ace/ace-elements.min.js"></script>
+</body>
+<script>
+	$(function() {
+		var dayDate = new Date();
+		dayDate.setDate(dayDate.getDate() - 6);
+		$("#beginTime").val(DateUtil.dateToStr("yyyy-MM-dd", dayDate));
+		$("#endTime").val(DateUtil.dateToStr("yyyy-MM-dd", new Date()));
+
+		poundageConfigPagin();
+
+		$('.input-daterange').datepicker({
+			todayBtn : "linked",
+			endDate : new Date(),
+			setDate : new Date(),
+			clearBtn : true,
+			autoclose : true
+		});
+
+		$('.chosen-select').chosen({
+			allow_single_deselect : true
+		});
+
+		$(window).off('resize.chosen').on('resize.chosen', function() {
+			$('.chosen-select').each(function() {
+				var $this = $(this);
+				$this.next().css({
+					'width' : 207
+				});
+			})
+		}).trigger('resize.chosen');
+	});
+
+	function poundageConfigPagin() {
+		bingdUrserTableParams = jQuery.extend({}, boostrapTableParams); // 表单中的table参数
+		// table分页参数配置
+		boostrapTableParams.url = "${ctx.contextPath}/d-admin/customSettle/findPaging";
+		$("#customNoSettleTable").bootstrapTable(boostrapTableParams);
+		initGridSearch(); // 初始化grid搜索
+	}
+
+	// bootstrap-table分页查询时的参数封装
+	function boostrapTableQueryParams(params) {
+		if (isEmpty(params)) { // 点击搜索按钮时
+			var options = $("#customNoSettleTable")
+					.bootstrapTable('getOptions');
+			$("#customNoSettleTable").bootstrapTable('refreshOptions', {
+				pageNumber : 1,
+				sortName : ""
+			});
+		} else { // 点击分页时
+			return boostrapTableSearchParams("grid-search-form", params);
+		}
+	}
+	
+	// 审批
+	var isAudit = false;
+	function audit(){
+		var selections = $("#customNoSettleTable").bootstrapTable('getSelections');
+		
+		if (isEmpty(selections)) {
+			common_error("请先选择要结算的记录！");
+			return;
+		}
+		if (selections.length > 1) {
+			common_error("只能选择一条记录结算！");
+			return;
+		}
+
+		var settleStatus = selections[0].settleStatus;
+		if (settleStatus == 2) {
+			common_error("只能操作未结算的记录！");
+			return;
+		}
+		
+		swal({
+			title : "强制结算（5秒后窗口关闭）",
+			text : "强制结算后将无法还原，请谨慎操作！",
+			type : "warning",
+			showCancelButton : true,
+			confirmButtonColor : "#DD6B55",
+			cancelButtonText : "不通过",
+			confirmButtonText : "通过",
+			timer : 5000,
+			closeOnConfirm : true
+		}, function(isConfirm) {
+			if (isAudit)
+				return;
+			
+			if (isConfirm == undefined) {
+				swal("审批窗口关闭！", "", "error");
+				return;
+			}
+			isAudit = true;
+			var recordId = selections[0].recordId;
+			var params = "recordId=" + recordId;
+			$.ajax({
+				type : "POST",
+				url : "${ctx.contextPath}/d-admin/customSettle/coerceSettle",
+				data : params,
+				dataType : "json",
+				success : function(data) {
+					if (data.success) {
+						common_success("操作成功");
+						boostrapTableQueryParams(); // 刷新列表
+					} else {
+						common_error(data.errDesc);
+					}
+				},
+				complete : function() {
+					isAudit = false;
+				}
+			});
+		});
+	}
+	
+	
+</script>
+</html>

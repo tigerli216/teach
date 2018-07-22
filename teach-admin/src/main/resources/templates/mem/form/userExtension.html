@@ -1,0 +1,434 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<div class="hr-line-dashed"></div>
+<div class="hide" id="userExtension_div">
+	<div class="tabs-container">
+		<input type="hidden" id="user" name="user" />
+		<ul class="nav nav-tabs">
+			<li class="active" id="base_div" onClick="getUserInfo();">
+				<a data-toggle="tab" href="#tab-1" aria-expanded="true">学生基本信息</a>
+			</li>
+			<li class="" onClick="findCustomPaging();">
+				<a data-toggle="tab" href="#tab-2" aria-expanded="false">已购买定制课</a>
+			</li>
+			<li class="" onClick="findPublicPaging();">
+				<a data-toggle="tab" href="#tab-3" aria-expanded="false">已购买网课</a>
+			</li>
+			<li class="" onClick="findOrderPaging();">
+				<a data-toggle="tab" href="#tab-4" aria-expanded="false">个人订单</a>
+			</li>
+		</ul>
+
+		<div class="tab-content">
+			<div id="tab-1" class="tab-pane active">
+				<div class="panel-body"  style="display:none;">
+					<div class="profile-user-info profile-user-info-striped">
+	                    <div class="profile-info-row">
+	                        <div class="profile-info-name">登录账号：</div>
+	                        <div class="profile-info-value form-group">
+	                            <span id="loginAccount" name="loginAccount"></span>
+	                        </div>
+	                        <div class="profile-info-name">真实姓名：</div>
+	                        <div class="profile-info-value form-group">
+	                            <span id="realName" name="realName"></span>
+	                        </div>
+	                        <div class="profile-info-name">性别：</div>
+	                        <div class="profile-info-value form-group">
+	                            <span id="sexStr" name="sexStr"></span>
+	                        </div>
+	                    </div>
+	
+	                    <div class="profile-info-row">
+	                        <div class="profile-info-name">手机号码：</div>
+	                        <div class="profile-info-value form-group">
+	                            <span id="bindMobile" name="bindMobile"></span>
+	                        </div>
+	                        <div class="profile-info-name">邮箱：</div>
+	                        <div class="profile-info-value form-group">
+	                            <span id="email" name="email"></span>
+	                        </div>
+	                        <div class="profile-info-name">推荐码：</div>
+	                        <div class="profile-info-value form-group">
+	                            <span id="recommendCode" name="recommendCode"></span>
+	                        </div>
+	                    </div>
+	                    <div class="profile-info-row">
+	                        <div class="profile-info-name">国家：</div>
+	                        <div class="profile-info-value form-group">
+	                            <span id="country" name="country"></span>
+	                        </div>
+	                        <div class="profile-info-name">学校：</div>
+	                        <div class="profile-info-value form-group">
+	                            <span id="school" name="school"></span>
+	                        </div>
+	                        <div class="profile-info-name">年级：</div>
+	                        <div class="profile-info-value form-group">
+	                            <span id="grade" name="grade"></span>
+	                        </div>
+	                    </div>
+	                 </div> 
+				</div>
+			</div>
+			
+			<!-- 学生定制课 -->
+			<div id="tab-2" class="tab-pane">
+				<div class="panel-body"  style="display:none;">
+					<form id="grid-custom-form">
+						<input id="userId" name="userId" type="hidden"/>
+						<div class="profile-user-info profile-user-info-striped">
+							<div class="profile-info-row">
+								<div class="profile-info-name">课程名称：</div>
+								<div class="profile-info-value form-group">
+									<input type="text" name="lessonName" placeholder="课程名称"
+										class="input-large" maxlength="120">
+								</div>
+								<div class="profile-info-name">课程分类：</div>
+								<div class="profile-info-value form-group">
+									<select class="input-large" name="lessonType">
+										<option value="0">全部</option>
+										<option value="1">定制课</option>
+										<option value="2">实习课</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</form>
+					<div class="btn-group hidden-xs" id="customToolbar" role="group">
+						<button type="button" id="grid-custom-search-btn" title="搜索" class="btn btn-outline btn-default">
+							<i class="glyphicon glyphicon-search" aria-hidden="true"></i>
+						</button>
+						<button type="button" id="grid-custom-reset-btn" title="重置" class="btn btn-outline btn-default">
+							<svg class="icon" aria-hidden="true"> 
+                                <use xlink:href="#icon-zhongzhi"></use>
+                            </svg>
+						</button>
+					</div>
+					<table id="customTable" data-mobile-responsive="true">
+						<thead>
+							<tr>
+								<th data-formatter="boostrapTableSortFormatter">序号</th>
+								<th data-field="lessonId" data-visible="false">课程ID</th>
+								<th data-field="userId" data-visible="false">用户ID</th>
+								<th data-field="lessonName">课程名称</th>
+								<th data-field="lessonTypeStr">课程分类</th>
+								<th data-field="industry">行业</th>
+								<th data-field="totalClass" data-visible="false">总课时(分钟)</th>
+								<th data-field="finishClass" data-visible="false">已完成课时(分钟)</th>
+								<th data-field="lessonPriceStr">课程价格(元)</th>
+								<th data-field="loginAccount">用户</th>
+								<th data-field="beginTime">开始时间</th>
+								<th data-field="endTime">结束时间</th>
+								<th data-field="buyTime">购买时间</th>
+								<th data-field="orderCode" data-visible="false">订单编码</th>
+								<th data-field="createTime" data-visible="false">创建时间</th>
+								<th data-field="createOp" data-visible="false">创建人</th>
+								<th data-field="modifyTime" data-visible="false">修改时间</th>
+								<th data-field="modifyOp" data-visible="false">修改人</th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+			
+			
+			<!-- 学生网课 -->
+			<div id="tab-3" class="tab-pane">
+				<div class="panel-body" style="display:none;">
+					<form id="grid-public-form">
+						<input type="hidden" id="userId" name="userId" />
+						<div class="profile-user-info profile-user-info-striped">
+							<div class="profile-info-row">
+								<div class="profile-info-name">课程名称：</div>
+								<div class="profile-info-value form-group">
+									<input type="text" name="lessonName" placeholder="课程名称"
+										class="input-large" maxlength="120">
+								</div>
+								<div class="profile-info-name">课程分类：</div>
+								<div class="profile-info-value form-group">
+									<select class="input-large" name="lessonType">
+										<option value="0">全部</option>
+										<option value="1">录播课</option>
+										<option value="2">直播课</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</form>
+					<div class="btn-group hidden-xs" id="publicToolbar"
+						role="group">
+						<button type="button" id="grid-public-search-btn" title="搜索"
+							class="btn btn-outline btn-default">
+							<i class="glyphicon glyphicon-search" aria-hidden="true"></i>
+						</button>
+						<button type="button" id="grid-public-reset-btn" title="重置"
+							class="btn btn-outline btn-default">
+							<svg class="icon" aria-hidden="true">
+                                  <use xlink:href="#icon-zhongzhi"></use>
+                              </svg>
+						</button>
+					</div>
+					<table id="publicTable" data-mobile-responsive="false">
+						<thead>
+							<tr>
+								<th data-formatter="boostrapTableSortFormatter">序号</th>
+								<th data-field="lessonId" data-visible="false">课程ID</th>
+								<th data-field="lessonName">课程名称</th>
+								<th data-field="lessonTypeStr">课程分类</th>
+								<th data-field="seriesName" data-visible="false">系列名称</th>
+								<th data-field="origPriceStr">课程原价</th>
+								<th data-field="discountPriceStr">课程折扣价</th>
+								<th data-field="validDuration">有效时长</th>
+								<th data-field="visitAuthStr">访问权限</th>
+								<th data-field="shelfStatusStr">上架状态</th>
+								<th data-field="isTopStr">是否置顶</th>
+								<th data-field="weight">权重(倒序)</th>
+								<th data-field="tutorName">讲师</th>
+								<th data-field="industry">所属行业</th>
+								<!-- <th data-field="validTime">有效期</th> -->
+								<th data-field="createTime" data-visible="false">创建时间</th>
+								<th data-field="createOp" data-visible="false">创建人</th>
+								<th data-field="modifyTime" data-visible="false">修改时间</th>
+								<th data-field="modifyOp" data-visible="false">修改人</th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+			
+			<!-- 学生订单 -->
+			<div id="tab-4" class="tab-pane">
+				<div class="panel-body" style="display:none;">
+					<form id="grid-order-form">
+						<input type="hidden" id="userId" name="userId" />
+						<div class="profile-user-info profile-user-info-striped">
+							<div class="profile-info-row">
+								<div class="profile-info-name">付款方式：</div>
+								<div class="profile-info-value form-group">
+									<select class="input-large" name=payType>
+										<option value="0">全部</option>
+										<option value="1">线上</option>
+										<option value="2">线下</option>
+									</select>
+								</div>	
+								<div class="profile-info-name">订单编码：</div>
+								<div class="profile-info-value form-group">
+									<input type="text" name="orderCode" id="orderCode"
+										placeholder="订单编码" class="input-large"
+										onkeyup="this.value=this.value.replace(/^ +| +$/g,'')"
+										maxlength="30">
+								</div>
+								<div class="profile-info-name">课程名称：</div>
+								<div class="profile-info-value form-group">
+									<input type="text" name="orderName" id="orderName"
+										placeholder="课程名称" class="input-large"
+										onkeyup="this.value=this.value.replace(/^ +| +$/g,'')"
+										maxlength="120">
+								</div>
+							</div>
+							<div class="profile-info-row">
+								<div class="profile-info-name">订单子类型：</div>
+								<div class="profile-info-value form-group">
+									<select class="input-large" name="orderSubType">
+										<option value="0">全部</option>
+										<option value="21">定制课</option>
+										<option value="22">实习课</option>
+									</select>
+								</div>
+								<div class="profile-info-name">订单状态：</div>
+								<div class="profile-info-value form-group">
+									<select class="input-large" name=orderStatus>
+										<option value="0">全部</option>
+										<option value="1">已确认</option>
+										<option value="2">已取消</option>
+										<option value="4">退款</option>
+									</select>
+								</div>
+								<div class="profile-info-name">支付状态：</div>
+								<div class="profile-info-value form-group">
+									<select class="input-large" name="payStatus">
+										<option value="0">全部</option>
+										<option value="1">未付款</option>
+										<option value="2">已付款</option>
+										<option value="4">已退款</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</form>
+					<div class="btn-group hidden-xs" id="orderToolbar"
+						role="group">
+						<button type="button" id="grid-order-search-btn" title="搜索"
+							class="btn btn-outline btn-default">
+							<i class="glyphicon glyphicon-search" aria-hidden="true"></i>
+						</button>
+						<button type="button" id="grid-reset-btn" title="重置"
+							class="btn btn-outline btn-default">
+							<svg class="icon" aria-hidden="true">
+							    <use xlink:href="#icon-zhongzhi"></use>
+							</svg>
+						</button>
+					</div>
+					<table id="orderTable" data-mobile-responsive="false">
+						<thead>
+							<tr>
+								<th data-formatter="boostrapTableSortFormatter">序号</th>
+								<th data-field="realName" data-visible="false">用户名</th>
+								<th data-field="userId" data-visible="false">会员id</th>
+								<th data-field="loginAccount">会员账号</th>
+								<th data-field="orderId" data-visible="false">订单ID</th>
+								<th data-field="busiId" data-visible="false">业务ID</th>
+								<th data-field="orderName">订单名称</th>
+								<th data-field="orderCode">订单编码</th>
+								<th data-field="orderSubTypeStr">订单子类型</th>
+								<th data-field="orderStatusStr">订单状态</th>
+								<th data-field="payStatusStr">支付状态</th>
+								<th data-field="payTypeStr" data-visible="true">付款方式</th>
+								<th data-field="origPriceStr">订单原价</th>
+								<th data-field="discountPriceStr">订单折扣价</th>
+								<th data-field="orderStatusStr" data-visible="false">订单状态</th>
+								<th data-field="createTime">订单创建时间</th>
+								<th data-field="validTime" data-visible="false">有效时间</th>
+								<th data-field="payTime" data-visible="false">订单付款时间</th>
+								<th data-field="dealTime" data-visible="false">订单成交时间</th>
+								<th data-field="orderNotes" data-visible="false">订单附言</th>
+								<th data-field="payNotes" data-visible="false">付款备注</th>
+							</tr>
+						</thead>
+					</table>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+
+	/** ===== 学生基本信息 ===== **/
+	function getUserInfo() {
+		var userId = $(".tabs-container #user").val();
+		$.ajax({
+			type : "POST",
+			url : "${ctx.contextPath}/d-admin/mem/user/getUser",
+			data : "userId=" + userId,
+			dataType : "json",
+			success : function(data) {
+				$("#tab-1 #loginAccount").html(data.loginAccount);
+				$("#tab-1 #realName").html(data.realName);
+				$("#tab-1 #sexStr").html(data.sexStr);
+				
+				$("#tab-1 #bindMobile").html(data.bindMobile);
+				$("#tab-1 #email").html(data.email);
+				$("#tab-1 #recommendCode").html(data.recommendCode);
+				
+				$("#tab-1 #country").html(data.country);
+				$("#tab-1 #school").html(data.school);
+				$("#tab-1 #grade").html(data.grade);
+				
+				$("#tab-1 .panel-body").show();
+			},
+			complete : function() {
+			}
+		});
+	}
+
+	/** ===== 定制课列表 ===== **/
+	var lessonCustomTable;
+	function findCustomPaging() {
+		$("#grid-custom-form #userId").val($(".tabs-container #user").val());
+		customTable = jQuery.extend({}, boostrapTableParams);
+		// 定制课
+		customTable.queryParams = "customTableQueryParams";
+		customTable.toolbar = "#customToolbar";
+
+		var newUrl = "${ctx.contextPath}/d-admin/lesson/custom/findPagingByUserId";
+		if (isEmpty(lessonCustomTable)) {
+			initGridSearch("grid-custom-search-btn", "grid-custom-form",
+					"customTableQueryParams"); // 初始化grid搜索
+			// table分页参数配置
+			customTable.url = newUrl;
+			lessonCustomTable = $("#customTable").bootstrapTable(customTable);
+		} else {
+			$("#customTable").bootstrapTable("refresh", "");
+		}
+		$("#tab-2 .panel-body").show();
+	}
+	// bootstrap-table用户订单分页查询时的参数封装
+	function customTableQueryParams(params) {
+		if (isEmpty(params)) { // 点击搜索按钮时
+			var options = $("#customTable").bootstrapTable('getOptions');
+			$("#customTable").bootstrapTable('refreshOptions', {
+				pageNumber : 1,
+				sortName : "",
+			});
+		} else { // 点击分页时
+			return boostrapTableSearchParams("grid-custom-form", params);
+		}
+	}
+	
+	/** ===== 网课列表 ===== **/
+	var lessonPublicTable;
+	function findPublicPaging() {
+		$("#grid-public-form #userId").val($(".tabs-container #user").val());
+		var publicTable = jQuery.extend({}, boostrapTableParams);
+		// 定制课
+		publicTable.queryParams = "publicTableQueryParams";
+		publicTable.toolbar = "#publicToolbar";
+
+		var newUrl = "${ctx.contextPath}/d-admin/lesson/public/findUserPublicPaging";
+		if (isEmpty(lessonPublicTable)) {
+			initGridSearch("grid-public-search-btn", "grid-public-form", "publicTableQueryParams"); // 初始化grid搜索
+			// table分页参数配置
+			publicTable.url = newUrl;
+			lessonPublicTable = $("#publicTable").bootstrapTable(publicTable);
+		} else {
+			$("#publicTable").bootstrapTable("refresh", "");
+		}
+		$("#tab-3 .panel-body").show();
+	}
+	// bootstrap-table用户订单分页查询时的参数封装
+	function publicTableQueryParams(params) {
+		if (isEmpty(params)) { // 点击搜索按钮时
+			var options = $("#publicTable").bootstrapTable('getOptions');
+			$("#publicTable").bootstrapTable('refreshOptions', {
+				pageNumber : 1,
+				sortName : "",
+			});
+		} else { // 点击分页时
+			return boostrapTableSearchParams("grid-public-form", params);
+		}
+	}
+
+	/** 学生订单列表 **/
+	var userOrderTable;
+	function findOrderPaging() {
+		$("#grid-order-form #userId").val($(".tabs-container #user").val());
+		var orderTable = jQuery.extend({}, boostrapTableParams);
+		// 定制课
+		orderTable.queryParams = "orderTableQueryParams";
+		orderTable.toolbar = "#orderToolbar";
+
+		var newUrl = "${ctx.contextPath}/d-admin/order/findPaging";
+		if (isEmpty(userOrderTable)) {
+			initGridSearch("grid-order-search-btn", "grid-order-form", "orderTableQueryParams"); // 初始化grid搜索
+			// table分页参数配置
+			orderTable.url = newUrl;
+			userOrderTable = $("#orderTable").bootstrapTable(orderTable);
+		} else {
+			$("#orderTable").bootstrapTable("refresh", "");
+		}
+		$("#tab-4 .panel-body").show();
+	}
+	// bootstrap-table用户订单分页查询时的参数封装
+	function orderTableQueryParams(params) {
+		if (isEmpty(params)) { // 点击搜索按钮时
+			var options = $("#orderTable").bootstrapTable('getOptions');
+			$("#orderTable").bootstrapTable('refreshOptions', {
+				pageNumber : 1,
+				sortName : "",
+			});
+		} else { // 点击分页时
+			return boostrapTableSearchParams("grid-order-form", params);
+		}
+	}
+	
+</script>

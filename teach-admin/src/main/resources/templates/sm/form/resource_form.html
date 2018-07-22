@@ -1,0 +1,168 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<div class="modal inmodal" id="form-modal" role="dialog"
+	aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button class="close" data-dismiss="modal" type="button">×</button>
+				<h4 id="modalHeaderMsg" class="modal-title"></h4>
+			</div>
+			<div class="modal-body">
+				<form id="form-edit" class="form-horizontal">
+					<input type="hidden" id="resourceId" name="resourceId"> <input
+						type="hidden" id="pId" name="pId">
+					<div class="profile-user-info profile-user-info-striped">
+						<div class="profile-info-row">
+							<div class="profile-info-name">
+								<span>* 功能名称： </span>
+							</div>
+							<div class="profile-info-value form-group">
+								<input type="text" id="resourceTitle" name="resourceTitle"
+									class="input-large" />
+							</div>
+							<div class="profile-info-name">
+								<span>上级功能名称：</span>
+							</div>
+							<div class="profile-info-value form-group">
+								<input type="text" id="parentName" name="parentName"
+									class="input-large" disabled="true" />
+							</div>
+						</div>
+
+						<div class="profile-info-row">
+							<div class="profile-info-name">
+								<span>*功能类型：</span>
+							</div>
+							<div class="profile-info-value form-group">
+								<select id="resourceType" name="resourceType"
+									class="input-large">
+									<option value="">-请选择-</option>
+								</select>
+							</div>
+							<div class="profile-info-name">
+								<span> 菜单排序：</span>
+							</div>
+							<div class="profile-info-value form-group">
+								<input type="text" id="menuSort" name="menuSort"
+									class="input-large" />
+							</div>
+						</div>
+						<div class="profile-info-row" id="menuUrl_div">
+							<div class="profile-info-name">
+								<span> 功能地址：</span>
+							</div>
+							<div class="profile-info-value form-group">
+								<input type="text" id="menuUrl" name="menuUrl"
+									class="input-large" />
+							</div>
+						</div>
+						<div class="profile-info-row" id="menuImage_div">
+							<div class="profile-info-name">
+								<span> 样式：</span>
+							</div>
+							<div class="profile-info-value form-group">
+								<input type="text" id="menuImage" name="menuImage"
+									class="input-large" />
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+				<button type="button" class="btn btn-primary"
+					onClick="formSubmit();">保存</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(function() {
+		judgeVerification();
+	})
+
+	// 表单提交
+	var isFormSubmit = false;
+	function formSubmit() {
+		if (isFormSubmit)
+			return;
+
+		if (!$('#form-edit').valid())
+			return;
+
+		isFormSubmit = true;
+
+		$.ajax({
+			type : "POST",
+			url : "${ctx.contextPath}/d-admin/resource/edit",
+			data : $("#form-edit").serialize(),
+			dataType : "json",
+			success : function(data) {
+				if (data.success) {
+					common_success("保存成功！");
+					$("#form-modal").modal("hide");
+					if ($("#resourceId").val() == null || $("#resourceId").val() == '') {
+						resourceTree($("#parentId").val());
+					}
+					boostrapTableQueryParams(); // 刷新列表
+				} else {
+					common_error(data.errDesc);
+				}
+			},
+			complete : function() {
+				isFormSubmit = false;
+			}
+		});
+	}
+
+	// form表单校验
+	function judgeVerification() {
+		var icon = "<i class='fa fa-times-circle'></i> ";
+		$('#form-edit').validate({
+			rules : {
+				resourceTitle : {
+					required : true,
+					maxlength : 20,
+					minlength : 1
+				},
+				resourceType : {
+					required : true
+				},
+				menuSort : {
+					maxlength : 2,
+					minlength : 1,
+					isNumber : "#menuSort"
+				}
+			},
+
+			messages : {
+				resourceTitle : {
+					required : "功能名称不能为空！",
+					maxlength : "功能名称过长！",
+					minlength : "功能名称过短！"
+				},
+				resourceType : {
+					required : "功能类型不能为空！"
+				},
+				menuSort : {
+					maxlength : "只能填写0~99的数字！",
+					minlength : "只能填写0~99的数字！",
+					isNumber : "只能填写0~99的数字！"
+				}
+			}
+		});
+	};
+	
+	
+	 /** 根据业务小类获取业务属性 */
+    $("#form-modal #resourceType").change(function() {
+    	var resourceType = $("#form-edit #resourceType").find("option:selected").val();
+    	if (resourceType == 1) {
+    		$("#form-edit #menuUrl_div").addClass("hide");
+    	} else {
+    		$("#form-edit #menuUrl_div").removeClass("hide");
+    	}
+    });
+</script>

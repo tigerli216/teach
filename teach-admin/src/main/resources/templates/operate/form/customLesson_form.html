@@ -1,0 +1,279 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<div class="modal inmodal" id="customLesson-form-modal" role="dialog"
+	aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button class="close" data-dismiss="modal" type="button">×</button>
+				<h5 id="modalHeaderMsg" class="modal-title"></h5>
+			</div>
+			<div class="modal-body">
+				<form id="grid-thirdIpSearch-form">
+					<input hidden="hidden" id="lessonId" name="lessonId">
+					<div class="profile-user-info profile-user-info-striped">
+						<div class="profile-info-row">
+							<div class="profile-info-name">课程名称：</div>
+							<div class="profile-info-value form-group">
+								<input type="text" name="lessonName" id="lessonName"
+									placeholder="课程名称" class="input-large"
+									maxlength="120">
+							</div>
+							<div class="profile-info-name">课程周期：</div>
+							<div class="profile-info-value form-group">
+								<input type="text" name="lessonCycle" id="lessonCycle"
+									placeholder="课程周期" class="input-large"
+									onkeyup="this.value=this.value.replace(/^ +| +$/g,'')"
+									maxlength="60">
+							</div>
+						</div>
+						<div class="profile-info-row">
+							<div class="profile-info-name">课时数：</div>
+							<div class="profile-info-value form-group">
+								<input type="text" name="classNum" id="classNum"
+									placeholder="课时数" class="input-large"
+									onkeyup="this.value=this.value.replace(/^ +| +$/g,'')"
+									maxlength="250">
+							</div>
+							<div class="profile-info-name">权重值：</div>
+							<div class="profile-info-value form-group">
+								<input type="text" name="weight" id="weight" placeholder="权重值"
+									class="input-large"
+									onkeyup="this.value=this.value.replace(/^ +| +$/g,'')"
+									maxlength="10">
+							</div>
+						</div>
+					</div>
+					<div class="profile-user-info profile-user-info-striped">
+						<div class="profile-info-row">
+							<div class="profile-info-name">课程简介：</div>
+							<div class="profile-info-value form-group">
+								<textarea id="lessonAbstract" name="lessonAbstract"
+									style="float: left; width: 100%; height: 120px;"
+									maxlength="250" onchange="lessonAbstractChange();">
+								</textarea>
+							</div>
+						</div>
+					</div>
+					<div class="profile-user-info profile-user-info-striped">
+						<div class="profile-info-name">课程说明：</div>
+						<div class="profile-info-value form-group">
+							<div id="lessonRcmdE"></div>
+						</div>
+					</div>
+					<div class="profile-user-info profile-user-info-striped">
+						<div class="profile-info-row">
+							<div class="profile-info-name">目标客户：</div>
+							<div class="profile-info-value form-group">
+								<input type="text" name="targetMem" id="targetMem"
+									placeholder="目标客户" class="input-large"
+									maxlength="500">
+							</div>
+							<div class="profile-info-name">是否置顶：</div>
+							<div class="profile-info-value form-group">
+								<select class="input-large" name="isTop" id="isTop">
+									<option value="1">否</option>
+									<option value="2">是</option>
+								</select>
+							</div>
+						</div>
+						<div class="profile-info-row">
+							<div class="profile-info-name">状态：</div>
+							<div class="profile-info-value form-group">
+								<select class="input-large" name="status" id="status">
+									<option value="1">有效</option>
+									<option value="2">无效</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="profile-user-info profile-user-info-striped">
+						<div class="profile-info-name">课程图片：</div>
+						<div class="profile-info-value form-group">
+							<div type="text" name="lessonPic" id="lessonPic" class="col-sm-4"
+								style="padding-left: 0px; width: 222px;"></div>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+				<button type="button" class="btn btn-primary"
+					onclick="saveOrUpdate()">保存</button>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+<script src="${ctx.contextPath}/js/wangEditor.js"></script>
+<script src="${ctx.contextPath}/js/wangEditor-fullscreen-plugin.js"></script>
+<script type="text/javascript">
+	contentChange = false;
+	
+	$(function(){
+		var E = window.wangEditor;
+		lessonRcmdE = new E('#lessonRcmdE'); // 活动说明E
+
+		lessonRcmdE.customConfig.uploadImgServer = '${ctx.contextPath}/d-admin/upload';	// 上传到服务器上
+		// 将图片大小限制为 3M
+		lessonRcmdE.customConfig.uploadImgMaxSize = 3 * 1024 * 1024;
+		// 限制一次最多上传 5 张图片
+		lessonRcmdE.customConfig.uploadImgMaxLength = 5;
+		lessonRcmdE.customConfig.uploadFileName = 'imgFile';
+		// 将 timeout 时间改为 3s
+		lessonRcmdE.customConfig.uploadImgTimeout = 3000;
+		
+		lessonRcmdE.customConfig.onchange = function (html) {
+			contentChange = true;
+	    }
+		lessonRcmdE.create();
+		E.fullscreen.init('#lessonRcmdE');
+	});
+
+	// 表单提交
+	function saveOrUpdate() {
+		isFormSubmit = true;
+		if (!$('#grid-thirdIpSearch-form').valid()) {
+			common_error("课程信息不完全");
+			return;
+		}
+
+		var contentStr = lessonRcmdE.txt.html();
+		if (contentStr.length > 10000) {
+			common_error("您输入的内容过长！");
+			return;
+		}
+		
+		var lessonId = $("#lessonId").val();
+		var lessonRcmdStr = lessonRcmdE.txt.html();
+		var lessonAbstract = $("#lessonAbstract").val();
+		$("#lessonAbstract").removeAttr("name");
+		
+		$("#mask").show();
+		$("#grid-thirdIpSearch-form").ajaxSubmit({
+			type : "POST",
+			async : false,
+			timeout : 5000,
+			url : "${ctx.contextPath}/d-admin/operate/custom/saveOrUpdate",
+			data : $("#customLesson-form-modal #grid-thirdIpSearch-form").serialize(),
+			dataType : "json",
+			success : function(data) {
+				if (data.success) {
+					if (isEmpty(lessonId)) {
+						lessonId = data.result;
+					}
+					
+					// 课程简介发生变化
+					if (isLessonAbstractChange) {
+						$.ajax({
+							type : "POST",
+							url : "${ctx.contextPath}/d-admin/operate/custom/updateLessonAbstract",
+							data : jQuery.param({lessonId: lessonId, lessonAbstract: lessonAbstract}),
+							dataType : "json",
+							success : function(data) {
+								if (!data.success) {
+									common_error("修改失败！");
+								}
+							},
+							complete : function() {
+								$("#lessonAbstract").attr("name", "lessonAbstract");
+							}
+						});
+					}
+					
+					if (contentChange) {	// 富文本是否有改变
+						$.ajax({
+							type : "POST",
+							url : "${ctx.contextPath}/d-admin/operate/custom/updateLessonRcmd",
+							data : jQuery.param({lessonId: lessonId, lessonRcmdStr: lessonRcmdStr}),
+							dataType : "json",
+							success : function(data) {
+								if (data.success) {
+									$("#customLesson-form-modal").modal("hide");
+									boostrapTableQueryParams(); // 刷新列表
+									common_success("保存成功！");
+								} else {
+									common_error("修改失败！");
+								}
+							},
+							complete : function() {
+								contentChange = false;
+								isFormSubmit = false;
+							}
+						});
+					} else {
+						console.log();
+						$("#customLesson-form-modal").modal("hide");
+						boostrapTableQueryParams(); // 刷新列表
+						common_success("保存成功！");
+						isFormSubmit = false;
+					}
+				} else {
+					common_error(data.errDesc);
+				}
+				//$("#customLesson-form-modal").modal("hide");
+			},
+			complete : function() {
+				$("#mask").hide();
+			}
+		});
+	}
+
+	// form表单校验
+	function judgeVerification() {
+		var icon = "<i class='fa fa-times-circle'></i> ";
+		$('#customLesson-form-modal #grid-thirdIpSearch-form').validate({
+			rules : {
+				lessonName : {
+					required : true
+				},
+				lessonCycle : {
+					required : true
+				},
+				classNum : {
+					required : true,
+				},
+				lessonAbstract : {
+					required : true
+				},
+				lessonRcmd : {
+					required : true
+				},
+				targetMem : {
+					required : true
+				},
+				weight : {
+					required : true,
+					positive : "#customLesson-form-modal #weight"
+				}
+			},
+			messages : {
+				lessonName : {
+					required : icon + "请输入课程名称！"
+				},
+				lessonCycle : {
+					required : icon + "请输入课程周期！"
+				},
+				classNum : {
+					required : icon + "请输入课时数！"
+				},
+				lessonAbstract : {
+					required : icon + "请输入课程简介！"
+				},
+				lessonRcmd : {
+					required : icon + "请输入课程说明！"
+				},
+				targetMem : {
+					required : icon + "请输入目标客户！"
+				},
+				weight : {
+					required : icon + "请输入权重值！"
+				}
+			}
+		});
+	};
+	
+	var isLessonAbstractChange = false;
+	function lessonAbstractChange() {
+		isLessonAbstractChange = true;
+	}
+</script>

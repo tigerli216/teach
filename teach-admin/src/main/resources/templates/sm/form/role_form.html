@@ -1,0 +1,356 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<div class="modal inmodal" id="form-modal" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal" type="button">×</button>
+                <h4 id="modalHeaderMsg" class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="form-edit" class="form-horizontal">
+                    <input type="hidden" id="resIdList" name="resIdList">
+                    <input type="hidden" id="orgIdList" name="orgIdList">
+                    <input type="hidden" id="roleId" name="roleId">
+                    <input type="hidden" id="parentId" name="parentId">
+                    <div id="memExtension_div">
+                        <div class="tabs-container" >
+                            <ul class="nav nav-tabs">
+                                <li class="active" id="base_div" onClick="">
+                                    <a data-toggle="tab" href="#tab-1" aria-expanded="true"><i class="fa fa-edit"></i>基本信息</a>
+                                </li>
+                                <li class="" onClick="">
+                                    <a data-toggle="tab" href="#tab-2" aria-expanded="false" ><i class="fa fa-folder-o"></i>可访问功能菜单</a>
+                                </li>
+                                <li class="" onClick="">
+                                    <a data-toggle="tab" href="#tab-3" aria-expanded="false" ><i class="fa fa-lock"></i>可访问数据组织</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content">
+                                <!-- 用户基本属性/实名信息 -->
+                                <div id="tab-1" class="tab-pane active">
+                                    <div class="panel-body">
+                                        <form id="form-role-base" class="form-horizontal">
+                                            <div class="profile-user-info profile-user-info-striped">
+                                                <div class="profile-info-row">
+                                                    <div class="profile-info-name">角色名称：</div>
+                                                    <div class="profile-info-value form-group">
+                                                        <input type="text" id="roleName" name="roleName" class="input-large"  />
+                                                    </div>
+                                                    <div class="profile-info-name">备注：</div>
+                                                    <div class="profile-info-value form-group">
+                                                        <input type="text" id="roleDesc" name="roleDesc" class="input-large"  />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <!-- 可访问功能菜单 -->
+                                <div id="tab-2" class="tab-pane">
+                                    <div class="widget-body scrollable-horizontal" style="padding-bottom: 20px;">
+                                        <input type="hidden" id="selectedResourceIds" name="selectedResourceIds">
+                                        <div class="widget-main">
+                                            <div id="resourceTree" class="ztree"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 可访问数据组织 -->
+                                <div id="tab-3" class="tab-pane">
+                                    <div class="widget-body scrollable-horizontal" style="padding-bottom: 20px;">
+                                        <input type="hidden" id="selectedOrgIds" name="selectedOrgIds">
+                                        <div class="widget-main">
+                                            <div id="orgTree" class="ztree"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="formRoleSubmit">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    /************************获取基本信息*************************/
+    function getRoleBaseInfo() {
+    	var roleId = $("#form-edit #roleId").val();
+    	if (isEmpty(roleId)) {
+    		return;
+    	}
+    	/**查询 */
+        $.ajax({
+            type : "POST",
+            url : "${ctx.contextPath}/d-admin/role/findRoleById",
+            data : "roleId=" + roleId,
+            dataType : "json",
+            success : function(data) {
+                $('#form-edit #roleName').val(data.roleName);
+                $('#form-edit #roleDesc').val(data.roleDesc);
+            },
+            complete : function() {
+                isEditInitForm = false;
+            }
+        });
+    }
+
+    /***********************功能菜单树**************************/
+    var resSetting = {
+        check: {
+            enable: true
+        },
+        data: {
+            simpleData: {
+                enable: true
+            }
+        },
+        callback: {
+            onCheck: zResTreeOnCheck
+        }
+    };
+    
+    function treeRes() {
+        $.ajax({
+            type : "POST",
+            url : "${ctx.contextPath}/d-admin/role/findTreeRes",
+            data : "treeOpen=true",
+            dataType : "json",
+            success : function(data) {
+                $.fn.zTree.init($("#resourceTree"), resSetting, data);
+                loadResAndRole();
+            },
+            complete : function() {
+                isEditInitForm = false;
+            }
+        });
+    }
+    
+    // 加载角色与菜单之间的关系
+    function loadResAndRole() {
+    	var roleId = $('#form-edit #roleId').val();
+    	if (isEmpty(roleId)) {
+    		return;
+    	}
+    	$.ajax({
+	         type : "POST",
+	         url : "${ctx.contextPath}/d-admin/role/findRelResRoleByRoleId",
+	         data : "roleId="+ roleId,
+	         dataType : "json",
+	         success : function(data) {
+	        	 if (data.success) {
+	        		 resRoleCheck(data.result);
+	        	 }
+	         },
+	         complete : function() {
+	             isEditInitForm = false;
+	         }
+       });
+    }
+    
+    // 选中组织
+	function resRoleCheck(resList) {
+		var resTreeObj = $.fn.zTree.getZTreeObj("resourceTree");
+		if (!isEmpty(resTreeObj)) {
+			var resNodes = resTreeObj.getCheckedNodes(true);
+			if (!isEmpty(resNodes) && resNodes.length > 0) {
+				for (var i = 0; i < resNodes.length; i++) {
+					resTreeObj.checkNode(resNodes[i], false, false);
+				}
+			}
+		}
+		if (resList != null && resList.length > 0) {
+			for (var j = 0; j < resList.length; j++) {
+				var node = resTreeObj.getNodeByParam("id",resList[j]);
+				if (!isEmpty(node)) {
+					resTreeObj.checkNode(node, true, false);
+				}
+			}
+		}
+	}
+
+    // 触发事件
+    function zResTreeOnCheck(event, treeId, treeNode){
+        var treeObj = $.fn.zTree.getZTreeObj("resourceTree");
+        var nodes = treeObj.getCheckedNodes(true);
+        if (nodes.length == 0) {
+            treeObj.checkNode(treeNode, false, false);
+            return;
+        }
+    }
+
+    /***********************组织菜单树**************************/
+    var orgSetting = {
+        check: {
+            enable: true,
+            chkStyle: "checkbox",
+            chkboxType: { "Y": "s", "N": "ps" }
+        },
+        data: {
+            simpleData: {
+                enable: true
+            }
+        },
+        callback: {
+            onCheck: zOrgTreeOnCheck
+        }
+    };
+
+    function orgRes() {
+        $.ajax({
+            type : "POST",
+            url : "${ctx.contextPath}/d-admin/org/findOrganizationTree",
+            data : "treeOpen=true",
+            dataType : "json",
+            success : function(data) {
+                $.fn.zTree.init($("#orgTree"), orgSetting, data);
+                loadOrgAndRole();
+            },
+            complete : function() {
+                isEditInitForm = false;
+            }
+        });
+    }
+    
+    function loadOrgAndRole() {
+    	var roleId = $('#form-edit #roleId').val();
+    	if (isEmpty(roleId)) {
+    		return;
+    	}
+    	$.ajax({
+	         type : "POST",
+	         url : "${ctx.contextPath}/d-admin/role/findRelOrgRoleByRoleId",
+	         data : "roleId="+ roleId,
+	         dataType : "json",
+	         success : function(data) {
+	        	 if (data.success) {
+	        	     orgResCheck(data.result);
+	        	 }
+	         },
+	         complete : function() {
+	             isEditInitForm = false;
+	         }
+       });
+    }
+    
+    // 选中组织与菜单直接的关系
+	function orgResCheck(orgResList) {
+		var resTreeObj = $.fn.zTree.getZTreeObj("orgTree");
+		if (!isEmpty(resTreeObj)) {
+			var resNodes = resTreeObj.getCheckedNodes(true);
+			if (!isEmpty(resNodes) && resNodes.length > 0) {
+				for (var i = 0; i < resNodes.length; i++) {
+					resTreeObj.checkNode(resNodes[i], false, false);
+				}
+			}
+		}
+		if (orgResList != null && orgResList.length > 0) {
+			for (var j = 0; j < orgResList.length; j++) {
+				var node = resTreeObj.getNodeByParam("id",orgResList[j]);
+				if (!isEmpty(node)) {
+					resTreeObj.checkNode(node, true, false);
+				}
+			}
+		}
+	}
+
+    // 触发事件
+    function zOrgTreeOnCheck(event, treeId, treeNode){
+        var treeObj = $.fn.zTree.getZTreeObj("orgTree");
+        var nodes = treeObj.getCheckedNodes(true);
+        if (nodes.length == 0) {
+            treeObj.checkNode(treeNode, false, false);
+            return;
+        }
+    }
+    
+    /*************************提交保存*************************/
+    // 上传form表单数据
+    $('#formRoleSubmit').on('click', function () {
+    	var roleId = $('#form-edit #roleId').val();
+    	var roleName = $('#form-edit #roleName').val();
+    	
+    	// 当页面使用页签时valid验证不生效-增加手动验证
+    	if(isEmpty(roleName) || roleName.length < 2 || roleName.length > 32){
+    		$('#txtRoleName').removeClass('has-info').addClass('has-error');
+    		$('#txtRoleName').append('<div class="help-inline">角色名称长度范围应在2-32个字符之间!</div>');
+    		return false;
+    	}
+    	 /**获取选中的菜单*/ 
+    	var resTreeObj = $.fn.zTree.getZTreeObj("resourceTree");
+    	var resTreeNodes = resTreeObj.getCheckedNodes(true);
+    	var resIds = "";
+    	for (var i = 0; i < resTreeNodes.length; i++) {
+    		resIds += resTreeNodes[i].id + ",";
+		}
+        $("#form-edit #resIdList").val(resIds); 
+
+    	/** 获取选中的组织 */
+    	var orgTreeObj = $.fn.zTree.getZTreeObj("orgTree");
+    	var orgTreeNodes = orgTreeObj.getCheckedNodes(true);
+    	var orgIds = "";
+		for (var i = 0; i < orgTreeNodes.length; i++) {
+		  orgIds += orgTreeNodes[i].id + ",";
+		}
+	    $("#form-edit #orgIdList").val(orgIds); 
+
+    	if (isEmpty(roleId)) {
+    		$("#form-edit #parentId").val($("#selectedTreeRoleId").val());
+    		addRole();
+    	} else {
+    		updateRole(roleId);
+    	}
+    });
+    
+    function addRole() {
+    	$.ajax({
+			type : "POST",
+			url : "${ctx.contextPath}/d-admin/role/addRole",
+			data : $("#form-edit").serialize(),
+			dataType : "json",
+			success : function(data) {
+				if (data.success) {
+					common_success("保存成功！");
+					$("#form-modal").modal("hide");
+			  		roleTree();   // 刷新角色树
+			  		queryRole();  // 刷新列表
+				} else {
+					common_error(data.errDesc);
+				}
+			},
+			complete : function() {
+				isFormSubmit = false;
+			}
+	    });
+    }
+    
+    function updateRole(roleId) {
+    	var orgIds = $("#form-edit #orgIdList").val();
+    	var resIds = $("#form-edit #resIdList").val();
+    	$.ajax({
+			type : "POST",
+			url : "${ctx.contextPath}/d-admin/role/updateRole",
+			data : $("#form-edit").serialize(),
+			dataType : "json",
+			success : function(data) {
+				if (data.success) {
+					common_success("保存成功！");
+					$("#form-modal").modal("hide");
+			  		roleTree();   // 刷新角色树
+			  		queryRole();  // 刷新列表
+				} else {
+					common_error(data.errDesc);
+				}
+			},
+			complete : function() {
+				isFormSubmit = false;
+			}
+	    });
+    }
+    
+</script>

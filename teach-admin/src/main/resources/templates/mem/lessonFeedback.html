@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>用户课程反馈管理</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+#parse("./include/commonCss.html")
+<link href="${ctx.contextPath}/hplus/css/plugins/chosen/chosen.css"
+	rel="stylesheet">
+	<style>
+	.bootstrap-table .table thead>tr>th{
+		width:10%
+	}
+	</style>
+</head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content animated fadeInUp">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox">
+					<div class="ibox float-e-margins">
+						<div class="ibox-title">
+							<h5>用户课程反馈列表</h5>
+							<div class="ibox-tools">
+								<a class="collapse-link"> <i class="fa fa-chevron-up"></i>
+								</a>
+							</div>
+						</div>
+						<div class="ibox-content">
+							<!-- 	<div class="alert alert-success alert-dismissable">
+								<button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+								可双击订单所在行，可查看订单详情。
+							</div> -->
+							<form id="grid-search-form">
+								<div class="profile-user-info profile-user-info-striped">
+									<div class="profile-info-row">
+										<div class="profile-info-name">用户账号：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="loginAccount" id="loginAccount"
+												placeholder="用户账号" class="input-large" 
+												maxlength="30" onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
+										</div>
+										<div class="profile-info-name">课程名称：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="lessonName" id="lessonName"
+												placeholder="课程名称" class="input-large" onkeyup="this.value=this.value.replace(/^ +| +$/g,'')"
+												maxlength="120">
+										</div>
+										</div>
+										<div class="profile-info-row">
+										<div class="profile-info-name">创建时间：</div>
+										<div class="profile-info-value form-group form-group-item">
+											<input type="text" name="createTime" id="createTime"
+												placeholder="创建时间" class="input-large form-control" onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
+										</div>
+										<!-- <div class="profile-info-name">结束时间：</div>
+										<div class="profile-info-value form-group form-group-item">
+											<input type="text" name="endTime" id="endTime"
+												placeholder="创建时间" class="input-large form-control" onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
+										</div> -->
+									</div>
+								</div>
+							</form>
+							<div class="btn-group hidden-xs" id="tableEventsToolbar"
+								role="group">
+								<button type="button" id="grid-search-btn" title="搜索"
+									class="btn btn-outline btn-default">
+									<i class="glyphicon glyphicon-search" aria-hidden="true"></i>
+								</button>
+								<button type="button" id="grid-reset-btn" title="重置"
+									class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true">
+									    <use xlink:href="#icon-zhongzhi"></use>
+									</svg>
+								</button>
+							</div>
+							<table id="lessonFeedbackTable" data-mobile-responsive="false">
+								<thead>
+									<tr>
+										<th data-formatter="boostrapTableSortFormatter">序号</th>
+										<th data-field="fbId" data-visible="false">反馈ID</th>
+										<th data-field="loginAccount">用户账号</th>
+										<th data-field="lessonTypeStr" data-visible="true">课程类别</th>
+										<th data-field="lessonId" data-visible="false">课程ID</th>
+										<th data-field="lessonName">课程名称</th>
+										<th data-field="content">反馈内容</th>
+										<th data-field="createTime">创建时间</th>
+									</tr>
+								</thead>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	#parse("./include/commonJs.html")
+	<script
+		src="${ctx.contextPath}/hplus/js/plugins/chosen/chosen.jquery.min.js"></script>
+</body>
+<script>
+	$(function() {
+		poundageConfigPagin();
+		$('#grid-search-form #createTime').datetimepicker({
+			 	language:  'zh-CN',
+		        todayBtn:  true,
+		        clearBtn: true,
+		        autoclose: true,
+		        format:"yyyy-mm-dd",
+	 	        minView: "month"
+		});
+		$('#grid-search-form #endTime').datetimepicker({
+		 	language:  'zh-CN',
+	        todayBtn:  true,
+	        clearBtn: true,
+	        autoclose: true,
+	        format:"yyyy-mm-dd",
+ 	        minView: "month"
+	});
+	});
+
+	function poundageConfigPagin() {
+		bingdUrserTableParams = jQuery.extend({}, boostrapTableParams); // 表单中的table参数
+		// table分页参数配置
+		boostrapTableParams.url = "${ctx.contextPath}/d-admin/lessonFeedback/findPaging";
+		$("#lessonFeedbackTable").bootstrapTable(boostrapTableParams);
+		initGridSearch(); // 初始化grid搜索
+	}
+
+	// bootstrap-table分页查询时的参数封装
+	function boostrapTableQueryParams(params) {
+		if (isEmpty(params)) { // 点击搜索按钮时
+			var options = $("#lessonFeedbackTable").bootstrapTable('getOptions');
+			$("#lessonFeedbackTable").bootstrapTable('refreshOptions', {
+				pageNumber : 1,
+				sortName : ""
+			});
+		} else { // 点击分页时
+			return boostrapTableSearchParams("grid-search-form", params);
+		}
+	}
+</script>
+</html>

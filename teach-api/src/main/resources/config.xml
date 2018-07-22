@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns="http://www.springframework.org/schema/beans" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+		http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd"
+		default-lazy-init="true">
+	
+	<!-- dubbo -->
+	<dubbo:application name="${dubbo.application.name}"  />
+	<dubbo:protocol name="${dubbo.protocol.name}" charset="${dubbo.protocol.charset}" serialization="${dubbo.protocol.serialization}"
+		threads="${dubbo.protocol.threads}" port="${dubbo.protocol.port}"/>
+    <dubbo:registry address="${dubbo.registry.address}" check="${dubbo.registry.check}" file="dubboregistry/dubbo-registry.properties"></dubbo:registry>
+    <dubbo:consumer  retries="0" cache="${dubbo.consumer.cache}" check="${dubbo.consumer.check}" timeout="${dubbo.consumer.timeout}" /> <!-- 消费者 -->
+    <dubbo:annotation package="${dubbo.annotation.package}" />
+	<!-- <dubbo:monitor protocol="${dubbo.monitor.protocol}" /> 通过注册中心发现监控中心服务 -->
+	
+</beans>

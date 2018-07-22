@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+#parse("./include/commonCss.html")
+<link href="${ctx.contextPath}/css/wangEditor-fullscreen-plugin.css"
+	rel="stylesheet">
+<link href="${ctx.contextPath}/hplus/css/plugins/chosen/chosen.css"
+	rel="stylesheet">
+</head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content animated fadeInUp">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox">				
+						<div class="ibox-title" role="dialog" aria-hidden="true">
+							<h4>新增课程</h4>
+                    	</div>
+						<div class="ibox-content" id="form-modal">
+							<form id="form-prod-model" class="form-horizontal">
+								<div class="profile-user-info profile-user-info-striped" id="product_base_attr_div">
+									<input type="hidden" id="lessonId" name="lessonId" />
+									<div class="profile-info-row">									
+										<div class="profile-info-name">用户：</div>
+										<div class="profile-info-value form-group">
+											<select name="userId" id="userId" class="chosen-select">
+												#foreach($userDTO in $userList)
+												  #if(!${userDTO.realName})
+												<option value="${userDTO.userId}">${userDTO.email}
+												</option>
+												  #else
+												<option value="${userDTO.userId}">${userDTO.email} / ${userDTO.realName}
+												</option> 
+												  #end
+												#end
+											</select>
+										</div>
+									</div>	
+								
+									<div class="profile-info-row">	
+										<div class="profile-info-name">
+											<span style="color: red">*</span>课程分类：
+										</div>
+										<div class="profile-info-value form-group">
+											<select class="input-large" name="lessonType" id="lessonType">
+												<option value="1">定制课</option>
+												<option value="2">实习课</option>
+											</select>
+										</div>	
+										<div class="profile-info-name">
+											<span style="color: red"></span>所属行业：
+										</div>
+										<div class="profile-info-value form-group">
+											<select class="input-large" name="industryId" id="industryId"
+												onChange="industryChange(this.value)">
+												#foreach($industryDTO in $industryList)
+												<option value="${industryDTO.industryId}">${industryDTO.industryName}
+												</option> #end
+											</select>
+										</div>
+									</div>	
+								
+									<div class="profile-info-row">																														
+										<div class="profile-info-name">
+											<span style="color: red">*</span>课程名称：
+										</div>
+										<div class="profile-info-value form-group">
+											<input type="text" id="lessonName" name="lessonName"
+												placeholder="课程名称" class="input-large" maxlength="120"/>
+										</div>	
+										<div class="profile-info-name">
+											<span style="color: red">*</span>课程价格(元)：
+										</div>
+										<div class="profile-info-value form-group">
+											<input type="text" id="lessonPriceStr" name="lessonPriceStr"
+												placeholder="价格单位：元" class="input-large" maxlength="16"/>
+										</div>															
+									</div>
+															
+									<div class="profile-info-row">	
+										<div class="profile-info-name">
+											<span style="color: red">*</span>开始时间：
+										</div>
+										<div class="profile-info-value form-group">
+											<input type="text" id="beginTime" name="beginTime"
+												placeholder="开始时间"
+												class="input-large form-control date-icon">
+										</div>
+										<div class="profile-info-name">
+											<span style="color: red">*</span>结束时间：
+										</div>
+										<div class="profile-info-value form-group">
+											<input type="text" id="endTime" name="endTime"
+												placeholder="结束时间"
+												class="input-large form-control date-icon">
+										</div>
+									</div>
+									
+									<div class="profile-info-row">
+										<div class="profile-info-name">
+											<span style="color: red">*</span>总课时（分钟）：
+										</div>
+										<div class="profile-info-value form-group">
+											<input type="text" id="totalClass" name="totalClass"
+												placeholder="请填写以分钟为单位的时长" class="input-large" maxlength="9"/>
+										</div>
+									</div>
+								</div>
+								
+								<div class="profile-user-info profile-user-info-striped">
+									<div class="profile-info-row">
+										<div class="profile-info-name"><span style="color: red">*</span>课程介绍：</div>
+										<div class="profile-info-value form-group">
+											<div id="lessonRcmdE"></div>
+										</div>
+									</div>
+								</div>
+								<div class="hr-line-dashed"></div>
+								<div id="form-prodAttr-div"></div>
+								<div class="profile-user-info profile-user-info-striped">
+									<div class="profile-info-row">
+										<div class="profile-info-value form-group">
+											<button type="button" onClick="addHourCount()" title="新增课时" class="btn btn-primary">新增课时</button>
+										</div>
+									</div>
+								</div>
+								<br> <br> <br>
+							</form>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-primary"
+									onClick="addformSubmit();">保存</button>
+								<button type="button" class="btn btn-white"
+									onClick="formCancel();">返回</button>
+							</div>
+						</div>				
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="mask" class="sweet-overlay" tabindex="-1" style="opacity: 1; display: none;">
+		<div style="margin:20% 40%">
+			<img style="" alt="" src="${ctx.contextPath}/images/loading.gif">
+			<span style="color:white;">正在提交中...</span>
+		</div>
+	</div>
+	#parse("./include/commonJs.html")
+<script src="${ctx.contextPath}/hplus/js/plugins/chosen/chosen.jquery.min.js"></script>
+<script src="${ctx.contextPath}/js/wangEditor.js"></script>
+<script src="${ctx.contextPath}/js/wangEditor-fullscreen-plugin.js"></script>
+</body>
+<script type="text/javascript">
+	contentChange = false;
+	
+	isEditInitFormSub = true;
+	$(function(){
+		var E = window.wangEditor;
+		lessonRcmdE = new E('#lessonRcmdE'); // 活动说明E
+	
+		lessonRcmdE.customConfig.uploadImgServer = '${ctx.contextPath}/d-admin/upload';	// 上传到服务器上
+		// 将图片大小限制为 3M
+		lessonRcmdE.customConfig.uploadImgMaxSize = 3 * 1024 * 1024;
+		// 限制一次最多上传 5 张图片
+		lessonRcmdE.customConfig.uploadImgMaxLength = 5;
+		lessonRcmdE.customConfig.uploadFileName = 'imgFile';
+		// 将 timeout 时间改为 3s
+		lessonRcmdE.customConfig.uploadImgTimeout = 3000;
+		lessonRcmdE.customConfig.zIndex = 100;
+		
+		lessonRcmdE.customConfig.onchange = function (html) {
+			contentChange = true;
+	    }
+		lessonRcmdE.create();
+		E.fullscreen.init('#lessonRcmdE');
+		
+		judgeVerification();
+
+		$('#form-prod-model #beginTime').datetimepicker({
+			 language:  'zh-CN',
+		        todayBtn:  true,
+		        clearBtn: true,
+		        autoclose: true,
+		        format:"yyyy-mm-dd",
+	 	        minView: "month"
+		});
+
+		$('#form-prod-model #endTime').datetimepicker({
+			language : 'zh-CN',
+			todayBtn : true,
+			clearBtn : true,
+			autoclose : true,
+			format:"yyyy-mm-dd",
+	 	    minView: "month"
+		})
+		initChosenSelect();
+	})
+	
+	function initChosenSelect(){
+		$('.chosen-select').chosen({
+			allow_single_deselect : true
+		});
+		$(window).off('resize.chosen').on('resize.chosen', function() {
+			$('.chosen-select').each(function() {
+				var $this = $(this);
+				$this.next().css({
+					'width' : 250
+				});
+			})
+		}).trigger('resize.chosen');
+	}
+
+	// 表单提交
+	var isFormSubmit = false;
+	function addformSubmit() {
+		if (isFormSubmit)
+		return;
+		if (!$('#form-modal #form-prod-model').valid()){
+			common_error("数据不完善");
+			return;
+		}
+		//验证课程结束时间是否大于开始时间
+		var startTime = $('#form-prod-model #beginTime').val();
+		var endTime = $('#form-prod-model #endTime').val();
+		if(Date.parse(startTime) > Date.parse(endTime)){
+			common_error("结束时间要大于开始时间");
+			return;
+		}
+		
+	    var classNameNull = false;
+		// 校验课时名称
+		$("#form-prodAttr-div input[id=className]").each(function(){
+			if(isEmpty($(this).val())){
+				classNameNull = true;
+				return;
+			}
+		});
+		
+		if(classNameNull){
+			common_error("课时名称不能为空");
+			return;
+		}
+		
+		// 校验课时时长
+		$("#form-prodAttr-div input[id=planDuration]").each(function(){
+			if(isEmpty($(this).val())){
+				common_error("课时计划时长不能为空");
+				return;
+			}
+			if(!isPositive($(this).val())){
+				common_error("课时计划时长格式错误");
+				return;
+			}
+		})
+		if($('#lessonPriceStr').val() <= 0){
+			common_error("课程价格必须大于0");
+			return;
+		}
+		var lessonRcmdStr = lessonRcmdE.txt.html();
+		if (lessonRcmdStr.length > 10000) {
+			common_error("您输入的内容过长！");
+			return;
+		}
+		
+		var lessonId = $("#lessonId").val();
+		isFormSubmit = true;
+		$("#mask").show();
+		$.ajax({
+			type : "POST",
+			url : "${ctx.contextPath}/d-admin/lesson/custom/saveOrUpdateLesson",
+			data : $("#form-modal #form-prod-model").serialize(),
+			dataType : "json",
+			success : function(data) {
+				isFormSubmit = false;
+				if (data.success) {
+					// 富文本是否有改变
+	            	if (contentChange) {	
+						if (isEmpty(lessonId)) {
+							lessonId = data.result;
+						}
+						$.ajax({
+							type : "POST",
+							url : "${ctx.contextPath}/d-admin/lesson/custom/updateLessonRcmd",
+							data : jQuery.param({lessonId: lessonId, lessonRcmdStr: lessonRcmdStr}),
+							dataType : "json",
+							success : function(data) {
+								if (data.success) {
+									common_success("保存成功！");
+									$("#form-modal").modal("hide");
+									window.location.href = "${ctx.contextPath}/d-admin/lesson/custom/index";
+									boostrapTableQueryParams(); // 刷新列表
+								} else {
+									common_error("修改失败！");
+								}
+							},
+							complete : function() {
+								contentChange = false;
+								isFormSubmit = false;
+							}
+						});
+					} else {
+						common_success("保存成功！");
+						$("#form-modal").modal("hide");
+						window.location.href = "${ctx.contextPath}/d-admin/lesson/custom/index";
+						/* boostrapTableQueryParams(); */ // 刷新列表
+						isFormSubmit = false;
+						$("#mask").hide();
+					}
+				} else {
+					common_error(data.errDesc);
+				}
+			},
+			complete : function() {
+				isFormSubmit = false;
+				$("#mask").hide();
+			}
+		});
+	}
+
+	// 表单取消 返还
+	function formCancel() {
+		window.location.href = "${ctx.contextPath}/d-admin/lesson/custom/index";
+	}
+
+	// 行业改变导师联动事件
+	function industryChange(industryId) {
+		var tutorHtml=getTutorByIndustry(industryId);
+		$("#form-prodAttr-div select[id=tutorId]").each(
+				function() {
+					$(this).html(tutorHtml);
+					$(this).trigger("chosen:updated");
+				});
+		thisTutorsHtml=tutorHtml;
+	}
+	// 根据行业获取导师
+	var thisTutorsHtml="";
+	function getTutorByIndustry(industryId){
+		var html = '';
+		$.ajax({
+			type : "POST",
+			async : false,
+			url : "${ctx.contextPath}/d-admin/lesson/public/getTutorByIndustryId",
+			data : "industryId=" + industryId,
+			dataType : "json",
+			success : function(data) {
+				if (data.length > 0) {
+					for (var i = 0; i < data.length; i++) {
+						if (data[i].realName != null && data[i].realName != "") {
+							html += '<option value='+data[i].tutorId+'>'+data[i].loginAccount+' / '
+							+ data[i].realName + '</option>';
+						} else {
+							html += '<option value='+data[i].tutorId+'>' + data[i].loginAccount + '</option>';
+						}
+					}
+				}
+			}
+		});
+		
+		return html;
+	}
+
+	var closeCount = "";
+	// 用来绑定事件(使用unbind避免重复绑定)
+	function bindListener() {
+		$("button[name=hour-close]").unbind().click(function() {
+			closeCount += this.getAttribute('id') + ",";
+			$(this).parent().parent().remove();
+		})
+	}
+
+	//增加课时数
+	var hourIndex = 0;
+	function addHourCount() {
+		var tutorHtml=thisTutorsHtml.length>0?thisTutorsHtml:getTutorByIndustry($("#industryId").val());
+		var html = '<div>'
+				+ '<div class="profile-user-info profile-user-info-striped">'
+				+ '<input type="hidden" name="attrList['+hourIndex+'].identifying" value="1"/>'
+				+ '<div  class="profile-info-row">'
+				+ '<div class="profile-info-name"><span style="color:red">*</span>课时名称：</div>'
+				+ '<div class="profile-info-value form-group">'
+				+ '    <input type="text"  name="attrList['+hourIndex+'].className" id="className" class="input-large" maxlength="120"/>'
+				+ '</div>'
+				+ '<div class="profile-info-name"><span style="color:red">*</span>导师：</div>'
+				+ '<div class="profile-info-value form-group">'
+				+ '    <select name="attrList['+hourIndex+'].tutorId" id="tutorId" class="chosen-select">'
+				+ tutorHtml
+				+ '	  </select>'
+				+ '</div>'
+				+ '</div>'
+				+ '<div class="profile-info-row input-daterange" id="timeFormate">'
+				+ '<div class="profile-info-name"><span style="color:red">*</span>计划上课时间：</div>'
+				+ '<div class="profile-info-value form-group">'
+				+ '    <input type="text"  name="attrList['+hourIndex+'].planTime" id="planTime"' 
+				+ '		class="input-large form-control date-icon" />'
+				+ '</div>'
+				+ '<div class="profile-info-name"><span style="color:red">*</span>计划时长(分钟)：</div>'
+				+ '<div class="profile-info-value form-group">'
+				+ '<select class="input-large" name="attrList['+hourIndex+'].planDuration" id="planDuration">'
+				+	'<option value="30">30分钟</option>'
+				+	'<option value="60">60分钟</option>'
+				+	'<option value="90">90分钟</option>'
+				+	'<option value="120">120分钟</option>'
+				+ '</select>'
+				+ '</div>'
+				+ '</div>'
+				+ '</div>'
+				+ '<div class="profile-user-info profile-user-info-striped">'
+				+ '<div class="profile-info-row">'
+				+ '<div class="profile-info-name">课时介绍：</div>'
+				+ '<div class="profile-info-value form-group">'
+				+ '<textarea  name="attrList['+hourIndex+'].classRcmd" id="classRcmd" maxlength="1024" class="col-sm-10" maxlength="1000"></textarea>'
+				+ '</div>'
+				+ '</div>'
+				+ '</div>'
+				+ '<div class="profile-info-value" style="width:630px"></div>'
+				+ '<div class="profile-info-value form-group">'
+		        + '<button type="button" name="hour-close" id="' + hourIndex + '"' + 'class="btn btn-warning">删除课时</button>'
+		        + '</div>'
+				+ '</div>';
+		$("#form-prodAttr-div").append(html);
+		hourIndex++;
+		bindListener();
+
+		$('#timeFormate #planTime').datetimepicker({
+			 	language:  'zh-CN',
+		        todayBtn:  true,
+		        clearBtn: true,
+		        autoclose: true,
+		        format:"yyyy-mm-dd",
+	 	        minView: "month"
+		});
+		initChosenSelect();
+	}
+
+	// form表单校验
+	function judgeVerification() {
+		var icon = "<i class='fa fa-times-circle'></i> ";
+		$('#form-modal  #form-prod-model').validate({
+			rules : {
+				lessonName : {
+					required : true
+				},
+				userId : {
+					required : true
+				},
+				lessonType : {
+					required : true
+				},
+				lessonPriceStr : {
+					required : true,
+					digital : "#form-prod-model #lessonPriceStr"
+				},
+				industryId : {
+					required : true
+				},
+				totalClass : {
+					required : true,
+					positive : "#form-prod-model #totalClass"
+				},
+				beginTime : {
+					required : true
+				},
+				endTime : {
+					required : true
+				},
+				lessonRcmd : {
+					required : true
+				},
+				planDuration : {
+					required : true,
+					positive : "#form-prod-model #planDuration"
+				},
+				tutorId : {
+					required : true
+				},
+				planTime : {
+					required : true
+				}
+
+			},
+			messages : {
+				lessonName : {
+					required : icon + "课程名称不能为空！"
+				},
+				userId : {
+					required : icon + "用户不能为空！"
+				},
+				lessonType : {
+					required : icon + "课程分类不能为空！"
+				},
+				lessonPriceStr : {
+					required : icon + "课程价格不能为空！"
+				},
+				industryId : {
+					required : icon + "行业不能为空！"
+				},
+				totalClass : {
+					required : icon + "总课时不能为空！"
+				},
+				beginTime : {
+					required : icon + "开始时间不能为空！"
+				},
+				endTime : {
+					required : icon + "结束时间不能为空！"
+				},
+				lessonRcmd : {
+					required : icon + "课程介绍不能为空！"
+				},
+				planDuration : {
+					required : icon + "课时计划时长不能为空！"
+				},
+				tutorId : {
+					required : icon + "讲师不能为空！"
+				},
+				planTime : {
+					required : icon + "计划上课时间不能为空！"
+				}
+			}
+		});
+	};
+</script>
+</html>

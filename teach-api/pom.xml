@@ -1,0 +1,82 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.wst</groupId>
+		<artifactId>teach</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<artifactId>teach-api</artifactId>
+	<packaging>war</packaging>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- 这里一定要配置上java的版本，如果是1.7版本的可不用配置 -->
+		<java.version>1.8</java.version>
+		<start-class>com.hiwi.StartUp</start-class>
+	</properties>
+
+	<dependencies>
+		<!-- 服务接口，内部默认依赖common -->
+		<dependency>
+			<groupId>com.hiwi</groupId>
+			<artifactId>common</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.wst</groupId>
+			<artifactId>teach-service</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+			
+		<dependency>
+		    <groupId>com.alibaba</groupId>
+		    <artifactId>fastjson</artifactId>
+		    <version>1.2.47</version>
+		</dependency>
+		
+		<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        
+        <dependency>
+		    <groupId>org.springframework.session</groupId>
+		    <artifactId>spring-session</artifactId>
+		</dependency>
+
+		<!-- tomcat支持 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+		</dependency>
+		<!-- velocity依赖 -->
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-velocity</artifactId>
+		    <exclusions>
+		    	<exclusion>
+		    		<artifactId>spring-boot-starter</artifactId>
+		    		<groupId>org.springframework.boot</groupId>
+		    	</exclusion>
+		    </exclusions>
+		</dependency>
+	</dependencies>
+	<build>
+		<finalName>${project.groupId}.${project.artifactId}</finalName>
+		<defaultGoal>compile</defaultGoal>
+
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<configuration>
+						<source>1.8</source>
+						<target>1.8</target>
+						<encoding>UTF-8</encoding>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+</project>

@@ -1,0 +1,169 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<div class="modal inmodal" id="busiConfig-form-modal" role="dialog"
+	aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button class="close" data-dismiss="modal" type="button">×</button>
+				<h5 id="modalHeaderMsg" class="modal-title"></h5>
+			</div>
+			<div class="modal-body">
+				<form id="grid-thirdIpSearch-form">
+					<input type="hidden" id="configId" name="configId" />
+					<div class="profile-user-info profile-user-info-striped">
+						<div class="profile-info-row">
+							<div class="profile-info-name">业务名称：</div>
+							<div class="profile-info-value form-group">
+								<input type="text" name="busiName" id="busiName"
+									placeholder="业务名称" class="input-large" 
+									maxlength="250">
+							</div>
+							<div class="profile-info-name">业务编码：</div>
+							<div class="profile-info-value form-group">
+								<input type="text" name="busiCode" id="busiCode"
+									placeholder="业务编码" class="input-large"
+									onkeyup="this.value=this.value.replace(/^ +| +$/g,'')" 
+									maxlength="60">
+							</div>
+						</div>
+						<div class="profile-info-row">
+							<div class="profile-info-name">业务类型：</div>
+							<div class="profile-info-value form-group">
+								<select name="busiType" id="busiType" class="input-large"
+									onchange="busiTypeChange(this.value)">
+									<option value="1">定制课咨询配置</option>
+									<option value="2">活动咨询配置</option>
+								</select>
+							</div>
+							<div class="profile-info-name">微信号：</div>
+							<div class="profile-info-value form-group">
+								<input type="text" name="wechatNumber" id="wechatNumber"
+									placeholder="微信账号" class="input-large"
+									onkeyup="this.value=this.value.replace(/^ +| +$/g,'')" maxlength="500">
+							</div>
+						</div>
+					</div>
+					<div class="profile-user-info profile-user-info-striped" id="custom-div">
+						<div class="profile-info-row">
+							<div class="profile-info-name">二维码地址：</div>
+							<div class="profile-info-value form-group">
+								<div id="qRCodeUrl" name="qRCodeUrl" class="col-sm-4"
+								 style="padding-left:0px; width:222px;"></div>
+							</div>
+						</div>
+					</div>
+					<div class="profile-user-info profile-user-info-striped" id="activity-div" style="display: none;">
+						<div class="profile-info-row">
+							<div class="profile-info-name">昵称：</div>
+							<div class="profile-info-value form-group">
+								<input type="text" name="nickName" id="nickName"
+									placeholder="昵称" class="input-large"
+									onkeyup="this.value=this.value.replace(/^ +| +$/g,'')" maxlength="500">
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+				<button type="button" class="btn btn-primary"
+					onclick="saveOrUpdate()">保存</button>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+		
+	// 表单提交
+	function saveOrUpdate() {
+		
+		if (!$('#grid-thirdIpSearch-form').valid())
+			return;
+		var busiType=$("#grid-thirdIpSearch-form #busiType").val();
+		/* if(busiType==1){
+			var qRCodeFile=$("#grid-thirdIpSearch-form #qRCodeFile").val();
+			if(!qRCodeFile.length>0){
+				common_error("请上传二维码图片");
+				return;
+			}
+		}else */
+		
+		var wechatNumber=$("#grid-thirdIpSearch-form #wechatNumber").val();
+		if(isEmpty(wechatNumber)){
+			common_error("请输入微信号");
+			return;
+		}
+		
+		if(busiType==2){
+			var nickName=$("#grid-thirdIpSearch-form #nickName").val();
+			if(isEmpty(nickName)){
+				common_error("请输入微信昵称");
+				return;
+			}
+		}
+		
+		$("#mask").show();
+		$("#grid-thirdIpSearch-form").ajaxSubmit({
+			type : "POST",
+			async : false,
+			timeout : 5000,
+			url : "${ctx.contextPath}/d-admin/busiConfig/saveOrUpdate",
+			data : $("#grid-thirdIpSearch-form").serialize(),
+			dataType : "json",
+			success : function(data) {
+				if (data.success) {
+					common_success("操作成功！");
+					$("#busiConfig-form-modal").modal("hide");
+					boostrapTableQueryParams();
+				} else {
+					common_error(data.errDesc);
+				}
+				
+			},
+			complete : function() {
+				$("#mask").hide();
+			}
+		});
+	}
+
+	function busiTypeChange(busiType) {
+		// 定制课咨询配置
+		if (busiType == 1) {
+			$("#grid-thirdIpSearch-form #activity-div").hide();
+			$("#grid-thirdIpSearch-form #custom-div").show();
+		} else { // 活动咨询配置
+			$("#grid-thirdIpSearch-form #custom-div").hide();
+			$("#grid-thirdIpSearch-form #activity-div").show();
+		}
+	}
+	
+	// form表单校验
+	function judgeVerification() {
+		var icon = "<i class='fa fa-times-circle'></i> ";
+		$('#busiConfig-form-modal #grid-thirdIpSearch-form').validate({
+			rules : {
+				busiName : {
+					required : true
+				},
+				busiCode : {
+					required : true
+				},
+				busiType : {
+					required : true
+				}
+			},
+
+			messages : {
+				busiName : {
+					required : icon + "请输入业务名称！"
+				},
+				busiCode : {
+					required : icon + "请输入业务编码！"
+				},
+				busiType : {
+					required : icon + "请选择业务类型！"
+				}
+			}
+		});
+	};
+</script>

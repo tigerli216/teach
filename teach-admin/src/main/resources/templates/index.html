@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>运营支撑平台 - 主页</title>
+#parse("./include/commonCss.html")
+<!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+<![endif]-->
+</head>
+
+<body class="fixed-sidebar full-height-layout gray-bg"
+	style="overflow: hidden">
+	<div id="wrapper">
+		<!--左侧导航开始-->
+		<nav class="navbar-default navbar-static-side" role="navigation">
+			<div class="nav-close">
+				<i class="fa fa-times-circle"></i>
+			</div>
+			<div class="sidebar-collapse">
+				<ul class="nav" id="side-menu">
+					<li class="nav-header nav-header1">
+						<div class="dropdown profile-element">
+							<div class="header-bg">
+								<!--<img src="/admin//hplus/img/fm-logo.png">-->
+								WST运营支撑平台
+							</div>
+							<div class="header-padding">
+							<span><img alt="image" class="img-circle" src="${ctx.contextPath}/hplus/img/wst-logo.png">
+							</span> 
+							<a data-toggle="dropdown" class="dropdown-toggle" href="#" aria-expanded="true"> 
+								<span class="clear"> 
+									<span class="block m-t-xs"><strong class="font-bold">$op.opLoginName</strong></span>
+									<span class="text-muted text-xs block">$op.opName
+									<b class="caret"></b></span>
+								</span>
+							</a>
+							<ul class="dropdown-menu animated fadeInRight m-t-xs">
+								<li>
+									<a class="J_menuItem" onClick="javascript:getPersonal();" href="">个人资料</a>
+								</li>
+								<li>
+									<a class="J_menuItem" onClick="javascript:initChangePw();" href="">修改密码</a>
+								</li>
+								<li class="divider"></li>
+								<li><a href="login.html">安全退出</a></li>
+							</ul>
+							</div>
+						</div>
+						<div class="logo-element">WST</div>
+					</li> #parse("./include/menus.html")
+				</ul>
+			</div>
+		</nav>
+		<!--左侧导航结束-->
+		<!--右侧部分开始-->
+		<div id="page-wrapper" class="gray-bg dashbard-1">
+			<!-- <div class="row border-bottom">
+                <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+                    <div class="navbar-header"><a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
+                        <form role="search" class="navbar-form-custom" method="post" action="search_results.html">
+                            <div class="form-group">
+                                <input type="text" placeholder="请输入您需要查找的内容 …" class="form-control" name="top-search" id="top-search">
+                            </div>
+                        </form>
+                    </div>
+                    ##parse("./include/msg.html")
+                </nav>
+            </div> -->
+
+			#* 首页内容tab页面 及关闭按钮---------开始 *#
+			#parse("./include/content-tabs.html") #* 首页内容tab页面 及关闭按钮---------结束
+			*#
+
+			<div class="row J_mainContent" id="content-main"
+				style="height: calc(100% - 80px);">
+				<iframe class="J_iframe" name="iframe0" width="100%" height="100%"
+					src="${ctx.contextPath}/d-admin/homePage" frameborder="0"
+					data-id="${ctx.contextPath}/d-admin/homePage" seamless></iframe>
+			</div>
+			#*页脚---------开始 *# #parse("./include/footer.html") #* 页脚---------结束
+			*#
+		</div>
+		<!--右侧部分结束-->
+
+		<!--右侧边栏开始-->
+		#parse("./include/right-sidebar.html")
+		<!--右侧边栏结束-->
+
+
+		<!--mini聊天窗口开始-->
+		#parse("./include/chatbox.html")
+		<!--mini聊天窗口结束-->
+	</div>
+	#parse("./include/commonJs.html")
+	<script src="${ctx.contextPath}/hplus/js/plugins/metisMenu/jquery.metisMenu.js"></script>
+	<script src="${ctx.contextPath}/hplus/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+	<script src="${ctx.contextPath}/hplus/js/plugins/layer/layer.min.js"></script>
+
+	<!-- 自定义js -->
+	<script src="${ctx.contextPath}/hplus/js/hplus.js?v=4.1.0"></script>
+	<script src="${ctx.contextPath}/hplus/js/contabs.js"></script>
+	<!-- 第三方插件 -->
+	<script src="${ctx.contextPath}/hplus/js/plugins/pace/pace.min.js"></script>
+	
+	<div class="modal inmodal" id="updatePassWord-form-modal" role="dialog" aria-hidden="true">
+		<div class="modal-dialog" >
+			<div class="modal-content">
+				<div class="modal-header">
+					<button class="close" data-dismiss="modal" type="button">×</button>
+					<h4 id="modalHeaderMsg" class="modal-title">修改密码</h4>
+				</div>
+				<div class="modal-body">
+					<form id="updatePassWord-form" class="form-horizontal">
+						<input type="hidden" id="userId" name="userId" value="${op.opId}" />
+						<div class="profile-user-info profile-user-info-striped">
+							<div class="profile-info-row">
+								<div class="profile-info-name">旧密码：</div>
+								<div class="profile-info-value form-group">
+									<input type="text" id="oldPassword" name="oldPassword" class="col-md-11" />
+								</div>
+							</div>
+							<div class="profile-info-row">
+								<div class="profile-info-name">新密码：</div>
+								<div class="profile-info-value form-group">
+									<input type="text" id="newPassword" name="newPassword" class="col-md-11" />
+								</div>
+							</div>
+							<div class="profile-info-row">
+								<div class="profile-info-name">确认新密码：</div>
+								<div class="profile-info-value form-group">
+									<input type="text" id="againPassword" name="againPassword" class="col-md-11" />
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+					<button type="button" class="btn btn-primary" onClick="submitChange();">提交</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="modal inmodal" id="personal-form-modal" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button class="close" data-dismiss="modal" type="button">×</button>
+				<h5 id="modalHeaderMsg" class="modal-title">个人资料</h5>
+			</div>
+			<div class="modal-body">
+				<form id="form-edit" class="form-horizontal">
+				<input type="hidden" id="opId" name="opId" value="${op.opId}" />
+					<div class="profile-user-info profile-user-info-striped">
+						<div class="profile-user-info profile-user-info-striped">
+							<div class="profile-info-row">
+								<div class="profile-info-name">账号登陆名：</div>
+								<div id="opLoginName" class="profile-info-value form-group"></div>
+								<div class="profile-info-name"> 账号状态 ：</div>
+								<div id="status" class="profile-info-value form-group"></div>
+							    <div class="profile-info-name"> 账号锁定状态 ：</div>
+								<div id="lockStatus" class="profile-info-value form-group"></div>
+							</div>
+							<div class="profile-info-row">
+								<div class="profile-info-name">创建人：</div>
+								<div id="createOpName" class="profile-info-value form-group"></div>
+								<div class="profile-info-name">创建时间：</div>
+								<div id="createTime" class="profile-info-value form-group"></div>
+								<div class="profile-info-name">归属组织：</div>
+								<div id="orgName" class="profile-info-value form-group"></div>
+							</div>
+							<div class="profile-info-row">
+								<div class="profile-info-name">是否主账户：</div>
+								<div  id="isOwner" class="profile-info-value form-group"></div>
+								<div class="profile-info-name">上次文件批次：</div>
+								<div id="batchId" class="profile-info-value form-group"></div>
+								<div class="profile-info-name">系统管理人员：</div>
+								<div id="isAdmin" class="profile-info-value form-group"></div>
+							</div>
+							<div class="profile-info-row">
+								<div class="profile-info-name">供货商管理员：</div>
+								<div id="isSupplierAdmin" class="profile-info-value form-group"></div>
+								<div class="profile-info-name">上次修改时间：</div>
+								<div id="modifyTime" class="profile-info-value form-group"></div>
+								<div class="profile-info-name">修改人：</div>
+								<div  id="modifyOpName" class="profile-info-value form-group"></div>
+							</div>
+							<div class="profile-info-row">
+								<div class="profile-info-name">上次重置密码时间 ：</div>
+								<div id="nextResetPwdTime" class="profile-info-value form-group"></div>
+								<div class="profile-info-name">密码重置原因 ：</div>
+								<div id="resetPwdNotes" class="profile-info-value form-group"></div>
+								<div class="profile-info-name">账号失效时间：</div>
+								<div id="overdueTime" class="profile-info-value form-group"></div>
+							</div>
+						</div>
+					</div>
+					<div class="hr-line-dashed"></div>
+					<input type="hidden" id="userId" name="userId" value="" />
+					<div class="profile-user-info profile-user-info-striped">
+					<div class="profile-user-info profile-user-info-striped">
+						<div class="profile-info-row">
+							<div class="profile-info-name">名称：</div>
+							<div class="profile-info-value form-group">
+								<input type="text" id="opName" name="opName" class="input-large" />
+							</div>
+							<div class="profile-info-name">email：</div>
+							<div class="profile-info-value form-group">
+								<input type="text" id="email" name="email" class="input-large" />
+							</div>
+						</div>
+						<div class="profile-info-row">
+							<div class="profile-info-name">qq：</div>
+							<div class="profile-info-value form-group">
+								<input type="text" id="qq" name="qq" class="input-large" />
+							</div>
+							<div class="profile-info-name">地址：</div>
+							<div class="profile-info-value form-group">
+								<input type="text" id="address" name="address" class="input-large" />
+							</div>
+						</div>
+						<div class="profile-info-row">
+							<div class="profile-info-name">手机号：</div>
+							<div class="profile-info-value form-group">
+								<input type="text" id="mobilePhone" name="mobilePhone" class="input-large" />
+							</div>
+							<div class="profile-info-name">电话号码：</div>
+							<div class="profile-info-value form-group">
+								<input type="text" id="telePhone" name="telePhone" class="input-large" />
+							</div>
+						</div>
+						<div class="profile-info-row">
+							<div class="profile-info-name">工作号码：</div>
+							<div class="profile-info-value form-group">
+								<input type="text" id="jobNumber" name="jobNumber" class="input-large" />
+							</div>
+							<div class="profile-info-name">年龄：</div>
+							<div class="profile-info-value form-group">
+								<input type="text" id="age" name="age" class="input-large" />
+							</div>
+						</div>
+						<div class="profile-info-row">
+							<div class="profile-info-name">证件类型</div>
+							<div class="profile-info-value form-group">
+								<select id="identityType" name="identityType" class="input-large">
+									<option value="0">身份证</option>
+									<option value="1">身份证</option>
+								</select>
+							</div>
+							<div class="profile-info-name">身份证号：</div>
+							<div class="profile-info-value form-group">
+								<input type="text" id="identityNo" name="identityNo" class="input-large" />
+							</div>
+						</div>
+						<div class="profile-info-row">
+								<div class="profile-info-name">邮编：</div>
+								<div class="profile-info-value form-group">
+								<input type="text" id="postcode" name="postcode" class="input-large" /></div>
+								<div class="profile-info-name">  </div>
+								<div class="profile-info-value form-group">
+									<!-- <input type="text" disabled="disabled" id="postcode1" name="postcode1" class="input-large" />
+									</div> -->
+								</div>
+						</div>
+					</div>
+				</form>
+			</div>
+
+			<div class="modal-footer">
+				<button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+				<button type="button" class="btn btn-primary"
+					onClick="formSubmit();">保存</button>
+			</div>
+		</div>
+	</div>
+	</div>
+</body>
+</html>
+<script>
+
+    //初始化修改
+	function getPersonal() {
+		$("#personal-form-modal").modal("show");
+		editInitForm();
+	}
+//form修改时初始化
+	function editInitForm() {
+		var opId = ${op.opId};
+		$('.form-group').removeClass('has-error');
+		$('span[class*=help-block]').remove();
+		emptyDivInputValue('form-modal');
+
+		$.ajax({
+			type : "POST",
+			url : "${ctx.contextPath}/d-admin/operator/getById",
+			data : "opId=" + opId,
+			dataType : "json",
+			success : function(data) {
+				var ustatus = new Array("不是", "是");
+				var accstatus = new Array("有效", "无效 ");
+				var ostatus = new Array("主账户", "从账户 ");
+				var lockstatus = new Array("解锁", "锁定 ");
+				var itype = new Array("身份证", "身份证 ");
+				// 初始化form数据
+				initParam(data, null, 'personal-form-modal');
+				$("#createOpName").html(data.createOpName);
+				$("#createTime").html(data.createTime);
+				//$("#roleIds").html(data.roleIds);
+				$("#status").html(accstatus[data.status]);
+				$("#overdueTime").html(data.overdueTime);
+				$("#regTime").html(data.regTime);
+				$("#batchId").html(data.batchId);
+				$("#orgName").html(data.orgName);
+				//$("#orgIds").html(data.orgIds);
+				$("#lockStatus").html(lockstatus[data.lockStatus]);
+				//$("#supplierId").html(data.supplierId);
+				$("#isSupplierAdmin").html(ustatus[data.isSupplierAdmin]);
+				$("#nextResetPwdTime").html(data.nextResetPwdTime);
+				$("#resetPwdNotes").html(data.resetPwdNotes);
+				$("#opLoginName").html(data.opLoginName);
+				$("#isOwner").html(ostatus[data.isOwner]);
+				$("#supplierId").html(data.supplierId);
+				$("#opName").html(data.opName);
+				$("#isAdmin").html(ustatus[data.isAdmin]);
+				$("#email").html(data.email);
+				$("#qq").html(data.qq);
+				$("#address").html(data.address);
+				$("#mobilePhone").html(data.mobilePhone);
+				$("#telePhone").html(data.telePhone);
+				$("#jobNumber").html(data.jobNumber);
+				$("#identityNo").html(data.identityNo);
+				$("#age").html(data.age);
+				$("#createOpId").html(data.createOpId);
+				$("#modifyOpName").html(data.modifyOpName);
+				$("#modifyTime").html(data.modifyTime);
+				$("#postcode").html(data.postcode);
+				
+				$("#form-modal").modal("show");
+			},
+			complete : function() {
+			}
+		});
+	};
+    
+	$(function() {
+		judgeVerification();
+	})
+	
+	// form表单校验
+	function judgeVerification() {
+		var icon = "<i class='fa fa-times-circle'></i> ";
+		$('#form-edit').validate({
+			rules : {
+				opName : {
+					required : true,
+					maxlength : 32,
+					minlength : 2
+				},
+				email : {
+					maxlength : 32,
+					email : true
+				},
+				telePhone : {
+					minlength : 12,
+					maxlength : 13,
+					isTel : "#form-edit #telePhone"
+				},
+				mobilePhone : {
+					minlength : 11,
+					maxlength : 11,
+					isTel : "#form-edit #mobilePhone"
+				},
+				qq : {
+					minlength : 5,
+					maxlength : 13,
+					isQQ : "#form-edit #qq"
+				},
+				identityNo : {
+					isIdCardNo : "#form-edit #identityNo"
+				},
+				postcode : {
+					isZipCode : "#form-edit #postcode"
+				},
+				age : {
+					isAge : "#form-edit #age"
+				}
+			},
+
+			messages : {
+				opName : {
+					required : icon + "操作员名不能为空！",
+					maxlength : icon + "最长为32个字符！",
+					minlength : icon + "最短为2个字符！"
+				},
+				email : {
+					maxlength : icon + "最长为32个字符！",
+					email : icon + "邮箱格式不正确！"
+				},
+				telePhone : {
+					minlength : icon + "最少12个数字！",
+					maxlength : icon + "最长13个数字！",
+					isTell : icon + "电话格式不正确！"
+				},
+				mobilePhone : {
+					minlength : icon + "最少11个数字！",
+					maxlength : icon + "最长11个数字！",
+					isTell : icon + "手机格式不正确！"
+				},
+				qq : {
+					minlength : icon + "最少5个数字！",
+					maxlength : icon + "最长13个数字！",
+					isQQ : icon + "QQ号码格式不正确！"
+				},
+				identityNo : {
+					isIdCardNo : icon + "身份证格式不正确！"
+				},
+				postcode : {
+					isZipCode : icon + "邮政编码格式不正确！"
+				},
+				age : {
+					isAge : icon + "年龄不正确！"
+				}
+			}
+		});
+	};
+	// 表单提交
+	var isFormSubmit = false;
+	function formSubmit() {
+		if (isFormSubmit)
+			return;
+
+		if (!$('#form-edit').valid())
+			return;
+
+		isFormSubmit = true;
+		$.ajax({
+			type : "POST",
+			url : "${ctx.contextPath}/d-admin/operator/edit1",
+			data : $("#form-edit").serialize(),
+			dataType : "json",
+			success : function(data) {
+				if (data.success) {
+					common_success("保存成功！");
+					$("#personal-form-modal").modal("hide");
+					boostrapTableQueryParams(); // 刷新列表
+				} else {
+					common_error(data.errDesc);
+				}
+			},
+			complete : function() {
+				isFormSubmit = false;
+			}
+		});
+	}
+
+	
+	// 下线
+	var isLogout = false;
+	function logout() {
+		if (isLogout)
+			return;
+
+		isLogout = true;
+		$.ajax({
+			type : "POST",
+			url : "${ctx.contextPath}/d-admin/logout",
+			dataType : "json",
+			success : function(data) {
+				if (data.success) {
+					window.location.href = "${ctx.contextPath}/d-admin/login";
+				} else {
+					alert(data.errDesc);
+				}
+			},
+			complete : function() {
+				isLogout = false;
+			}
+		});
+	}
+	
+	// 初始化修改密码
+	function initChangePw() {
+		$('.form-group').removeClass('has-error');
+		$('span[class*=help-block]').remove();
+		emptyDivInputValue('updatePassWord-form-modal');
+		
+		$("#updatePassWord-form-modal").modal("show");
+	}
+	// 修改密码
+	var isSubmitChange = false;
+	function submitChange() {
+		if (isSubmitChange)
+			return;
+
+		if (!$('#updatePassWord-form').valid())
+			return;
+
+		isSubmitChange = true;
+		var oldPassword = $('#oldPassword').val();
+		var newPassword = $('#newPassword').val();
+		var againPassword = $('#againPassword').val();
+		$.ajax({
+			type : "POST",
+			url : "${ctx.contextPath}/d-admin/operator/modifyPwd",
+			data : "oldPassword=" + oldPassword + "&newPassword=" + newPassword
+					+ "&againPassword=" + againPassword,
+			dataType : "json",
+			success : function(data) {
+				if (data.success) {
+					common_success("修改成功");
+					$("#updatePassWord-form-modal").modal("hide");
+				} else {
+					common_error(data.errDesc);
+				}
+			},
+			complete : function() {
+				isSubmitChange = false;
+			}
+		});
+	}
+</script>

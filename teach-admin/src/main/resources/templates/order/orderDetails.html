@@ -1,0 +1,344 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<div class="hr-line-dashed"></div>
+<div class="hide" id="orderDetails_div">
+    <div class="tabs-container" >
+        <input type="hidden" id="orderId"/>
+        <input type="hidden" id="orderSplit"/>
+        <ul class="nav nav-tabs">
+            <li class="" onClick="findOrderList();" id="orderDtlLi">
+                <a data-toggle="tab" href="#tab-2" aria-expanded="false" >用户订单详情</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div id="tab-2" class="tab-pane">
+                <div class="panel-body">
+                	<!-- 产品属性 -->
+                	<div id="orderDtlDiv" class="form-horizontal"></div>
+                	<!-- 支付记录 -->
+                    <div id="orderPaymentDiv" class="form-horizontal"></div>
+                    <!-- 优惠券记录 -->
+                    <div id="orderCouponRecordDiv" class="form-horizontal"></div>
+                    <!-- 拆单记录 -->
+                    <div id="orderSplitRecordDiv" class="form-horizontal"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    /**用户订单详情*/
+    var uOrderTable;
+    var isfindUserOrderUserId = "0";
+    function findOrderList() {
+        /** 请求查询 */
+        var orderId = $(".tabs-container #orderId").val();
+        if (isEmpty(orderId)) return;
+
+        /**提交查询*/
+        $.ajax({
+            type:"POST",
+            url:"${ctx.contextPath}/d-admin/order/query/findOrderDtlList",
+            data:"orderId=" + orderId,
+            dataType:"json",
+            success:function(data){
+            	if (isEmpty(data)) {
+            		$("#orderDtlDiv").html("无数据！");
+            		return;
+            	}
+            	var html = "";
+            	for (var i=0; i<data.length; i++) {
+            		var orderDtl = data[i];
+            		if(i > 0){
+            			html += '<div class="hr-line-dashed"></div>';
+            		}
+            		html += '<div class="profile-user-info profile-user-info-striped">\
+	            				<div class="profile-info-row">\
+			                  <div class="profile-info-name">产品名称：</div>\
+			                  <div class="profile-info-value form-group">\
+			                      <span>'+ orderDtl.prodName +'</span>\
+			                  </div>\
+			                  <div class="profile-info-name">商品原价：</div>\
+			                  <div class="profile-info-value form-group">\
+			                      <span>'+ orderDtl.transTotalPrice +'</span>\
+			                  </div>\
+			                  <div class="profile-info-name">商品成交价：</div>\
+			                  <div class="profile-info-value form-group">\
+			                      <span>'+ orderDtl.transPriceStr +'</span>\
+			                  </div>\
+			                  <div class="profile-info-name">优惠价：</div>\
+			                  <div class="profile-info-value form-group">\
+			                      <span>'+ orderDtl.discountAmountStr +'</span>\
+			                  </div>\
+			              </div>\
+		              </div>';
+		              var orderProdAttrList = orderDtl.orderProdAttrList;
+		              if (!isEmpty(orderProdAttrList)) {
+		              	html += '<div class="hr-line-dashed"></div><div class="profile-user-info profile-user-info-striped">';
+		              	for (var j=0; j<orderProdAttrList.length; j++) {
+		              		var orderProdAttr = orderProdAttrList[j];
+							if(orderProdAttr.attrCode=='AMOUNT'){
+		              			var str = (orderProdAttr.attrValue * 0.01).toFixed(2) + '';
+		              			var intSum = str.substring(0,str.indexOf(".")).replace( /\B(?=(?:\d{3})+$)/g, ',' );//取到整数部分
+		              			var dot = str.substring(str.length,str.indexOf("."))//取到小数部分
+		              			orderProdAttr.attrValue = intSum + dot;
+		              		}
+		              		if (j % 4 == 0) {
+		              			if (j != 0) {
+		              				html += "</div>";
+		              			}
+		              			html += '<div class="profile-info-row">';
+		              		}
+		              		var attrname = orderProdAttr.attrName;
+		              		var attrvalue = orderProdAttr.attrValue;
+		              		if(attrname == "充值金额(元）" || attrname == "会员价(元)"){
+		              			attrvalue = attrvalue / 100;
+		              		}
+		              		html += '<div class="profile-info-name">'+ attrname +'：</div>\
+				                  <div class="profile-info-value form-group">\
+				                      <span>'+ attrvalue +'</span>\
+				                  </div>';
+		              	}
+		              	if (orderProdAttrList.length % 4 == 0) {
+		              		html += "</div>";
+		              	}
+		              	html += '</div>';
+		              }
+            	}
+            	$("#orderDtlDiv").html(html);
+            },
+            complete:function(){
+              	$("#orderPaymentDiv").html("无支付数据");
+            	findPaymentDTO();
+            	findOrderCouponRecord();
+            	// 订单拆单了才去查询拆单明细
+            	if($(".tabs-container #orderSplit").val() == 1){
+            		findOrderSplitRecord();	
+            	}
+			}
+        });
+
+        isUserRealUserId = orderId;
+    }
+    /**用户支付详情*/
+    function findPaymentDTO() {
+      /** 请求查询 */
+      var orderId = $(".tabs-container #orderId").val();
+      if (isEmpty(orderId)) return;
+
+        /**提交查询*/
+        $.ajax({
+            type:"POST",
+            url:"${ctx.contextPath}/d-admin/order/query/getPayByOrderId",
+            data:"orderId=" + orderId,
+            dataType:"json",
+            success:function(data){
+            	if (isEmpty(data)) {
+            		//$("#orderPaymentDiv").html("无数据！");
+            		return;
+            	}
+            	 var html1 = "";	
+            	 
+            	 for(var j=0;j<data.length; j++){
+            		 var paymentDTO = data[j];
+            		 var paySource = paymentDTO.paySourceStr;
+            		 if(paySource == "优惠券"){
+            			 html1 += '<div class="hr-line-dashed"></div>\
+                  			<div class="profile-user-info profile-user-info-striped">\
+      	            			<div class="profile-info-row">\
+      			                  <div class="profile-info-name">优惠金额：</div>\
+      			                  <div class="profile-info-value form-group">\
+      			                      <span>'+ paymentDTO.payAmountStr +'</span>\
+      			                  </div>\
+      			                  <div class="profile-info-name">交易类型：</div>\
+      			                  <div class="profile-info-value form-group">\
+      			                      <span>'+ paymentDTO.tradeTypeStr +'</span>\
+      			                  </div>\
+      			                  <div class="profile-info-name">在线支付时间：</div>\
+      			                  <div class="profile-info-value form-group">\
+      			                      <span>'+ paymentDTO.payTime +'</span>\
+      			                  </div>\
+      			                  <div class="profile-info-name">支付成功时间：</div>\
+      			                  <div class="profile-info-value form-group">\
+      			                      <span>'+ paymentDTO.paySuccessTime +'</span>\
+      			                  </div>\
+      			             	  </div>\
+      			                 <div class="profile-info-row">\
+      			                  <div class="profile-info-name">金额来源：</div>\
+      			                  <div class="profile-info-value form-group">\
+      			                      <span>'+ paymentDTO.paySourceStr +'</span>\
+      			                  </div>\
+      			                  <div class="profile-info-name">科目编码：</div>\
+      			                  <div class="profile-info-value form-group">\
+      			                      <span>'+ paymentDTO.bookCode +'</span>\
+      			                  </div>';
+      			              
+      			              if(paymentDTO.payChn == 6){
+      			              	html1 += '<div class="profile-info-name">银行卡：</div>\
+      		                  			  <div class="profile-info-value form-group">\
+      		                      		  	  <span>'+ paymentDTO.param2 +'</span>\
+      		                      		  </div>';
+      			              }
+      			         html1 +=  '</div></div>';
+            		 }else{
+            			 html1 += '<div class="hr-line-dashed"></div>\
+                 			<div class="profile-user-info profile-user-info-striped">\
+     	            			<div class="profile-info-row">\
+     			                  <div class="profile-info-name">支付金额：</div>\
+     			                  <div class="profile-info-value form-group">\
+     			                      <span>'+ paymentDTO.payAmountStr +'</span>\
+     			                  </div>\
+     			                 <div class="profile-info-name">支付方式：</div>\
+    			                  <div class="profile-info-value form-group">\
+    			                      <span>'+ paymentDTO.paySourceStr +'</span>\
+    			                  </div>\
+     			                  <div class="profile-info-name">交易类型：</div>\
+     			                  <div class="profile-info-value form-group">\
+     			                      <span>'+ paymentDTO.tradeTypeStr +'</span>\
+     			                  </div>\
+     			                  <div class="profile-info-name">支付状态：</div>\
+     			                  <div class="profile-info-value form-group">\
+     			                      <span>'+ paymentDTO.tradeStatusStr +'</span>\
+     			                  </div>\
+     			                  </div>\
+     			                  <div class="profile-info-row">\
+     			                  <div class="profile-info-name">支付通道商户名称：</div>\
+     			                  <div class="profile-info-value form-group">\
+     			                      <span>'+ paymentDTO.payChnName +'</span>\
+     			                  </div>\
+     			                  <div class="profile-info-name">在线支付时间：</div>\
+     			                  <div class="profile-info-value form-group">\
+     			                      <span>'+ paymentDTO.payTime +'</span>\
+     			                  </div>\
+     			                  <div class="profile-info-name">支付成功时间：</div>\
+     			                  <div class="profile-info-value form-group">\
+     			                      <span>'+ paymentDTO.paySuccessTime +'</span>\
+     			                  </div>\
+     			                  <div class="profile-info-name">第三方支付交易号码：</div>\
+     			                  <div class="profile-info-value form-group">\
+     			                      <span>'+ paymentDTO.thridTradeNo +'</span>\
+     			              	  </div>\
+     			              </div>\
+     			              <div class="profile-info-row">\
+     			                  <div class="profile-info-name">金额来源：</div>\
+     			                  <div class="profile-info-value form-group">\
+     			                      <span>'+ paymentDTO.paySourceStr +'</span>\
+     			                  </div>\
+     			                  <div class="profile-info-name">科目编码：</div>\
+     			                  <div class="profile-info-value form-group">\
+     			                      <span>'+ paymentDTO.bookCode +'</span>\
+     			                  </div>';
+     			              
+     			              if(paymentDTO.payChn == 6){
+     			              	html1 += '<div class="profile-info-name">银行卡：</div>\
+     		                  			  <div class="profile-info-value form-group">\
+     		                      		  	  <span>'+ paymentDTO.param2 +'</span>\
+     		                      		  </div>';
+     			              }
+     			         html1 +=  '</div></div>';
+            		 }
+            		 
+            		 
+            	 }
+            	$("#orderPaymentDiv").html(html1);
+            }
+        });
+    }
+    
+    /**用户优惠券使用详情*/
+    function findOrderCouponRecord() {
+    	//清空用户优惠券使用记录
+    	$("#orderCouponRecordDiv").html("");
+    	/*请求查询*/
+    	var orderId = $(".tabs-container #orderId").val();
+        if (isEmpty(orderId)) return;
+        /*提交查询*/
+        $.ajax({
+            type:"POST",
+            url:"${ctx.contextPath}/d-admin/order/query/findOrderCouponRecordByOrderId",    //请求路径会不同
+            data:"orderId=" + orderId,
+            dataType:"json",
+            success:function(data){
+            	if (isEmpty(data)) {
+            		//$("#orderPaymentDiv").html("无数据！");
+            		return;
+            	}
+            	 var html1 = '<div class="hr-line-dashed"></div>\
+            	 <div class="profile-user-info profile-user-info-striped">';	
+            	 
+            	 for(var j=0;j<data.length; j++){
+            		 var OrderCouponRecord = data[j];
+            		html1 += '<div class="profile-info-row">\
+			                  <div class="profile-info-name">优惠券名称：</div>\
+				                  <div class="profile-info-value form-group">\
+				                      <span>'+ OrderCouponRecord.couponName +'</span>\
+				              </div>\
+					          <div class="profile-info-name">抵用金额：</div>\
+						          <div class="profile-info-value form-group">\
+						              <span>'+ OrderCouponRecord.discountAmountStr +'</span>\
+						      </div>\
+						      <div class="profile-info-name">使用时间：</div>\
+					          	  <div class="profile-info-value form-group">\
+					             	  <span>'+ OrderCouponRecord.createTime +'</span>\
+					      	  </div></div>';     
+            	 }
+            	 html1 += '</div>';
+            	$("#orderCouponRecordDiv").html(html1);
+            }
+        });
+    }
+    
+    // 查询拆单记录
+    function findOrderSplitRecord(){
+    	$("#orderSplitRecordDiv").html("");
+    	var orderId = $(".tabs-container #orderId").val();
+        if (isEmpty(orderId)) return;
+        /*提交查询*/
+        $.ajax({
+            type:"POST",
+            url:"${ctx.contextPath}/d-admin/order/query/findOrderSplitRecordByOrderId",
+            data:"orderId=" + orderId,
+            dataType:"json",
+            success:function(data){
+            	if (isEmpty(data)) {
+            		$("#orderSplitRecordDiv").html("无数据！");
+            		return;
+            	}
+            	var splitArr = new Array("", "有效", "无效");
+            	var html1 = '<div class="hr-line-dashed"></div><div class="profile-user-info profile-user-info-striped">';	
+            	for(var j=0;j<data.length; j++){
+            		var orderSplitRecord = data[j];
+            		html1 += '<div class="profile-info-row">\
+			                  	<div class="profile-info-name">拆单金额：</div>\
+				                  	<div class="profile-info-value form-group">\
+				                    	<span>'+ orderSplitRecord.amount / 100 +'</span>\
+				              	</div>\
+				              	<div class="profile-info-name">分销商用户ID：</div>\
+			                  		<div class="profile-info-value form-group">\
+			                    		<span>'+ orderSplitRecord.parentUser +'</span>\
+			              		</div>\
+					          	<div class="profile-info-name">分销商佣金：</div>\
+						          	<div class="profile-info-value form-group">\
+						              	<span>'+ orderSplitRecord.commission / 100 +'</span>\
+						      	</div>\
+				              	<div class="profile-info-name">代理商用户ID：</div>\
+			                  		<div class="profile-info-value form-group">\
+			                    		<span>'+ orderSplitRecord.topUser +'</span>\
+			              		</div>\
+						      	<div class="profile-info-name">代理商佣金：</div>\
+					          	  	<div class="profile-info-value form-group">\
+					             	  	<span>'+ orderSplitRecord.topCommission / 100 +'</span>\
+					      	  	</div>\
+					      		<div class="profile-info-name">状态：</div>\
+					          	<div class="profile-info-value form-group">\
+					              	<span>'+ splitArr[orderSplitRecord.status] +'</span>\
+					      		</div>\
+					      	  </div>';     
+            	 }
+            	 html1 += '</div>';
+            	$("#orderCouponRecordDiv").html(html1);
+            }
+        });
+    }
+</script>

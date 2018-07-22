@@ -1,0 +1,406 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!--  课程添加和修改    -->
+<div class="modal inmodal" id="form-modal" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal" type="button">×</button>
+                <h4 id="modalHeaderMsg" class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="form-prod-model" class="form-horizontal">
+                    <div class="profile-user-info profile-user-info-striped" id="product_base_attr_div">
+                        <input type="hidden" id="lessonId" name="lessonId"/>
+                        <div class="profile-info-row">
+                            <div class="profile-info-name"><span style="color:red">*</span>课程名称：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="lessonName" name="lessonName" class="input-large" maxlength="60"/>
+                            </div>
+                            <div class="profile-info-name"><span style="color:red">*</span>课程分类：</div>
+                            <div class="profile-info-value form-group">
+                                <select class="input-large" name="lessonType" id="lessonType">
+                                    <option value="">全部</option>
+                                    <option value="1">录播课</option>
+                                    <option value="2">直播课</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="profile-info-row">
+                            <div class="profile-info-name"><span style="color:red">*</span>系列名称：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="seriesName" name="seriesName" class="input-large" maxlength="60"/>
+                            </div>
+                            <div class="profile-info-name"><span style="color:red">*</span>访问权限：</div>
+                            <div class="profile-info-value form-group">
+                                <select class="input-large" name="visitAuth" id="visitAuth">
+                                    <option value="">全部</option>
+                                    <option value="1">游客</option>
+                                    <option value="2">普通用户</option>
+                                    <option value="3">VIP</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="profile-info-row">
+                            <div class="profile-info-name"><span style="color:red">*</span>课程原价：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="origPrice" name="origPrice" class="input-large" maxlength="20"/>
+                            </div>
+                            <div class="profile-info-name"><span style="color:red"></span>课程折扣价：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="discountPrice" name="discountPrice" class="input-large" maxlength="20"/>
+                            </div>
+                        </div>
+                        <div class="profile-info-row input-daterange">
+                        	<div class="profile-info-name"><span style="color:red"></span>所属行业：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="industry" name="industry" class="input-large" />
+                            </div>
+                            <div class="profile-info-name"><span style="color:red">*</span>有效期：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="validTime" name="validTime" placeholder="有效期"
+                                       class="input-large form-control date-icon">
+                            </div>
+                        </div>
+                         <div class="profile-info-row">
+                            <div class="profile-info-name"><span style="color:red"></span>是否置顶：</div>
+                            <div class="profile-info-value form-group">
+                                <select class="input-large" name="isTop" id="isTop">
+                                    <option value="">全部</option>
+                                    <option value="1">否</option>
+                                    <option value="2">是</option>
+                                </select>
+                            </div>
+                            <div class="profile-info-name"><span style="color:red"></span>权重(倒序)：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="weight" name="weight" class="input-large" />
+                            </div>
+                        </div>
+                        <div class="profile-info-row">
+                            <div class="profile-info-name"><span style="color:red">*</span>讲师ID：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="tutorId" name="tutorId" class="input-large" maxlength="20"/>
+                            </div>
+							<div class="profile-info-name">讲师介绍：</div>
+							<div class="profile-info-value form-group">
+								<textarea id="tutorRcmd" name="tutorRcmd" maxlength="1024" class="col-sm-10" maxlength="1000"></textarea>
+							</div>
+                        </div>
+					</div> 
+					<div class="profile-user-info profile-user-info-striped"  id="product_base_desc_div">
+						<div class="profile-info-row">
+							<div class="profile-info-name">课程介绍：</div>
+							<div class="profile-info-value form-group">
+								<textarea id="lessonRcmd" name="lessonRcmd" maxlength="1024" class="col-sm-10"></textarea>
+							</div>
+						</div>
+					</div>
+					<div class="hr-line-dashed"></div>
+					<div id="form-prodAttr-div">
+					</div>
+					 <div class="profile-user-info profile-user-info-striped">
+                        <div class="profile-info-row">
+                            <div class="profile-info-value form-group">
+                                <button type="button" onClick="addHourCount()" title="新增课时" 
+                                 class="add-day-btn btn-success">新增课时
+                            	</button>
+                            </div>
+                        </div>
+                    </div>
+                     <br><br><br>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" onClick="formSubmit();">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--网课课程详情页面 -->
+<div class="modal inmodal" id="dform-modal" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal" type="button">×</button>
+                <h4 id="modalHeaderDetailsMsg" class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="formDetails-prod-model" class="form-horizontal">
+                    <div class="profile-user-info profile-user-info-striped" id="productDetails_base_attr_div">
+                        <input type="hidden" id="lessonId" name="lessonId"/>
+                        <div class="profile-info-row">
+                            <div class="profile-info-name"><span style="color:red">*</span>课程名称：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="lessonName" name="lessonName" class="input-large" style="border:0;"  disabled="disabled"/>
+                            </div>
+                            <div class="profile-info-name"><span style="color:red">*</span>课程分类：</div>
+                            <div class="profile-info-value form-group">
+                                <select class="input-large" name="lessonType" id="lessonType" style="border:0;"  disabled="disabled">
+                                    <option value="">全部</option>
+                                    <option value="1">录播课</option>
+                                    <option value="2">直播课</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="profile-info-row">
+                            <div class="profile-info-name"><span style="color:red">*</span>系列名称：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="seriesName" name="seriesName" class="input-large" style="border:0;"  disabled="disabled"/>
+                            </div>
+                            <div class="profile-info-name"><span style="color:red">*</span>访问权限：</div>
+                            <div class="profile-info-value form-group">
+                                <select class="input-large" name="visitAuth" id="visitAuth" style="border:0;"  disabled="disabled">
+                                    <option value="">全部</option>
+                                    <option value="1">游客</option>
+                                    <option value="2">普通用户</option>
+                                    <option value="3">VIP</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="profile-info-row">
+                            <div class="profile-info-name"><span style="color:red">*</span>课程原价：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="origPrice" name="origPrice" class="input-large" style="border:0;"  disabled="disabled"/>
+                            </div>
+                            <div class="profile-info-name"><span style="color:red"></span>课程折扣价：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="discountPrice" name="discountPrice" class="input-large" style="border:0;"  disabled="disabled"/>
+                            </div>
+                        </div>
+                         <div class="profile-info-row">
+                            <div class="profile-info-name"><span style="color:red"></span>所属行业：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="industry" name="industry" class="input-large" style="border:0;"  disabled="disabled"/>
+                            </div>
+                            <div class="profile-info-name"><span style="color:red">*</span>有效期：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="validTime" name="validTime" placeholder="产品有效时间"
+                                       class="input-large" style="border:0;"  disabled="disabled"/>
+                            </div>
+                        </div>
+                        <div class="profile-info-row">
+                            <div class="profile-info-name"><span style="color:red"></span>是否置顶：</div>
+                            <div class="profile-info-value form-group">
+                                <select class="input-large" name="visitAuth" id="visitAuth" style="border:0;"  disabled="disabled">
+                                    <option value="">全部</option>
+                                    <option value="1">否</option>
+                                    <option value="2">是</option>
+                                </select>
+                            </div>
+                        	<div class="profile-info-name"><span style="color:red"></span>权重(倒序)：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="weight" name="weight" class="input-large" style="border:0;"  disabled="disabled"/>
+                            </div>
+                        </div>
+                        <div class="profile-info-row">
+                            <div class="profile-info-name"><span style="color:red">*</span>讲师ID：</div>
+                            <div class="profile-info-value form-group">
+                                <input type="text" id="tutorId" name="tutorId" class="input-large" style="border:0;"  disabled="disabled"/>
+                            </div>
+                            <div class="profile-info-name">讲师介绍：</div>
+							<div class="profile-info-value form-group">
+								<textarea id="tutorRcmd" name="tutorRcmd" maxlength="1024" class="col-sm-10" style="border:0;"  disabled="disabled"></textarea>
+							</div>
+                        </div>
+                    </div>
+                    <div class="profile-user-info profile-user-info-striped"  id="productDetails_base_desc_div">
+						<div class="profile-info-row">
+							<div class="profile-info-name">课程介绍：</div>
+							<div class="profile-info-value form-group">
+								<textarea id="lessonRcmd" name="lessonRcmd" maxlength="1024" class="col-sm-10" style="border:0;"  disabled="disabled"></textarea>
+							</div>
+						</div>
+					</div>
+					<div class="hr-line-dashed"></div>
+					<div id="dform-prodAttr-div">
+					</div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function(){
+		judgeVerification();
+		
+		$('#form-prod-model #validTime').datetimepicker({
+            language:  'zh-CN',
+            todayBtn:  true,
+            clearBtn: true,
+            autoclose: true,
+            startDate: new Date()
+        });
+    })
+
+    // 表单提交
+    var isFormSubmit = false;
+    function formSubmit() {
+        if (isFormSubmit) return;
+        if(!$('#form-modal #form-prod-model').valid()) return;
+        
+        isFormSubmit = true;
+        $.ajax({
+            type:"POST",
+            url:"${ctx.contextPath}/d-admin/lesson/public/saveOrUpdateLesson",
+            data : $("#form-modal #form-prod-model").serialize(),
+            dataType:"json", 
+            success:function(data){
+                if (data.success) {
+                    common_success("保存成功！");
+                    $("#form-modal").modal("hide");
+                    boostrapTableQueryParams();	// 刷新列表
+                } else {
+                    common_error(data.errDesc);
+                }
+            },
+            complete:function(){
+                isFormSubmit = false;
+            }
+        });
+    }
+    
+    var closeCount="";
+    // 用来绑定事件(使用unbind避免重复绑定)
+	function bindListener(){
+		$("button[name=hour-close]").unbind().click(function(){
+			closeCount+=this.getAttribute('id')+",";
+			$(this).parent().parent().remove();
+		})
+    }
+ 
+    //增加课时数
+    var hourIndex=0;
+    function addHourCount(){
+    	var html = '<div>'
+    			+'<div  class="profile-info-row">'
+    			+'<div class="profile-info-name"><span style="color:red">*</span>课时名称：</div>'
+    			+'<div class="profile-info-value form-group">'
+    			+'    <input type="text"  name="attrList['+hourIndex+'].className" class="input-large" maxlength="60" />'
+    			+'</div>'
+    			+'<div class="profile-info-name"><span style="color:red">*</span>时长(分钟)：</div>'
+    			+'<div class="profile-info-value form-group">'
+    			+'    <input type="text"  name="attrList['+hourIndex+'].duration" class="input-large" maxlength="10"/>'
+    			+'</div>'
+    			+'</div>'
+   			    +'<div  class="profile-info-row">'
+   			 	+'<div class="profile-info-name">是否免费：</div>'
+             	+'<div class="profile-info-value form-group">'
+						+'<select name="attrList['+hourIndex+'].isFree" class="input-large">'
+							+'<option value="1">否</option>'
+							+'<option value="2">是</option>'
+						+'</select>'
+             	+'</div>'
+       			+'<div class="profile-info-name"><span style="color:red">*</span>视频地址：</div>'
+       			+'<div class="profile-info-value form-group">'
+       			+'    <input type="text"  name="attrList['+hourIndex+'].movieUrl" class="input-large" />'
+       			+'</div>'
+       			+'</div>'
+       			+'<div  class="profile-info-row input-daterange" id="timeFormate">'
+       			+'<div class="profile-info-name">开始时间：</div>'
+				+'<div class="profile-info-value form-group">'
+					+'<input type="text" name="attrList['+hourIndex+'].beginTime" id="beginTime" placeholder="开始时间"'
+							+'class="input-large form-control date-icon datetimepicker" >'
+				+'</div>'
+				+'<div class="profile-info-name">结束时间：</div>'
+				+'<div class="profile-info-value form-group">'
+					+'<input type="text" name="attrList['+hourIndex+'].endTime" id="endTime" placeholder="结束时间"'
+							+'class="input-large form-control date-icon datetimepicker" >'
+				+'</div>'
+    			+'</div>'
+    			+'<div class="profile-info-name"><span style="color:red"></span>房间ID：</div>'
+    			+'<div class="profile-info-value form-group">'
+    			+'    <input type="text"  name="attrList['+hourIndex+'].roomId" class="input-large" />'
+    			+'</div>'
+                +'<div class="profile-info-value form-group">'
+                +'<button type="button" name="hour-close" id="'+hourIndex+'"' 
+                +'class="add-day-btn btn-danger"><i class="glyphicon glyphicon-trash" aria-hidden="true"></i>&nbsp当前课时</button>'
+                +'</div>'
+			+'</div>';
+    	$("#form-prodAttr-div").append(html);
+    	hourIndex++;
+    	bindListener();
+    	
+    	$('#timeFormate #beginTime').datetimepicker({
+    		language : 'zh-CN',
+			todayBtn : true,
+			startDate: new Date(),
+			clearBtn : true,
+			autoclose : true
+		}).on("changeDate",
+			function() {
+				var endTime = $('#timeFormate  #endTime').val();
+				$('#timeFormate #beginTime').datetimepicker("setEndDate",endTime);
+			});
+    	$('#timeFormate  #endTime').datetimepicker({
+    		language : 'zh-CN',
+			todayBtn : true,
+			startDate: new Date(),
+			clearBtn : true,
+			autoclose : true
+		}).on("changeDate",
+			function() {
+				var beginTime = $('#timeFormate  #beginTime').val();
+				$('#timeFormate #endTime').datetimepicker("setStartDate",beginTime);
+			});
+    }
+    
+    
+ 	// form表单校验
+    function judgeVerification() {
+        var icon = "<i class='fa fa-times-circle'></i> ";
+        $('#form-modal  #form-prod-model').validate({
+            rules: {
+            	lessonName: {
+                    required: true
+                },
+                lessonType: {
+                    required: true
+                },
+                seriesName: {
+                    required: true
+                },
+                visitAuth: {
+                    required: true
+                },
+                origPrice: {
+                    required: true
+                },
+                tutorId: {
+                    required: true
+                },
+                validTime: {
+                    required: true
+                }
+            },
+            messages: {
+            	lessonName: {
+                    required: icon + "课程名称不能为空！"
+                },
+                lessonType: {
+                    required: icon + "课程分类不能为空！"
+                },
+                seriesName: {
+                    required: icon + "系列名称不能为空！"
+                },
+                visitAuth: {
+                    required: icon + "访问权限不能为空！"
+                },
+                origPrice: {
+                    required: icon + "课程原价不能为空！"
+                },
+                tutorId: {
+                    required: icon + "讲师ID不能为空！"
+                },
+                validTime: {
+                    required: icon + "有效期不能为空！"
+                }
+            }
+        });
+    };
+
+</script>

@@ -1,0 +1,31 @@
+ 
+#if($op_menus.size() > 0)
+	#foreach($res in $op_menus[0].childrens)
+		#if($res.childrens.size()>0)
+		   <li>
+		    <a href="#">
+		     #if("$!{res.menuImage}" != "")<i class="$res.menuImage"></i>
+		    #else<i class="fa fa-desktop"></i>
+		    #end
+		    <span class="nav-label">$res.resourceTitle</span><span class="fa arrow"></span></a>
+			 <ul class="nav nav-second-level">
+			   #foreach($level2 in $res.childrens)
+				    #if($level2.childrens.size()>0)
+					  	<li><a href="#">${level2.resourceTitle}<span class="fa arrow"></span></a>
+		                   <ul class="nav nav-third-level">
+							 #foreach($level3 in $level2.childrens)
+							 <li><a class="J_menuItem" href="${ctx.contextPath}${level3.menuUrl}">${level3.resourceTitle}</a> </li>
+							 #end
+		                   </ul>
+		               </li>
+					#else
+					  <li><a class="J_menuItem" href="${ctx.contextPath}${level2.menuUrl}">${level2.resourceTitle}</a></li>
+					#end
+				#end
+			   </ul>
+		   </li>
+		#else
+			<li> <a class="J_menuItem" href="${ctx.contextPath}${res.menuUrl}"><i class="fa fa-magic"></i> <span class="nav-label">${res.resourceTitle}</span></a> </li>
+		#end
+	#end
+#end

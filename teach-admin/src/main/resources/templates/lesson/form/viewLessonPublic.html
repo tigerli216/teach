@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+#parse("./include/commonCss.html")
+<style>
+.modal-footer {
+	border-top:0px;
+}
+</style>
+</head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content animated fadeInUp">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox">
+                    <div class="ibox-title" role="dialog" aria-hidden="true">
+                        <h4>查看课程</h4>
+                    </div>
+                    <div class="ibox-content" id="form-modal">
+						<form id="form-prod-model" class="form-horizontal">
+							<div class="profile-user-info profile-user-info-striped" id="product_base_attr_div">
+								<input type="hidden" id="lessonId" name="lessonId" />
+								
+								<div class="profile-info-row">
+                                    <div class="profile-info-name">课程分类：</div>
+                                    <div class="profile-info-value form-group">
+                                        <input type="text" id="lessonTypeStr" name="lessonTypeStr" class="input-large" style="border: 0;" disabled="disabled" />
+                                    </div>
+								</div>
+								
+								<div class="profile-info-row">
+									<div class="profile-info-name">课程名称：</div>
+									<div class="profile-info-value form-group">
+										<input type="text" id="lessonName" name="lessonName" class="input-large" style="border: 0;" disabled="disabled" />
+									</div>
+									<div class="profile-info-name">系列名称：</div>
+									<div class="profile-info-value form-group">
+										<input type="text" id="seriesName" name="seriesName" class="input-large" style="border: 0;" disabled="disabled" />
+									</div>
+								</div>
+								
+								<div class="profile-info-row">
+                                    <div class="profile-info-name">访问权限：</div>
+                                    <div class="profile-info-value form-group">
+                                        <input type="text" id="visitAuthStr" name="visitAuthStr" class="input-large" style="border: 0;" disabled="disabled" />
+                                    </div>
+								</div>
+								
+								<div class="profile-info-row">
+									<div class="profile-info-name">原价(元)：</div>
+									<div class="profile-info-value form-group">
+										<input type="text" id="origPriceStr" name="origPriceStr" class="input-large" style="border: 0;" disabled="disabled" />
+									</div>
+									<div class="profile-info-name">折扣价(元)：</div>
+									<div class="profile-info-value form-group">
+										<input type="text" id="discountPriceStr" name="discountPriceStr" class="input-large" style="border: 0;" disabled="disabled" />
+									</div>
+								</div>
+
+                                <div class="profile-info-row">
+                                    <div class="profile-info-name">所属行业：</div>
+                                    <div class="profile-info-value form-group">
+                                        <input type="text" id="industry" name="industry" class="input-large" style="border: 0;" disabled="disabled" />
+                                    </div>
+                                </div>
+
+								<div class="profile-info-row input-daterange">
+									<div class="profile-info-name">权重(倒序)：</div>
+									<div class="profile-info-value form-group">
+										<input type="text" id="weight" name="weight" class="input-large" style="border: 0;" disabled="disabled" />
+									</div>
+									<div class="profile-info-name">是否置顶：</div>
+									<div class="profile-info-value form-group">
+										<input type="text" id="isTopStr" name="isTopStr" class="input-large" style="border: 0;" disabled="disabled" />
+									</div>
+								</div>
+								
+								<div class="profile-info-row" id="tutorIdDiv">
+									<div class="profile-info-name">讲师：</div>
+									<div class="profile-info-value form-group">
+										<input type="text" id="tutorName" name="tutorName" class="input-large" style="border: 0;" disabled="disabled" />
+									</div>
+								</div>
+							</div>
+							
+							<div class="profile-user-info profile-user-info-striped">
+							    <div class="profile-info-row">
+                                    <div class="profile-info-name">有效时长（月）：</div>
+                                    <div class="profile-info-value form-group">
+                                    	<input type="text" id="validDuration" name="validDuration" class="input-large" style="border: 0;" disabled="disabled" />
+                                    </div>
+							    </div>
+							</div>
+							
+							<div class="profile-user-info profile-user-info-striped">
+							    <div class="profile-info-row">
+                                    <div class="profile-info-name">讲师介绍：</div>
+                                    <div class="profile-info-value form-group">
+                                        <div id="tutorRcmdContent" style="min-height:100px"></div>
+                                    </div>
+							    </div>
+							</div>
+							
+							<div class="profile-user-info profile-user-info-striped" id="product_base_desc_div">
+								<div class="profile-info-row">
+									<div class="profile-info-name">课程介绍：</div>
+									<div class="profile-info-value form-group">
+									   <div id="lessonRcmdContent" style="min-height:100px"></div>
+									</div>
+								</div>
+							</div>
+							
+							<div class="hr-line-dashed"></div>
+							
+							<div id="form-prodAttr-div"></div>
+							
+							<br> <br> <br>
+						</form>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-primary" onClick="formCancel();">返回</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	#parse("./include/commonJs.html")
+</body>
+<script>
+	isEditInitFormSub = true;
+	$(function() {
+		var url = window.location.search;
+		var lessonId = url.split("=")[1];
+		if (lessonId == 0 || lessonId == null) {
+			common_error("关联ID不能为空!");
+			return;
+		}
+		
+		$.ajax({
+			type : "POST",
+			url : "${ctx.contextPath}/d-admin/lesson/public/getById",
+			data : "lessonId=" + lessonId,
+			dataType : "json",
+			success : function(data) {
+				// 初始化form数据
+				initParam(data, null, 'form-modal');
+				$("#lessonId").val(lessonId);
+				$("#lessonRcmdContent").html(data.lessonRcmdStr);
+				$("#tutorRcmdContent").html(data.tutorRcmd);
+				
+				$("#form-modal").modal("hide");
+				
+				var lessonTypeStr = data.lessonTypeStr;
+				$("#tutorIdDiv").show();
+				if (lessonTypeStr == "录播课") {
+					$("#tutorIdDiv").hide();
+					$("#tutorName").val("");
+				}
+
+				$("#form-prodAttr-div input:visible").val("");
+				$("#form-prodAttr-div .profile-user-info-striped").hide();
+				$("#form-prodAttr-div").empty();
+				var lessonType = data.lessonType;
+				var attrList = data.attrList;
+				for (var i = 0; i < attrList.length; i++) {
+					hourIndex = i + 1;
+					var lessonAttr = attrList[i];
+
+					var html = '<div class="profile-user-info profile-user-info-striped" style="margin-top:15px;">'
+							+ '<input type="hidden" name="attrList[' + i + '].identifying" value="1"/>'
+							+ '<input type="hidden" value="' + lessonAttr.classId + '" name="attrList[' + i + '].classId" />'
+							+ '<div class="profile-info-row">'
+							+ '<div class="profile-info-name">课时名称：</div>'
+							+ '<div class="profile-info-value form-group">'
+							+ '    <input type="text" value="' + lessonAttr.className + '" name="attrList[' + i + '].className" class="input-large" style="border:0;" disabled="disabled"/>'
+							+ '</div>'
+							+ '</div>'
+							+ '<div class="profile-info-row">'
+							+ '<div class="profile-info-name">时长(分钟)：</div>'
+							+ '<div class="profile-info-value form-group">'
+							+ '    <input type="text" value="' + lessonAttr.duration + '" name="attrList[' + i + '].duration" class="input-large" style="border:0;" disabled="disabled"/>'
+							+ '</div>'
+							+ '<div class="profile-info-name">是否免费：</div>'
+							+ '<div class="profile-info-value form-group">'
+							+ '<input type="text" value="' + lessonAttr.isFreeStr + '" name="attrList[' + i + '].isFree" class="input-large" style="border:0;" disabled="disabled"/>'
+						    + '</div>' 
+						     + '</div>';
+					if (lessonType == 1) { // 录播课
+						html += '</div>'
+								+ '<div class="profile-user-info profile-user-info-striped">'
+								+ '<div  class="profile-info-row" id="timeFormate">'
+								+ '<div class="profile-info-name"><span style="color:red">*</span>视频地址：</div>'
+								+ '<div class="profile-info-value form-group">'
+								+ '    <input type="text" value="' + lessonAttr.movieUrl + '" name="attrList[' + i + '].movieUrl" class="col-md-12" style="border:0;" disabled="disabled"/>'
+								+ '</div>' + '</div>' + '</div>' + '</div>';
+					} else if (lessonType == 2) {
+						html += '<div  class="profile-info-row input-daterange" id="timeFormate">'
+								+ '<div class="profile-info-name">开始时间：</div>'
+								+ '<div class="profile-info-value form-group">'
+								+ '<input type="text" value="' + lessonAttr.beginTime + '" name="attrList[' + i + '].beginTime" id="beginTime" placeholder="开始时间"'
+										+'class="input-large " style="border:0;"  disabled="disabled">'
+								+ '</div>'
+								+ '<div class="profile-info-name">结束时间：</div>'
+								+ '<div class="profile-info-value form-group">'
+								+ '<input type="text" value="' + lessonAttr.endTime + '" name="attrList[' + i + '].endTime" id="endTime" placeholder="结束时间"'
+										+'class="input-large " style="border:0;"  disabled="disabled">'
+								+ '</div>' + '</div>' + '</div>';
+					}
+					$("#form-prodAttr-div").append(html);
+				}
+
+				defaultSelected();
+			},
+			complete : function() {
+				isEditInitFormSub = false;
+				data.attrList
+			}
+		});
+	})
+
+	/*设置默认选中项*/
+	function defaultSelected() {
+		$('.my-default-choose').each(function() {
+			if ($(this).attr('value') == 1) { //否
+				$(this).find('option:eq(0)').attr('selected', true);
+			} else if ($(this).attr('value') == 2) { //是
+				$(this).find('option:eq(1)').attr('selected', true);
+			}
+		})
+	}
+
+	// 表单取消 返还
+	function formCancel() {
+		window.location.href = "${ctx.contextPath}/d-admin/lesson/public/index";
+	}
+</script>
+</html>

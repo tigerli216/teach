@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>功能菜单管理</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+#parse("./include/commonCss.html")
+</head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content animated fadeInUp">
+		<div class="row">
+			<div class="col-sm-2 show-bg show-padding">
+				<div class="ibox-title show-padding">
+					<div class="widget-body scrollable-horizontal show-height">
+						<div class="widget-main">
+							<div id="resourceTree" class="ztree"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-10">
+				<div class="ibox">
+					<div class="ibox float-e-margins">
+						<div class="ibox-title">
+							<h5>功能菜单信息</h5>
+							<div class="ibox-tools">
+								<a class="collapse-link"> <i class="fa fa-chevron-up"></i>
+								</a>
+							</div>
+						</div>
+						<div class="ibox-content">
+							<form id="grid-search-form">
+								<div class="profile-user-info profile-user-info-striped">
+									<input type="hidden" id="parentId" name="parentId" value="1">
+									<input type="hidden" id="changeResourceTitle"> <input
+										type="hidden" id="changeResourceType">
+									<div class="profile-info-row">
+										<div class="profile-info-name">功能名称：</div>
+										<div id="resourceTitle" class="profile-info-value"></div>
+										<div class="profile-info-name">功能类型：</div>
+										<div id="resourceTypeStr" class="profile-info-value"></div>
+									</div>
+									<div class="profile-info-row">
+										<div class="profile-info-name">功能路径：</div>
+										<div id="menuUrl" class="profile-info-value"></div>
+										<div class="profile-info-name">功能状态：</div>
+										<div id="statusStr" class="profile-info-value"></div>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+				<div class="ibox">
+					<div class="ibox float-e-margins">
+						<div class="ibox-title">
+							<h5>子功能菜单信息</h5>
+							<div class="ibox-tools">
+								<a class="collapse-link"> <i class="fa fa-chevron-up"></i>
+								</a>
+							</div>
+						</div>
+						<div class="ibox-content">
+							<div class="example">
+								<div class="btn-group hidden-xs" id="tableEventsToolbar"
+									role="group">
+									<button type="button" onClick="addInitForm()" title="添加"
+										class="btn btn-outline btn-default">
+										<i class="glyphicon glyphicon-plus" aria-hidden="true"></i>
+									</button>
+									<button type="button" onClick="editInitForm()" title="编辑"
+										class="btn btn-outline btn-default">
+										<i class="glyphicon glyphicon-pencil" aria-hidden="true"></i>
+									</button>
+									<button type="button" onClick="deleteRecord()" title="删除"
+										class="btn btn-outline btn-default">
+										<i class="glyphicon glyphicon-trash" aria-hidden="true"></i>
+									</button>
+									<button type="button" id="grid-search-btn" title="搜索"
+										class="btn btn-outline btn-default">
+										<i class="glyphicon glyphicon-search" aria-hidden="true"></i>
+									</button>
+								</div>
+								<table id="resourcetable" data-height="520"
+									data-mobile-responsive="true">
+									<thead>
+										<tr>
+											<th data-radio="true"></th>
+											<th data-formatter="boostrapTableSortFormatter">序号</th>
+											<th data-field="resourceId" data-visible="false">菜单Id</th>
+											<th data-field="menuSort" data-visible="false">顺序号</th>
+											<th data-field="resourceTitle">功能名称</th>
+											<th data-field="resourceType" data-visible="false">功能类型</th>
+											<th data-field="resourceTypeStr">功能类型</th>
+											<th data-field="menuUrl">功能路径</th>
+											<th data-formatter="sortBtn" data-align="center">调整顺序</th>
+										</tr>
+									</thead>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	#parse("./include/commonJs.html")
+	#parse("./sm/form/resource_form.html")
+</body>
+<script>
+	$(document).ready(function() {
+		initResourceTree();
+		
+		boostrapTableParams.url = "${ctx.contextPath}/d-admin/resource/findPaging";
+		$("#resourcetable").bootstrapTable(boostrapTableParams);
+		initGridSearch(); // 初始化grid搜索
+	});
+	
+	/** 生成排序按钮 */
+	function sortBtn(value, row, index) {
+		if (currentData.length > 1) {
+			var upBtn = '<a class="like" onClick="sortData(1, '+ index +')" title="向上"><i class="glyphicon glyphicon-arrow-up"></i></a>';
+			var downBtn = '<a class="like" onClick="sortData(2, '+ index +')" title="向下"><i class="glyphicon glyphicon-arrow-down"></i></a>';
+			if (index == 0) {
+				return downBtn;
+			} else if (index == (currentData.length - 1)) {
+				return upBtn;
+			} else {
+				return upBtn + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + downBtn;
+			}
+		}
+	}
+	
+	/** 排序业务操作 */
+	function sortData(sortType, index) {
+		var reqData = "[";  
+		for (var i=0; i<currentData.length; i++) {
+			var sortIndex = i;
+			if (sortType == 1) {	// 向上
+				if (i == (index - 1)) {
+					sortIndex = i + 1;
+				} else if (i == index) {
+					sortIndex = i - 1;
+				}
+			}
+			if (sortType == 2) { //  向下
+				if (i == (index + 1)) {
+					sortIndex = i - 1;
+				} else if (i == index) {
+					sortIndex = i + 1;
+				}
+			}
+			reqData += "{resourceId:"+ currentData[i].resourceId+"," + 'menuSort:' + sortIndex +"}";
+			reqData += ",";
+		}
+		reqData = reqData.substring(0, reqData.length - 1) + "]";
+		$.ajax({
+			type : "POST",
+			url : "${ctx.contextPath}/d-admin/resource/updateSort",
+			data : {menuSortlist:reqData},
+			dataType : "json",
+			success : function(data) {
+				if (data.success) {
+					boostrapTableQueryParams();
+				}
+			},
+			complete : function() {
+				isEditInitForm = false;
+			}
+		});
+		
+	}
+	
+	var setting = {
+			data : {
+				simpleData : {
+					enable : true
+				}
+			},
+			callback: {
+				onCheck: zTreeOnCheck,
+				onClick: function(event, treeId, treeNode){
+					var treeObj = $.fn.zTree.getZTreeObj("resourceTree");
+				    treeObj.selectNode(treeNode);
+					resourceIndex(treeNode.id);
+					$('#grid-search-form #parentId').val(treeNode.id);
+					boostrapTableQueryParams();
+				}
+			}
+		};
+
+	// 初始化功能菜单树
+	function initResourceTree() {
+		$.fn.zTree.init($("#resourceTree"), setting, ${resourceTree});
+		selectNode(1);
+	}
+	
+	// 功能菜单树
+	function resourceTree(id) {
+		$.ajax({
+			type : "POST",
+			url : "${ctx.contextPath}/d-admin/resource/findResourceTree",
+			data : "treeOpen=true",
+			dataType : "json",
+			success : function(data) {
+				$.fn.zTree.init($("#resourceTree"), setting, data);
+				selectNode(id);
+			},
+			complete : function() {
+				isEditInitForm = false;
+			}
+		});
+	}
+
+	// 选中节点
+	function selectNode(id) {
+		resourceIndex(id);
+	}
+	
+	// 触发事件
+	function zTreeOnCheck(event, treeId, treeNode){
+		resourceIndex(treeNode.id);
+		$('#grid-search-form #parentId').val(treeNode.id);
+		boostrapTableQueryParams();
+	}
+
+	// 首页信息
+	function resourceIndex(id) {
+		$.ajax({
+			type : "POST",
+			url : "${ctx.contextPath}/d-admin/resource/findResourceById",
+			data : "resourceId=" + id,
+			dataType : "json",
+			success : function(data) {
+				$('#grid-search-form #parentId').val(data.resourceId);
+				$('#grid-search-form #changeResourceTitle').val(data.resourceTitle);
+				$('#grid-search-form #changeResourceType').val(
+						getResourceType(data.resourceType));
+				$('#grid-search-form #resourceTitle').html(data.resourceTitle);
+				$('#grid-search-form #resourceTypeStr').html(
+						getResourceType(data.resourceType));
+				$('#grid-search-form #menuUrl').html(data.menuUrl);
+				$('#grid-search-form #statusStr').html(data.status == 0 ? '有效' : '无效');
+				
+				//先清空
+		        var len = $("#resourceType")[0].options.length;  
+		        for(var i =len-1;i>0;i--){  
+		        	$("#resourceType")[0].options.remove(i);  
+		        }  
+		        var type= data.resourceType;
+				if(type == 0){
+					$("#resourceType")[0].options.add(new Option("功能目录", 1));
+		        	$("#resourceType")[0].options.add(new Option("功能菜单", 2));
+				}else if(type == 1){
+					$("#resourceType")[0].options.add(new Option("功能目录", 1));
+		        	$("#resourceType")[0].options.add(new Option("功能菜单", 2));
+				}else if(type == 2){
+					$("#resourceType")[0].options.add(new Option("功能实体", 3));
+				}  
+				
+			},
+			complete : function() {
+				isEditInitForm = false;
+			}
+		});
+	}
+
+	var currentData = null;
+	// 加载服务器数据之前的处理程序
+ 	function respHandler(res) {
+ 		currentData = res.list;
+ 		return res;
+ 	}
+
+	// bootstrap-table分页查询时的参数封装
+	function boostrapTableQueryParams(params) {
+		if (isEmpty(params)) { // 点击搜索按钮时
+			var options = $("#resourcetable").bootstrapTable('getOptions');
+			$("#resourcetable").bootstrapTable('refreshOptions', {
+				pageNumber : 1,
+				sortName : ""
+			});
+		} else { // 点击分页时
+			return boostrapTableSearchParams("grid-search-form", params);
+		}
+	}
+
+	// form新增时初始化
+	function addInitForm() {
+		$('.form-group').removeClass('has-error');
+		$('span[class*=help-block]').remove();
+		emptyDivInputValue('form-modal');
+		$('#modalHeaderMsg').text('新增功能菜单');
+		var parentId = $('#parentId').val();
+		if(isEmpty(parentId)){
+			return;
+		}
+		$('#parentName').val($('#changeResourceTitle').val());
+		var resourceType = $('#changeResourceType').val()
+		if(resourceType == 3){
+			return;
+		}
+		$('#pId').val(parentId);
+		
+		var treeObj = $.fn.zTree.getZTreeObj("resourceTree");
+		var sNodes = treeObj.getSelectedNodes();
+		if (sNodes.length  == 0 || sNodes[0].getParentNode() == null) {
+			$("#form-edit #menuImage_div").show();
+		} else {
+			$("#form-edit #menuImage_div").hide();
+		}
+		$("#form-modal").modal("show");
+	};
+
+	// form修改时初始化
+	var isEditInitForm = false;
+	function editInitForm() {
+		if (isEditInitForm)
+			return;
+
+		var selections = $("#resourcetable").bootstrapTable('getSelections');
+		if (isEmpty(selections)) {
+			common_error("请先选择要编辑的行！");
+			return;
+		}
+		if (selections.length > 1) {
+			common_error("只能选择一行编辑！");
+			return;
+		}
+
+		var resourceId = selections[0].resourceId;
+		$('.form-group').removeClass('has-error');
+		$('span[class*=help-block]').remove();
+		emptyDivInputValue('form-modal');
+		var treeObj = $.fn.zTree.getZTreeObj("resourceTree");
+		var sNodes = treeObj.getSelectedNodes();
+		if (sNodes.length  == 0 || sNodes[0].getParentNode() == null) {
+			$("#form-edit #menuImage_div").show();
+		} else {
+			$("#form-edit #menuImage_div").hide();
+		}
+		$('#modalHeaderMsg').text('修改功菜单');
+		isEditInitForm = true;
+
+		$.ajax({
+			type : "POST",
+			url : "${ctx.contextPath}/d-admin/resource/findResourceById",
+			data : "resourceId=" + resourceId,
+			dataType : "json",
+			success : function(data) {
+				// 初始化form数据
+				initParam(data, null, 'form-modal');
+				$('#parentName').val($('#changeResourceTitle').val());
+				$('#form-edit #resourceType').get(0).setAttribute('readonly', 'true');
+				$("#form-modal").modal("show");
+			},
+			complete : function() {
+				isEditInitForm = false;
+			}
+		});
+	};
+	
+	// 删除
+	var isDelete = false;
+	function deleteRecord() {
+		var selections = $("#resourcetable").bootstrapTable('getSelections');
+		if (isEmpty(selections)) {
+			common_error("请先选择要删除的行！");
+			return;
+		}
+		if (selections.length > 1) {
+			common_error("只能选择一行删除！");
+			return;
+		}
+        swal({
+            title: "您确定要删除吗",
+            text: "删除后将无法恢复，请谨慎操作！",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "删除",
+            closeOnConfirm: false
+        }, function () {
+      	  if (isDelete) return;
+      	  
+        	var resourceId = selections[0].resourceId;
+        	
+        	isDelete = true;
+        	
+        	$.ajax({
+	        	type:"POST",
+	        	url:"${ctx.contextPath}/d-admin/resource/delete",
+	        	data:"resourceId=" + resourceId,
+	        	dataType:"json",
+	        	success:function(data){
+	        		if (data.success) {
+	        			swal("删除成功！", "您已经永久删除了这条信息。", "success");
+	        			resourceTree($("#parentId").val());
+	        			boostrapTableQueryParams();
+	        		} else {
+	        			swal("删除失败！", data.errDesc, "error");
+	        		}
+	        	},
+	        	complete:function(){
+	        		isDelete = false;
+	        	}
+	        });
+        });
+      };
+
+	function getResourceType(resourceType) {
+		if (resourceType == 1) {
+			return "功能目录";
+		} else if (resourceType == 2) {
+			return "功能菜单";
+		} else if (resourceType == 3) {
+			return "功能实体";
+		}
+		return "";
+	}
+</script>
+</html>

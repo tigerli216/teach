@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>定制课课程管理</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+#parse("./include/commonCss.html")
+<link href="${ctx.contextPath}/hplus/css/plugins/chosen/chosen.css"
+	rel="stylesheet">
+<link href="${ctx.contextPath}/js/webupload/webuploader.css"
+	type="text/css" rel="stylesheet" />
+	<style>
+		.form-group-item {
+			position: relative;
+		}
+		.form-group-item > input{
+			position: absolute;
+			top: 4px;
+			left: 25px;
+		}
+	</style>
+</head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content animated fadeInUp">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox">
+					<div class="ibox float-e-margins">
+						<div class="ibox-title">
+							<h5>定制课课程列表</h5>
+							<div class="ibox-tools">
+								<a class="collapse-link"> <i class="fa fa-chevron-up"></i>
+								</a>
+							</div>
+						</div>
+						<div class="ibox-content">
+							<form id="grid-search-form">
+								<input type="hidden" name="payStatus" id="payStatus" value="2" />
+								<div class="profile-user-info profile-user-info-striped">
+									<div class="profile-info-row">
+										<div class="profile-info-name">课程名称：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="lessonName" placeholder="课程名称"
+												class="input-large"
+												maxlength="120">
+										</div>
+										<div class="profile-info-name">课程分类：</div>
+										<div class="profile-info-value form-group">
+											<select class="input-large" name="lessonType">
+												<option value="0">全部</option>
+												<option value="1">定制课</option>
+												<option value="2">实习课</option>
+											</select>
+										</div>
+										<div class="profile-info-name">所属行业：</div>
+										<div class="profile-info-value form-group">
+											<select class="input-large" name="industryId" id="industryId">
+												<option value="0">全部</option>
+												#foreach($industryDTO in $industryList)
+												<option value="${industryDTO.industryId}">${industryDTO.industryName}
+												</option> #end
+											</select>
+										</div>
+									</div>
+									<div class="profile-info-row">
+										<div class="profile-info-name">用户账号：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="loginAccount" placeholder="用户账号"
+												class="input-large"
+												maxlength="30">
+										</div>
+										<div class="profile-info-name">开始时间：</div>
+										<div class="profile-info-value form-group form-group-item">
+											<input type="text" id="beginTime" name="beginTime"
+												placeholder="开始时间"
+												class="input-large form-control date-icon">
+										</div>
+										<div class="profile-info-name">结束时间：</div>
+										<div class="profile-info-value form-group form-group-item">
+											<input type="text" id="endTime" name="endTime"
+												placeholder="结束时间"
+												class="input-large form-control date-icon">
+										</div>
+									</div>
+								</div>
+							</form>
+							<div class="btn-group hidden-xs" id="tableEventsToolbar"
+								role="group">
+								<button type="button" onClick="customCoursewareUpload()" title="备课文件上传"
+									class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true">
+											    <use xlink:href="#icon-shenpi"></use>
+											</svg>
+								</button>
+								<button type="button" id="grid-search-btn" title="搜索"
+									class="btn btn-outline btn-default">
+									<i class="glyphicon glyphicon-search" aria-hidden="true"></i>
+								</button>
+								<button type="button" id="grid-reset-btn" title="重置"
+									class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true">
+                                    <use xlink:href="#icon-zhongzhi"></use>
+                                </svg>
+								</button>
+							</div>
+							<table id="lesson" data-mobile-responsive="false">
+								<thead>
+									<tr>
+										<th data-radio="true"></th>
+										<th data-formatter="boostrapTableSortFormatter">序号</th>
+										<th data-field="lessonId" data-visible="false">课程ID</th>
+										<th data-field="userId" data-visible="false">用户ID</th>
+										<th data-field="lessonName">课程名称</th>
+										<th data-field="lessonTypeStr">课程分类</th>
+										<th data-field="industry">行业</th>
+										<th data-field="totalClass" data-visible="false">总课时(分钟)</th>
+										<th data-field="finishClass" data-visible="false">已完成课时(分钟)</th>
+										<th data-field="lessonPriceStr">课程价格(元)</th>
+										<th data-field="loginAccount">用户</th>
+										<th data-field="beginTime">开始时间</th>
+										<th data-field="endTime">结束时间</th>
+										<th data-field="buyTime">购买时间</th>
+										<th data-field="orderCode" data-visible="false">订单编码</th>
+										<th data-field="payStatusStr" data-visible="false">支付状态</th>
+										<th data-field="createTime" data-visible="false">创建时间</th>
+										<th data-field="createOp" data-visible="false">创建人</th>
+										<th data-field="modifyTime" data-visible="false">修改时间</th>
+										<th data-field="modifyOp" data-visible="false">修改人</th>
+									</tr>
+								</thead>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="mask" class="sweet-overlay" tabindex="-1" style="opacity: 1; display: none;">
+		<div style="margin:20% 40%">
+			<img style="" alt="" src="${ctx.contextPath}/images/loading.gif">
+			<span style="color:white;">正在提交中...</span>
+		</div>
+	</div>
+	
+	#parse("./include/commonJs.html")
+	#parse("./include/fileUploadJs.js")
+	#parse("./lesson/form/readyFile_form.html")
+	<script src="${ctx.contextPath}/hplus/js/plugins/chosen/chosen.jquery.min.js"></script>
+	<script type="text/javascript" src="${ctx.contextPath}/js/webupload/webuploader.js"></script>
+</body>
+<script>
+	$(document).ready(function() {
+		// table分页参数配置
+		boostrapTableParams.url = "${ctx.contextPath}/d-admin/lesson/custom/findPaging";
+		$("#lesson").bootstrapTable(boostrapTableParams);
+	
+		initGridSearch(); // 初始化grid搜索
+		
+		$('#grid-search-form #beginTime').datetimepicker({
+	        language:  'zh-CN',
+	        todayBtn:  true,
+	        clearBtn: true,
+	        autoclose: true,
+	        format:"yyyy-mm-dd",
+		        minView: "month"
+	    });
+		$('#grid-search-form #endTime').datetimepicker({
+	        language:  'zh-CN',
+	        todayBtn:  true,
+	        clearBtn: true,
+	        autoclose: true,
+	        format:"yyyy-mm-dd",
+		        minView: "month"
+	    });
+		
+		var lessonCustom = null;
+	});
+	
+	
+	// bootstrap-table分页查询时的参数封装
+	function boostrapTableQueryParams(params) {
+		if (isEmpty(params)) { // 点击搜索按钮时
+			var options = $("#lesson").bootstrapTable('getOptions');
+			$("#lesson").bootstrapTable('refreshOptions', {
+				pageNumber : 1,
+				sortName : ""
+			});
+		} else { // 点击分页时
+			return boostrapTableSearchParams("grid-search-form", params);
+		}
+	}
+	
+	// 课程编辑导入
+	function customCoursewareUpload() {
+		lessonCustom = null;
+		var selections = $("#lesson").bootstrapTable('getSelections');
+		if (isEmpty(selections)) {
+			common_error("请先选择要编辑的课程！");
+			return;
+		}
+		if (selections.length > 1) {
+			common_error("只能选择一个课程编辑！");
+			return;
+		}
+		var lessonId = selections[0].lessonId;
+		$("#readyFile-form-modal #editLessonId").val(lessonId);
+		
+		$('.form-group').removeClass('has-error');
+		$('span[class*=help-block]').remove();
+		emptyDivInputValue('customCourseware-form-modal');
+		$('#readyFile-form-modal #modalHeaderMsg').text('备课文件上传');
+		$("#readyFile-form-modal").modal("show");
+		
+		// 课程新增导入
+		$.ajax({
+			url : "${ctx.contextPath}/d-admin/lesson/custom/getById",
+			type : "POST",
+			data : "lessonId=" + lessonId,
+			dataType : "json",
+			success : function(custom) {
+				lessonCustom = custom;
+				if(custom == null){
+					return;
+				}
+				var classList = custom.attrList;
+				var html = "";
+				for (var i = 0; i < classList.length; i++) {
+					html += '<option value="'+classList[i].classId+'">'
+							+ classList[i].className + '</option>';
+				}
+				$("#readyFile-form-modal #classId").html(html);
+				wordFileEditInit($('#readyFile-form-modal #readyFileDiv'), classList[0].readyFile, "readyFile", "readyFile");
+			},
+			complete : function(data) {
+			}
+		})
+	}
+	
+	function classChange(classId){
+		var classList = lessonCustom.attrList;
+		var readyFile = "";
+		for (var i = 0; i < classList.length; i++) {
+			if(classList[i].classId == classId){
+				readyFile = classList[i].readyFile;
+			}
+		}
+		wordFileEditInit($('#readyFile-form-modal #readyFileDiv'), readyFile, "readyFile", "readyFile");
+	}
+</script>
+</html>

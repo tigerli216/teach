@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>充值订单管理</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+#parse("./include/commonCss.html")
+<link href="${ctx.contextPath}/hplus/css/plugins/chosen/chosen.css"
+	rel="stylesheet">
+</head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content animated fadeInUp">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox">
+					<div class="ibox float-e-margins">
+						<div class="ibox-title">
+							<h5>充值订单列表</h5>
+							<div class="ibox-tools">
+								<a class="collapse-link"> <i class="fa fa-chevron-up"></i>
+								</a>
+							</div>
+						</div>
+						<div class="ibox-content">
+							<form id="grid-search-form">
+								<div class="profile-user-info profile-user-info-striped">
+									<div class="profile-info-row">
+										<div class="profile-info-name">会员账号：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="loginAccount" id="loginAccount" placeholder="会员账号"
+												class="input-large">
+										</div>
+										
+										<div class="profile-info-name">父ID：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="parentUser" id="parentUser" placeholder="父ID"
+												class="input-large"
+												onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
+										</div>
+
+										<div class="profile-info-name">充值号码：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="cardNumber"  placeholder="充值号码"
+												class="input-large"
+												onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
+										</div>
+									</div>
+									<div class="profile-info-row">
+										<div class="profile-info-name">订单ID：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="orderId" id="orderId" placeholder="订单ID"
+												class="input-large"
+												onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
+										</div>
+
+										<div class="profile-info-name">订单编号：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="orderCode" id="orderCode" placeholder="订单编号"
+												class="input-large"
+												onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
+										</div>
+										
+										<div class="profile-info-name">产品：</div>
+										<div class="profile-info-value form-group">
+											<select name="prodId" id="prodId"
+												data-placeholder="选择产品名称..." class="chosen-select">
+												<option value="0">=====全部=====</option>
+												 #foreach($product in $productList)
+												 【#if($product.busiCode != 'CASH_SERVICE' && $product.busiCode != 'PRE_ORDER'
+												 && $product.busiCode != 'TRAIN_BUY' && $product.busiCode != 'SERVICE_FEE')
+												<option value="${product.prodId}">${product.prodName}
+													【#if($product.busiCode == 'FLOW_RECHARGE') 流量
+													#elseif($product.busiCode == 'PHONE_BILL') 话费
+													#elseif($product.busiCode == 'OIL_RECHARGE') 油卡 
+													#elseif($product.busiCode == 'VIRTUAL_RECHARGE') 虚拟
+													#elseif($product.busiCode == 'LIFE_RECHARGE') 生活缴费
+													#elseif($product.busiCode == 'FILM_BUY') 电影
+													#else #end】
+												</option> #end】 #end
+											</select>
+										</div>
+									</div>
+									<div class="profile-info-row">
+										<div class="profile-info-name">充值类型：</div>
+										<div class="profile-info-value form-group">
+											<select class="input-large" name="rechargeType" id="rechargeType">
+												<option value="">全部</option>
+												<option value="1">话费充值</option>
+												<option value="2">流量充值</option>
+												<option value="3">油卡充值</option>
+												<option value="6">生活缴费</option>
+												<option value="7">虚拟充值</option>
+												<option value="8">电影票购买</option>
+											</select>
+										</div>
+										
+										<div class="profile-info-name">充值状态：</div>
+										<div class="profile-info-value form-group">
+											<select class="input-large" name="shippingStatus">
+												<option value="0">全部</option>
+												<option value="2">已提交</option>
+												<option value="3">充值成功</option>
+												<option value="5">充值失败退款中</option>
+												<option value="6">充值失败已退款</option>
+											</select>
+										</div>
+									</div>
+									<div class="profile-info-row input-daterange">
+										<div class="profile-info-name">订单创建开始时间：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="beginTime" id="beginTime" placeholder="订单创建开始时间"
+												class="input-large form-control date-icon datetimepicker" onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
+										</div>
+										<div class="profile-info-name">订单创建结束时间：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" name="endTime" id="endTime" placeholder="订单创建结束时间"
+												class="input-large form-control date-icon datetimepicker" onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
+										</div>
+									</div>
+								</div>
+							</form>
+							<div class="btn-group hidden-xs" id="tableEventsToolbar"
+								role="group">
+								<button type="button" onClick="rechargeSuccess();" title="充值成功"
+									class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true">
+									    <use xlink:href="#icon-chongzhichenggong"></use>
+									</svg>
+								</button>
+								<button type="button" onClick="rechargeFail();" title="充值失败"
+									class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true">
+									    <use xlink:href="#icon-shibai"></use>
+									</svg>
+								</button>
+								<button type="button" onClick="refund();" title="退款"
+									class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true">
+									    <use xlink:href="#icon-tuikuan"></use>
+									</svg>
+								</button>
+								<button type="button" onClick="batchPurchase()" title="批量操作"
+									class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true">
+											    <use xlink:href="#icon-shenpi"></use>
+											</svg>
+								</button>
+								<button type="button" id="grid-search-btn" title="搜索"
+									class="btn btn-outline btn-default">
+									<i class="glyphicon glyphicon-search" aria-hidden="true"></i>
+								</button>
+								<button type="button" id="grid-reset-btn" title="重置"
+									class="btn btn-outline btn-default">
+									<svg class="icon" aria-hidden="true">
+									    <use xlink:href="#icon-zhongzhi"></use>
+									</svg>
+								</button>
+							</div>
+							<table id="rechargeTable" data-mobile-responsive="false">
+								<thead>
+									<tr>
+										<th data-radio="true"></th>
+										<th data-formatter="boostrapTableSortFormatter">序号</th>
+										<th data-field="loginAccount" data-visible="true">会员号</th>
+										<th data-field="userId" data-visible="false">用户Id</th>
+										<th data-field="parentUser" data-visible="true">父用户Id</th>
+										<th data-field="orderId" data-visible="true">订单Id</th>
+										<th data-field="orderCode">订单编码</th>
+										<th data-field="orderName">产品名称</th>
+										<th data-field="orderTypeStr" data-visible="false">订单类型</th>
+										<th data-field="rechargeTypeStr" data-visible="true">充值类型</th>
+										<th data-field="subUserTypeStr">充值渠道</th>
+										<th data-field="cardNumber">充值号码</th>
+										<th data-field="originalPriceStr" data-visible="false">原价(元)</th>
+										<th data-field="createTime" >订单创建时间</th>
+										<th data-field="totalPriceStr">订单成交价(元)</th>
+										<th data-field="shippgingStatusStr">充值状态</th>
+									</tr>
+								</thead>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+		<div class="modal inmodal" id="batch-form-modal" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button class="close" data-dismiss="modal" type="button">×</button>
+					<h4 id="modalHeaderMsg" class="modal-title">批量处理充值订单</h4>
+				</div>
+				<div class="modal-body">
+					<form id="batch-form-edit" class="form-horizontal">
+						<div class="profile-user-info profile-user-info-striped">
+							<div class="profile-info-row">
+								<div class="profile-info-name">批量导入：</div>
+								<div class="profile-info-value form-group">
+									<div style="width: 80%;">
+										<input type="file" name="lineExcel" id="lineExcel" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+									</div>
+									<a href="${ctx.contextPath}/template/recharge_status_batch_template.xlsx"
+										target="_blank" style="float: right; font-size: large; margin-right: 30px; margin-top: -40px;"><span>模板下载</span></a>
+								</div>
+							</div>
+							<div class="profile-info-row">
+								<div class="profile-info-name">备注：</div>
+								<div class="profile-info-value form-group">
+									<textarea id="notes" name="notes" maxlength="1024"
+										placeholder="请输入备注" class="col-sm-9"></textarea>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+					<button type="button" class="btn btn-primary" onClick="batchFormSubmit(1);">充值成功</button>
+					<button type="button" class="btn btn-primary" onClick="batchFormSubmit(2);">充值失败</button>
+					<button type="button" class="btn btn-primary" onClick="batchFormSubmit(3);">退款</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal inmodal" id="batch-result-modal" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button class="close" data-dismiss="modal" type="button">×</button>
+					<h4 id="modalHeaderMsg" class="modal-title">批量处理充值订单结果</h4>
+				</div>
+				<div class="modal-body" id="batch-result-div" style="overflow-y: scroll;height:300px;">
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	
+	#parse("./include/commonJs.html")
+	<script src="${ctx.contextPath}/hplus/js/plugins/chosen/chosen.jquery.min.js"></script>
+	<script type="text/javascript" src="${ctx.contextPath}/js/ace/ace.min.js"></script>
+	<script type="text/javascript" src="${ctx.contextPath}/js/ace/ace-elements.min.js"></script>
+</body>
+<script>
+	$(function() {
+		var dayDate = new Date(); 
+		dayDate.setDate(dayDate.getDate()-6);
+		$("#beginTime").val(DateUtil.dateToStr("yyyy-MM-dd", dayDate));
+		$("#endTime").val(DateUtil.dateToStr("yyyy-MM-dd", new Date()));
+		
+		// table分页参数配置
+		boostrapTableParams.url = "${ctx.contextPath}/d-admin/order/query/findRgPaging";
+		$("#rechargeTable").bootstrapTable(boostrapTableParams);
+
+		initGridSearch(); // 初始化grid搜索
+
+		$('.input-daterange').datepicker({
+            todayBtn: "linked",
+            endDate: new Date(),
+            setDate : new Date(),
+            clearBtn : true,
+            autoclose: true
+        });
+
+		$('.chosen-select').chosen({
+			allow_single_deselect : true
+		});
+
+		$(window).off('resize.chosen').on('resize.chosen', function() {
+			$('.chosen-select').each(function() {
+				var $this = $(this);
+				$this.next().css({
+					'width' : 207
+				});
+			})
+		}).trigger('resize.chosen');
+		batchjudgeVerification();
+	});
+
+	// bootstrap-table分页查询时的参数封装
+	function boostrapTableQueryParams(params) {
+		if (isEmpty(params)) { // 点击搜索按钮时
+			var options = $("#rechargeTable").bootstrapTable('getOptions');
+			$("#rechargeTable").bootstrapTable('refreshOptions', {
+				pageNumber : 1,
+				sortName : ""
+			});
+		} else { // 点击分页时
+			var checkInfo = isNeedTimeQuery([ "#orderCode", "#loginAccount",
+			    "#orderId", "#parentUser"],"#beginTime", "#endTime");
+			if (!isEmpty(checkInfo)) {
+			    common_error(checkInfo);
+			    return false;
+			}
+			
+			return boostrapTableSearchParams("grid-search-form", params);
+		}
+	}
+
+	//加载服务器数据之前的处理程序
+	function respHandler(res) {
+		var rows = res.list;
+		if (isEmpty(rows))
+			return res;
+		for (i = 0; i < rows.length; i++) {
+        	if (rows[i].shippingStatus == 2) {
+        		rows[i].shippgingStatusStr = "充值提交成功";
+        	} else if (rows[i].shippingStatus == 3) {
+        		rows[i].shippgingStatusStr = "充值成功";
+        	} else if (rows[i].shippingStatus == 5) {
+        		rows[i].shippgingStatusStr = "充值失败退款中";
+        	} else if (rows[i].shippingStatus == 6) {
+        		rows[i].shippgingStatusStr = "充值失败已退款";
+        	}
+	    }         
+		return res;
+	}
+
+	// 充值成功
+	var isRechargeSuccess = false;
+	function rechargeSuccess() {
+		var selections = $("#rechargeTable").bootstrapTable('getSelections');
+		if (isEmpty(selections)) {
+			common_error("请先选择要操作的订单！");
+			return;
+		}
+		if (selections.length > 1) {
+			common_error("只能选择一个订单操作！");
+			return;
+		}
+
+		var rechargeStatus = selections[0].shippingStatus;
+		if (rechargeStatus != 2) {
+			common_error("只能操作【已提交】状态的订单！");
+			return;
+		}
+		swal({
+			title : "确定要更改订单为充值成功吗？",
+			text : "请填写备注说明信息！",
+			type : "input",
+			showCancelButton : true,
+			confirmButtonColor : "#DD6B55",
+			confirmButtonText : "提交",
+			closeOnConfirm : false
+		}, function(inputValue) {
+			if (isRechargeSuccess)
+				return;
+
+			if (isEmpty(inputValue)) {
+				swal.showInputError("必须填写备注说明信息");
+				return false;
+			}
+
+			isRechargeSuccess = true;
+			$.ajax({
+				type : "POST",
+				url : "${ctx.contextPath}/d-admin/order/recharge/rechargeSuccess",
+				data : {
+					orderId : selections[0].orderId,
+					rechargeType : selections[0].rechargeType,
+					notes : inputValue
+				},
+				dataType : "json",
+				success : function(data) {
+					if (data.success) {
+						swal("操作成功！", "", "success");
+						boostrapTableQueryParams();
+					} else {
+						swal("操作失败！", data.errDesc, "error");
+					}
+				},
+				complete : function() {
+					isRechargeSuccess = false;
+				}
+			});
+		});
+	};
+
+	// 充值失败
+	var isRechargeFail = false;
+	function rechargeFail() {
+		var selections = $("#rechargeTable").bootstrapTable('getSelections');
+		if (isEmpty(selections)) {
+			common_error("请先选择要操作的订单！");
+			return;
+		}
+		if (selections.length > 1) {
+			common_error("只能选择一个订单操作！");
+			return;
+		}
+
+		var rechargeStatus = selections[0].shippingStatus;
+		if (rechargeStatus != 2) {
+			common_error("只能操作【已提交】状态的订单！");
+			return;
+		}
+		swal({
+			title : "确定要更改订单为充值失败吗？",
+			text : "请填写备注说明信息！",
+			type : "input",
+			showCancelButton : true,
+			confirmButtonColor : "#DD6B55",
+			confirmButtonText : "提交",
+			closeOnConfirm : false
+		}, function(inputValue) {
+			if (isRechargeFail)
+				return;
+
+			if (isEmpty(inputValue)) {
+				swal.showInputError("必须填写备注说明信息");
+				return false;
+			}
+
+			isRechargeFail = true;
+			$.ajax({
+				type : "POST",
+				url : "${ctx.contextPath}/d-admin/order/recharge/rechargeFail",
+				data : {
+					orderId : selections[0].orderId,
+					rechargeType : selections[0].rechargeType,
+					notes : inputValue
+				},
+				dataType : "json",
+				success : function(data) {
+					if (data.success) {
+						swal("操作成功！", "", "success");
+						boostrapTableQueryParams();
+					} else {
+						swal("操作失败！", data.errDesc, "error");
+					}
+				},
+				complete : function() {
+					isRechargeFail = false;
+				}
+			});
+		});
+	};
+
+	// 退货
+	var isRefund = false;
+	function refund() {
+		var selections = $("#rechargeTable").bootstrapTable('getSelections');
+		if (isEmpty(selections)) {
+			common_error("请先选择要退款的订单！");
+			return;
+		}
+		if (selections.length > 1) {
+			common_error("只能选择一个订单退款！");
+			return;
+		}
+
+		var rechargeStatus = selections[0].shippingStatus;
+		if (rechargeStatus != 3) {
+			common_error("只能操作【充值成功】状态的订单！");
+			return;
+		}
+		swal({
+			title : "确定要退款吗？",
+			text : "请填写备注说明信息！",
+			type : "input",
+			showCancelButton : true,
+			confirmButtonColor : "#DD6B55",
+			confirmButtonText : "提交",
+			closeOnConfirm : false
+		}, function(inputValue) {
+			if (isRefund)
+				return;
+
+			if (isEmpty(inputValue)) {
+				swal.showInputError("必须填写备注说明信息");
+				return false;
+			}
+
+			isRefund = true;
+			$.ajax({
+				type : "POST",
+				url : "${ctx.contextPath}/d-admin/order/recharge/refund",
+				data : {
+					orderId : selections[0].orderId,
+					rechargeType : selections[0].rechargeType,
+					notes : inputValue
+				},
+				dataType : "json",
+				success : function(data) {
+					if (data.success) {
+						swal("操作成功！", "", "success");
+						boostrapTableQueryParams();
+					} else {
+						swal("操作失败！", data.errDesc, "error");
+					}
+				},
+				complete : function() {
+					isRefund = false;
+				}
+			});
+		});
+	};
+//初始化表格上传框
+	function initExcelFileDropzone() {
+		$("input[type=file]").ace_file_input({
+			style : 'well',
+			btn_choose : '请点击上传表格',
+			btn_change : null,
+			droppable : false,
+			thumbnail : 'large',
+			whitelist : 'xls|xlsx',
+			allowExt : ['xls', 'xlsx'],
+			before_remove : function() {
+				return true;
+			},
+			preview_error : function(filename, error_code) {
+
+			}
+		}).on('change', function() {
+
+		});
+	};
+	
+	//批量文件表单提交
+	var isBatchFormSubmit = false;
+	//type操作类型1-充值成功，2-充值失败，3-退款;
+	function batchFormSubmit(newType) {
+		var typeStr = "";
+		if(newType == 1){
+			typeStr = "确定要更改所提交的订单为充值成功吗？";
+		}else if(newType == 2){
+			typeStr = "确定要更改所提交的订单为充值失败吗？";
+		}else if(newType == 3){
+			typeStr = "确定将所提交订单进行退款吗";
+		}
+		var notes = $("#batch-form-edit #notes").val();
+		if (isBatchFormSubmit)
+			return;
+		var lineExcel = $("#lineExcel").val();
+		if(isEmpty(lineExcel)){
+			swal("请先上传文件","error");
+			return;
+		}
+		if (!$('#batch-form-edit').valid())
+			return;
+
+		// 提交表单
+		swal({
+			title :typeStr,
+			text : "提交后将无法还原，涉及到金额变动，请谨慎操作！",
+			type : "warning",
+			showCancelButton : true,
+			confirmButtonColor : "#DD6B55",
+			confirmButtonText : "提交",
+			closeOnConfirm : false
+		}, function() {
+			isBatchFormSubmit = true;
+			$("#batch-form-modal #batch-form-edit").ajaxSubmit({
+				url : "${ctx.contextPath}/d-admin/order/recharge/batchSubmitOrder",
+				async : false,
+				timeout : 500000,
+				type : "POST",
+				data : {rechargeType:newType,notes:notes},
+				dataType : "json",
+				success : function(data) {
+					if (data.success) {
+						var result = data.result;
+						var eDesc = "";
+						for (var i = 0; i < result.length; i++) {
+							eDesc += "<h4>" + result[i].errorMsg + "<h4>";
+						}
+						if(eDesc == null ||eDesc == undefined ||eDesc == ""){
+							swal("操作成功！", "订单状态处理成功！", "success");
+						}else{
+							swal.close()
+							$("#batch-result-div").html(eDesc);
+							$("#batch-result-modal").modal("show");
+						}
+						$("#batch-form-modal").modal("hide");
+						boostrapTableQueryParams(); // 刷新列表
+					} else {
+						common_error(data.errDesc);
+					}
+				},
+				complete : function() {
+					isBatchFormSubmit = false;
+				}
+			});
+		});
+	}
+	//批量线下预购 form初始化
+	function batchPurchase() {
+		// 初始化上传文件
+		initExcelFileDropzone();
+		$("#batch-form-modal").modal("show");
+	}
+	//form表单校验
+	function batchjudgeVerification() {
+		var icon = "<i class='fa fa-times-circle'></i> ";
+		$('#batch-form-edit').validate({
+			rules : {
+				notes : {
+					required : true,
+					stringMaxLength : 1024,
+				}
+			},
+			messages : {
+				notes : {
+					required : icon + "备注不能为空！"
+				}
+			}
+		});
+	};
+</script>
+</html>

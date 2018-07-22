@@ -1,0 +1,275 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<div class="modal inmodal" id="practiceLesson-form-modal" role="dialog"
+	aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button class="close" data-dismiss="modal" type="button">×</button>
+				<h5 id="modalHeaderMsg" class="modal-title"></h5>
+			</div>
+			<div class="modal-body">
+				<form id="grid-thirdIpSearch-form">
+					<input hidden="hidden" id="lessonId" name="lessonId">
+					<div class="profile-user-info profile-user-info-striped">
+						<div class="profile-info-row">
+							<div class="profile-info-name">职位名称：</div>
+							<div class="profile-info-value form-group">
+								<input type="text" name="practiceName" id="practiceName"
+									placeholder="职位名称" class="input-large"
+									maxlength="120">
+							</div>
+						</div>
+					</div>
+					<div class="profile-user-info profile-user-info-striped">
+						<div class="profile-info-name">课程简介：</div>
+						<div class="profile-info-value form-group">
+							<textarea id="lessonAbstract" name="lessonAbstract"
+								style="float: left; width: 100%; height: 120px;"
+								maxlength="250">
+							</textarea>
+						</div>
+					</div>
+					<div class="profile-user-info profile-user-info-striped">
+						<div class="profile-info-name">公司介绍：</div>
+						<div class="profile-info-value form-group">
+							<div id="companyRcmdE"></div>
+						</div>
+					</div>
+					<div class="profile-user-info profile-user-info-striped">
+						<div class="profile-info-name">职位介绍：</div>
+						<div class="profile-info-value form-group">
+							<div id="practiceRcmdE"></div>
+						</div>
+					</div>
+					<div class="profile-user-info profile-user-info-striped">
+						<div class="profile-info-name">行业介绍：</div>
+						<div class="profile-info-value form-group">
+							<textarea id="industryRcmd" name="industryRcmd"
+							style="float: left; width: 100%; height: 120px;"
+							maxlength="1000">
+							</textarea>
+						</div>
+					</div>
+					<div class="profile-user-info profile-user-info-striped">
+						<div class="profile-info-row">
+							<div class="profile-info-name">公司国家：</div>
+							<div class="profile-info-value form-group">
+								<select class="input-large" name="companyCountry"
+									id="companyCountry">
+									<option value="1">国内</option>
+									<option value="2">国外</option>
+								</select>
+							</div>
+							<div class="profile-info-name">公司位置：</div>
+							<div class="profile-info-value form-group">
+								<input type="text" name="companyLocation" id="companyLocation"
+									placeholder="公司位置" class="input-large"
+									maxlength="120">
+							</div>
+						</div>
+						<div class="profile-info-row">
+							<div class="profile-info-name">权重值：</div>
+							<div class="profile-info-value form-group">
+								<input type="text" name="weight" id="weight" placeholder="权重值"
+									class="input-large"
+									onkeyup="this.value=this.value.replace(/^ +| +$/g,'')"
+									maxlength="10">
+							</div>
+							<div class="profile-info-name">实习周期：</div>
+							<div class="profile-info-value form-group">
+								<input type="text" name="practiceDuration" id="practiceDuration"
+									placeholder="实习周期" class="input-large"
+									onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
+							</div>
+						</div>
+						<div class="profile-info-row">
+							<div class="profile-info-name">是否置顶：</div>
+							<div class="profile-info-value form-group">
+								<select class="input-large" name="isTop" id="isTop">
+									<option value="1">否</option>
+									<option value="2">是</option>
+								</select>
+							</div>
+							<div class="profile-info-name">状态：</div>
+							<div class="profile-info-value form-group">
+								<select class="input-large" name="status" id="status">
+									<option value="1">有效</option>
+									<option value="2">无效</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="profile-user-info profile-user-info-striped"
+						id="custom-div">
+						<div class="profile-info-row">
+							<div class="profile-info-name">职位图片：</div>
+							<div class="profile-info-value form-group">
+								<div type="text" name="jobPic" id="jobPic" class="col-sm-4"
+									style="padding-left: 0px; width: 222px;"></div>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+				<button type="button" class="btn btn-primary"
+					onclick="saveOrUpdate()">保存</button>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+<script src="${ctx.contextPath}/js/wangEditor.js"></script>
+<script src="${ctx.contextPath}/js/wangEditor-fullscreen-plugin.js"></script>
+<script type="text/javascript">
+	companyRcmdEChange = false;
+	practiceRcmdEChange = false;
+	
+	$(function(){
+		var E = window.wangEditor;
+		companyRcmdE = new E('#companyRcmdE');
+		practiceRcmdE = new E('#practiceRcmdE');
+	
+		companyRcmdE.customConfig.uploadImgServer = '${ctx.contextPath}/d-admin/upload';	// 上传到服务器上
+		// 将图片大小限制为 3M
+		companyRcmdE.customConfig.uploadImgMaxSize = 3 * 1024 * 1024;
+		// 限制一次最多上传 5 张图片
+		companyRcmdE.customConfig.uploadImgMaxLength = 5;
+		companyRcmdE.customConfig.uploadFileName = 'imgFile';
+		// 将 timeout 时间改为 3s
+		companyRcmdE.customConfig.uploadImgTimeout = 3000;
+		companyRcmdE.customConfig.onchange = function (html) {
+		companyRcmdEChange = true;
+        }
+	    companyRcmdE.create();
+	
+	
+		practiceRcmdE.customConfig.uploadImgServer = '${ctx.contextPath}/d-admin/upload';	// 上传到服务器上
+		// 将图片大小限制为 3M
+		practiceRcmdE.customConfig.uploadImgMaxSize = 3 * 1024 * 1024;
+		// 限制一次最多上传 5 张图片
+		practiceRcmdE.customConfig.uploadImgMaxLength = 5;
+		practiceRcmdE.customConfig.uploadFileName = 'imgFile';
+		// 将 timeout 时间改为 3s
+		practiceRcmdE.customConfig.uploadImgTimeout = 3000;
+		practiceRcmdE.customConfig.onchange = function (html) {
+			practiceRcmdEChange = true;
+   		}
+		practiceRcmdE.create();
+	});
+	
+	// 表单提交
+	function saveOrUpdate() {
+		isFormSubmit = true;
+		if (!$('#grid-thirdIpSearch-form').valid()) {
+			common_error("课程信息不完全");
+			return;
+		}
+		
+		var lessonAbstractStr = $("#lessonAbstract").val();
+		if (lessonAbstractStr.length > 250) {
+			common_error("您输入的课程简介内容过长！");
+			return;
+		}
+		
+		var companyRcmdStr = companyRcmdE.txt.html();
+		if (companyRcmdStr.length > 10000) {
+			common_error("您输入的公司介绍内容过长！");
+			return;
+		}
+		
+		var practiceRcmdStr = practiceRcmdE.txt.html();
+		if (practiceRcmdStr.length > 10000) {
+			common_error("您输入的职位介绍内容过长！");
+			return;
+		}
+		
+		$("#mask").show();
+		var lessonId = $("#grid-thirdIpSearch-form #lessonId").val();
+		$("#grid-thirdIpSearch-form").ajaxSubmit({
+			type : "POST",
+			async : false,
+			timeout : 5000,
+			url : "${ctx.contextPath}/d-admin/operate/practice/saveOrUpdate",
+			data : $("#practiceLesson-form-modal #grid-thirdIpSearch-form").serialize(),
+			dataType : "json",
+			success : function(data) {
+				if (data.success) {
+					if (companyRcmdEChange || practiceRcmdEChange) {	// 富文本是否有改变
+						if (isEmpty(lessonId)) {
+							lessonId = data.result;
+						}
+						$.ajax({
+							type : "POST",
+							url : "${ctx.contextPath}/d-admin/operate/practice/updateRcmdStr",
+							data : jQuery.param({lessonId: lessonId, companyRcmdStr: companyRcmdStr, practiceRcmdStr: practiceRcmdStr}),
+							dataType : "json",
+							success : function(data) {
+								if (data.success) {
+									common_success("保存成功！");
+									$("#practiceLesson-form-modal").modal("hide");
+									boostrapTableQueryParams(); // 刷新列表
+								} else {
+									common_error("修改失败！");
+								}
+							},
+							complete : function() {
+								contentChange = false;
+								isFormSubmit = false;
+							}
+						});
+					} else {
+						console.log();
+						common_success("保存成功！");
+						$("#practiceLesson-form-modal").modal("hide");
+						boostrapTableQueryParams(); // 刷新列表
+						isFormSubmit = false;
+					}
+				} else {
+					common_error(data.errDesc);
+				}
+				//$("#practiceLesson-form-modal").modal("hide");
+			},
+			complete : function() {
+				$("#mask").hide();
+			}
+		});
+	}
+
+	// form表单校验
+	function judgeVerification() {
+		var icon = "<i class='fa fa-times-circle'></i> ";
+		$('#practiceLesson-form-modal #grid-thirdIpSearch-form').validate({
+			rules : {
+				practiceName : {
+					required : true
+				},
+				companyLocation : {
+					required : true
+				},
+				weight : {
+					required : true,
+					positive : "#practiceLesson-form-modal #weight"
+				},
+				practiceDuration : {
+					required : true
+				}
+			},
+			messages : {
+				practiceName : {
+					required : icon + "请输职位名称！"
+				},
+				companyLocation : {
+					required : icon + "请输入公司位置！"
+				},
+				weight : {
+					required : icon + "请输入权重值！"
+				},
+				practiceDuration : {
+					required : icon + "请输入实习周期！"
+				}
+			}
+		});
+	};
+</script>

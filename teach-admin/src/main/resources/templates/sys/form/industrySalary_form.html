@@ -1,0 +1,111 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<div class="modal inmodal" id="industrySalary-form-modal" role="dialog"
+	aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button class="close" data-dismiss="modal" type="button">×</button>
+				<h5 id="modalHeaderMsg" class="modal-title"></h5>
+			</div>
+			<div class="modal-body">
+				<form id="grid-thirdIpSearch-form">
+					<input hidden="hidden" id="configId" name="configId">
+					<input hidden="hidden" id="baseSalary" name="baseSalary"> 
+					<div class="profile-user-info profile-user-info-striped">
+						<div class="profile-info-row">
+							<div class="profile-info-name">行业名称：</div>
+							<div class="profile-info-value form-group">
+								<select class="input-large" name="industryId" id="industryId">
+									<option value="">==请选择==</option> #foreach($industry in
+									$industryList)
+									<option value="${industry.industryId}">${industry.industryName}
+									</option> #end
+								</select>
+							</div>
+							<div class="profile-info-name">基础薪资(美元)：</div>
+							<div class="profile-info-value form-group">
+								<input type="text" name="baseSalaryStr" id="baseSalaryStr"
+									placeholder="基础薪资(美元)" class="input-large"
+									onkeyup="this.value=this.value.replace(/^ +| +$/g,'')"
+									maxlength="20">
+							</div>
+						</div>
+						<div class="profile-info-row">
+							<div class="profile-info-name">状态：</div>
+							<div class="profile-info-value form-group">
+								<select id="status" name="status" class="input-large">
+									<option value="1">有效</option>
+									<option value="2">无效</option>
+								</select>
+							</div>
+						</div>
+					</div>
+			</div>
+			</form>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+				<button type="button" class="btn btn-primary"
+					onclick="saveOrUpdate()">保存</button>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+
+<script type="text/javascript">
+	// 表单提交
+	function saveOrUpdate() {
+		
+		if (!$('#grid-thirdIpSearch-form').valid())
+			return;
+		
+		//尝试获取传递过来的ConfigID
+		var baseSalaryStr = $("#industrySalary-form-modal #baseSalaryStr").val();
+		var baseSalary = Math.floor(baseSalaryStr * 100);
+		$("#baseSalary").val(baseSalary);
+		$.ajax({
+			type : "POST",
+			url : "${ctx.contextPath}/d-admin/industrySalary/saveOrUpdate",
+			data : $("#industrySalary-form-modal #grid-thirdIpSearch-form")
+					.serialize(),
+			dataType : "json",
+			success : function(data) {
+				if (data.success) {
+					common_success("保存成功！");
+					$("#industrySalary-form-modal").modal("hide");
+					boostrapTableQueryParams();
+				} else {
+					common_error(data.errDesc);
+					$("#industrySalary-form-modal").modal("hide");
+				}
+				//再次进行表查询
+			},
+			complete : function() {
+			}
+		});
+	}
+	
+	// form表单校验
+	function judgeVerification() {
+		var icon = "<i class='fa fa-times-circle'></i> ";
+		$('#industrySalary-form-modal #grid-thirdIpSearch-form').validate({
+			rules : {
+				industryId    : {
+					required : true
+				},
+				baseSalaryStr   : {
+					required : true,
+					digital : "#industrySalary-form-modal #baseSalaryStr"
+				}
+			},
+			messages : {
+				industryId : {
+					required : icon + "请输行业名称！"
+				},
+				baseSalaryStr : {
+					required : icon + "请输入基础薪资！"
+				}
+			}
+		});
+	};
+</script>

@@ -1,0 +1,89 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<div class="modal inmodal" id="readyFile-form-modal" role="dialog"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal" type="button">×</button>
+                <h4 id="modalHeaderMsg" class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="form-edit" class="form-horizontal">
+                    <input type="hidden" id="editLessonId" name="editLessonId"/>
+                    <div class="profile-user-info profile-user-info-striped">
+                        <div class="profile-info-row">
+                            <div class="profile-info-name">课时名称：</div>
+                            <div class="profile-info-value form-group">
+                                <select id="classId" name="classId"
+									class="input-large" onchange="classChange(this.value);"
+									maxlength="120"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="profile-user-info profile-user-info-striped">
+                        <div class="profile-info-row">
+                            <div class="profile-info-name">备课文件：</div>
+                            <div class="profile-info-value form-group">
+                            	<div id="readyFileDiv" class="input-xlarge"></div>
+                            </div>
+	                    </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary"
+                        onClick="formSubmit();">确认上传
+                </button>
+                <a ></a>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    // 表单提交
+    var isFormSubmit = false;
+    function formSubmit() {
+    	
+    	var classId = $("#classId").val();
+    	var classList = lessonCustom.attrList;
+    	for (var i = 0; i < classList.length; i++) {
+			if(classList[i].classId == classId && classList[i].classStatus > 2){
+				swal("已结束的课时不能上传课件");
+				return;
+			}
+		}
+    	
+        if (isFormSubmit)
+            return;
+
+        isFormSubmit = true;
+        
+        $("#mask").show();
+        var url = "${ctx.contextPath}/d-admin/lesson/custom/readyFileUpload";
+		// 提交表单
+		$("#readyFile-form-modal #form-edit").ajaxSubmit({
+			url: url,
+			async : false,
+			timeout : 500000,
+			type : "POST",
+			dataType: "json",
+			success : function(data) {
+				if (data.success) {
+                    common_success("保存成功！");
+                    $("#readyFile-form-modal").modal("hide");
+                    boostrapTableQueryParams(); // 刷新列表
+                } else {
+                    common_error(data.errDesc);
+                }
+			},
+			complete : function() {
+				isFormSubmit = false;
+				$("#mask").hide();
+			}
+		});
+    }
+    
+</script>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+#parse("./include/commonCss.html")
+<link href="${ctx.contextPath}/css/watch_video.css" rel="stylesheet">
+</head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content animated fadeInUp">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox">
+					<div class="ibox float-e-margins">
+						<div class="ibox-title" id="watch-video" role="dialog"
+							aria-hidden="true">
+							<input type="hidden" id="lessonId" name="lessonId" />
+							<h5>查看课程视频</h5>
+							<div class="profile-user-info profile-user-info-striped">
+								<div class="row" style="width: 100%;">
+									<!-- 外层  竖型 -->
+									<div class="col-sm-6" style="width: 100%;">
+										<div class="tabs-container" style="width: 100%;">
+											<div class="tabs-left">
+												<ul class="nav nav-tabs" id="tabName">
+												</ul>
+												<div class="tab-content" style="width: 100%;">
+													<div id="tab-8" class="tab-pane active"
+														style="width: 100%;">
+														<div class="panel-body" id="text" style="width: 100%;">
+															<div class="col-md-9">
+																<div class="tabs-container">
+																	<ul class="nav nav-tabs" id="videos">
+																	</ul>
+																	<div class="tab-content" style="width: 100%;">
+																		<div id="tab-1" class="tab-pane active"
+																			style="width: 100%;">
+																			<div class="panel-body" id="tex" style="width: 100%;">
+																			</div>
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-white"
+									onClick="formCancel();">返回</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	#parse("./include/commonJs.html")
+</body>
+<script src="//imgcache.qq.com/open/qcloud/video/vcplayer/TcPlayer-2.2.0.js" charset="utf-8"></script>
+<script>
+	$(function() {
+		// form表单数据初始化
+		initFormData();
+	})
+
+	// 初始化课时信息
+	var attrList = null;
+	function initFormData() {
+		var url = window.location.search;
+		var lessonId = url.split("=")[1];
+        if (lessonId == 0 || lessonId == null){
+        	common_error("关联ID不能为空!");
+       	 	return;
+        }
+		var lessonCustom = null;
+		$.ajax({
+			type : "POST",
+			url : "${ctx.contextPath}/d-admin/lesson/custom/getById",
+			data : "lessonId=" + lessonId,
+			dataType : "json",
+			success : function(custom) {
+				if (custom == null) {
+					common_error("获取定制课视频信息失败");
+					return;
+				}
+				
+				attrList = custom.attrList;
+				var html = '<li class="active" style=" text-align:center;"><a style="padding-left: 20px;" data-toggle="tab"  id="'
+						+ attrList[0].classId + '" onclick="findVideos('
+						+ attrList[0].classId + ')">' + attrList[0].className
+						+ '</a></li>';
+				for (var i = 1; i < attrList.length; i++) {
+					html += '<li style=" text-align:center;"><a style="padding-left: 20px;" data-toggle="tab"  id="' + attrList[i].classId
+							+ '" onclick="findVideos(' + attrList[i].classId + ')">'
+							+ attrList[i].className + '</a></li>';
+				}
+				$("#tabName").html(html);
+
+				findVideos(attrList[0].classId);
+				var movieList = attrList[0].movieUrl.split("|");
+			},
+			complete : function() {
+				isEditInitFormSub = false;
+			}
+		});
+	}
+
+	// 通过课时信息 初始化视频信息
+	function findVideos(classId) {
+		if (classId == 0) {
+			return;
+		}
+
+		var movies = null;
+		for (var i = 0; i < attrList.length; i++) {
+			if (attrList[i].classId == classId) {
+				movies = attrList[i].movieUrl;
+			}
+		}
+		if (movies == null || movies == "") {
+			$("#videos").html("");
+			$("#tex").html('<div class="text" style=" text-align:center;"><h1>未上传视频</h1></div>');
+			return;
+		}
+		
+		if (movies.substr(0, 1) == ",") {
+			movies = movies.substr(1);
+		}
+		var movieList = movies.split(",");
+		html2 = "";
+		for (var i = 0; i < movieList.length; i++) {
+			if (i == 0) {
+				html2 += '<li class="active"><a data-toggle="tab" aria-expanded="true" onclick="play(0, '
+						+ classId + ')">视频' + (i + 1) + '</a></li>';
+				play(0, classId);
+			} else {
+				html2 += '<li><a data-toggle="tab" aria-expanded="true" onclick="play('
+						+ i + ', ' + classId + ')">视频' + (i + 1) + '</a></li>';
+			}
+		}
+		$("#videos").html(html2);
+	}
+
+	// 将视频信息放入视频播放器
+	function play(videoId, classId) {
+		if (classId == 0 || classId == null) {
+			return;
+		}
+		var movies = null;
+		for (var i = 0; i < attrList.length; i++) {
+			if (attrList[i].classId == classId) {
+				movies = attrList[i].movieUrl;
+			}
+		}
+		if (movies == null) {
+			return;
+		}
+
+		if (movies.substr(0, 1) == ",") {
+			movies = movies.substr(1);
+		}
+		var movieList = movies.split(",");
+		video = movieList[videoId];
+
+		html = '<div id="id_test_video" style="width:100%;height:450px;margin-left:9%;"></div>';
+		$("#tex").html(html);
+		//视频地址
+		var player = new TcPlayer('id_test_video', {
+			"m3u8" : video,
+			"autoplay" : false,
+			"width" : '90%',
+		});
+	}
+
+	// 表单取消 返还
+	function formCancel() {
+		window.location.href = "${ctx.contextPath}/d-admin/lesson/custom/index";
+	}
+</script>
+
+</html>

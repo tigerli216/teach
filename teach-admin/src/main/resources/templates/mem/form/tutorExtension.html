@@ -1,0 +1,387 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<div class="hr-line-dashed"></div>
+<div class="hide" id="tutorExtension_div">
+    <div class="tabs-container" >
+        <input type="hidden" id="tutor" name="tutor" />
+		<ul class="nav nav-tabs">
+			<li class="active" id="base_div" onClick="getTutorInfo();">
+				<a data-toggle="tab" href="#tab-1" aria-expanded="true">导师个人信息</a>
+			</li>
+			<li class="" onClick="findCustomPaging();">
+				<a data-toggle="tab" href="#tab-2" aria-expanded="false">定制课程</a>
+			</li>
+			<li class="" onClick="findPublicPaging();">
+				<a data-toggle="tab" href="#tab-3" aria-expanded="false">线上微课</a>
+			</li>
+			<li class="" onClick="findTutorSalaryPaging();">
+				<a data-toggle="tab" href="#tab-4" aria-expanded="false">薪资调整列表</a>
+			</li>
+		</ul>
+
+		<div class="tab-content">
+		
+			<!-- 导师个人信息 -->
+			<div id="tab-1" class="tab-pane active">
+				<div class="panel-body" style="display:none;">
+					<div class="profile-user-info profile-user-info-striped">
+	                    <div class="profile-info-row">
+	                        <div class="profile-info-name">登录账号：</div>
+	                        <div class="profile-info-value form-group">
+	                            <span id="loginAccount" name="loginAccount"></span>
+	                        </div>
+	                        <div class="profile-info-name">真实姓名：</div>
+	                        <div class="profile-info-value form-group">
+	                            <span id="realName" name="realName"></span>
+	                        </div>
+	                        <div class="profile-info-name">性别：</div>
+	                        <div class="profile-info-value form-group">
+	                            <span id="sexStr" name="sexStr"></span>
+	                        </div>
+	                    </div>
+	                    <div class="profile-info-row">
+	                        <div class="profile-info-name">手机号码：</div>
+	                        <div class="profile-info-value form-group">
+	                            <span id="bindMobile" name="bindMobile"></span>
+	                        </div>
+	                        <div class="profile-info-name">薪资(美元)：</div>
+	                        <div class="profile-info-value form-group">
+	                            <span id="tutorSalaryStr" name="tutorSalaryStr"></span>
+	                        </div>
+	                        <div class="profile-info-name">地区：</div>
+	                        <div class="profile-info-value form-group">
+	                            <span id="country" name="country"></span>
+	                        </div>
+	                    </div>
+	                    <div class="profile-info-row">
+	                        <div class="profile-info-name">所在行业：</div>
+	                        <div class="profile-info-value form-group">
+	                            <span id="industryName" name="industryName"></span>
+	                        </div>
+	                        <div class="profile-info-name">最近一份工作：</div>
+	                        <div class="profile-info-value form-group">
+	                            <span id="newlyJob" name="newlyJob"></span>
+	                        </div>
+	                        <div class="profile-info-name">职位：</div>
+	                        <div class="profile-info-value form-group">
+	                            <span id="position" name="position"></span>
+	                        </div>
+	                    </div>
+	                 </div> 
+				</div>
+			</div>
+			
+			<!-- 定制课 -->
+			<div id="tab-2" class="tab-pane">
+				<div class="panel-body"  style="display:none;">
+					<form id="grid-custom-form">
+						<input id="tutorId" name="tutorId" type="hidden"/>
+						<div class="profile-user-info profile-user-info-striped">
+							<div class="profile-info-row">
+								<div class="profile-info-name">课程名称：</div>
+								<div class="profile-info-value form-group">
+									<input type="text" name="lessonName" placeholder="课程名称"
+										class="input-large" maxlength="120">
+								</div>
+								<div class="profile-info-name">课程分类：</div>
+								<div class="profile-info-value form-group">
+									<select class="input-large" name="lessonType">
+										<option value="0">全部</option>
+										<option value="1">定制课</option>
+										<option value="2">实习课</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</form>
+					<div class="btn-group hidden-xs" id="customToolbar" role="group">
+						<button type="button" id="grid-custom-search-btn" title="搜索" class="btn btn-outline btn-default">
+							<i class="glyphicon glyphicon-search" aria-hidden="true"></i>
+						</button>
+						<button type="button" id="grid-custom-reset-btn" title="重置" class="btn btn-outline btn-default">
+							<svg class="icon" aria-hidden="true"> 
+                                <use xlink:href="#icon-zhongzhi"></use>
+                            </svg>
+						</button>
+					</div>
+					<table id="customTable" data-mobile-responsive="true">
+						<thead>
+							<tr>
+								<th data-formatter="boostrapTableSortFormatter">序号</th>
+								<th data-field="lessonId" data-visible="false">课程ID</th>
+								<th data-field="userId" data-visible="false">用户ID</th>
+								<th data-field="lessonName">课程名称</th>
+								<th data-field="lessonTypeStr">课程分类</th>
+								<th data-field="industry">行业</th>
+								<th data-field="totalClass" data-visible="false">总课时(分钟)</th>
+								<th data-field="finishClass" data-visible="false">已完成课时(分钟)</th>
+								<th data-field="lessonPriceStr">课程价格(元)</th>
+								<th data-field="loginAccount">用户</th>
+								<th data-field="beginTime">开始时间</th>
+								<th data-field="endTime">结束时间</th>
+								<th data-field="buyTime">购买时间</th>
+								<th data-field="orderCode" data-visible="false">订单编码</th>
+								<th data-field="createTime" data-visible="false">创建时间</th>
+								<th data-field="createOp" data-visible="false">创建人</th>
+								<th data-field="modifyTime" data-visible="false">修改时间</th>
+								<th data-field="modifyOp" data-visible="false">修改人</th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+			
+			
+			<!-- 网课 -->
+			<div id="tab-3" class="tab-pane">
+				<div class="panel-body" style="display:none;">
+					<form id="grid-public-form">
+						<input type="hidden" id="tutorId" name="tutorId" />
+						<div class="profile-user-info profile-user-info-striped">
+							<div class="profile-info-row">
+								<div class="profile-info-name">课程名称：</div>
+								<div class="profile-info-value form-group">
+									<input type="text" name="lessonName" placeholder="课程名称"
+										class="input-large" maxlength="120">
+								</div>
+								<div class="profile-info-name">课程分类：</div>
+								<div class="profile-info-value form-group">
+									<select class="input-large" name="lessonType">
+										<option value="0">全部</option>
+										<option value="1">录播课</option>
+										<option value="2">直播课</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</form>
+					<div class="btn-group hidden-xs" id="publicToolbar"
+						role="group">
+						<button type="button" id="grid-public-search-btn" title="搜索"
+							class="btn btn-outline btn-default">
+							<i class="glyphicon glyphicon-search" aria-hidden="true"></i>
+						</button>
+						<button type="button" id="grid-public-reset-btn" title="重置"
+							class="btn btn-outline btn-default">
+							<svg class="icon" aria-hidden="true">
+                                  <use xlink:href="#icon-zhongzhi"></use>
+                              </svg>
+						</button>
+					</div>
+					<table id="publicTable" data-mobile-responsive="false">
+						<thead>
+							<tr>
+								<th data-formatter="boostrapTableSortFormatter">序号</th>
+								<th data-field="lessonId" data-visible="false">课程ID</th>
+								<th data-field="lessonName">课程名称</th>
+								<th data-field="lessonTypeStr">课程分类</th>
+								<th data-field="seriesName" data-visible="false">系列名称</th>
+								<th data-field="origPriceStr">课程原价</th>
+								<th data-field="discountPriceStr">课程折扣价</th>
+								<th data-field="visitAuthStr">访问权限</th>
+								<th data-field="shelfStatusStr">上架状态</th>
+								<th data-field="isTopStr">是否置顶</th>
+								<th data-field="weight">权重(倒序)</th>
+								<th data-field="tutorName">讲师</th>
+								<th data-field="industry">所属行业</th>
+								<!-- <th data-field="validTime">有效期</th> -->
+								<th data-field="createTime" data-visible="false">创建时间</th>
+								<th data-field="createOp" data-visible="false">创建人</th>
+								<th data-field="modifyTime" data-visible="false">修改时间</th>
+								<th data-field="modifyOp" data-visible="false">修改人</th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+			
+			<!-- 薪资调整列表 -->
+			<div id="tab-4" class="tab-pane">
+				<div class="panel-body" style="display:none;">
+					<form id="grid-tutorSalary-form">
+						<input type="hidden" id="tutorId" name="tutorId" />
+						<div class="profile-user-info profile-user-info-striped">
+							<div class="profile-info-row  input-daterange">
+								<div class="profile-info-name">创建开始时间：</div>
+								<div class="profile-info-value form-group">
+									<input type="text" name="beginTime" id="beginTime"
+										placeholder="开始时间"
+										class="input-large form-control date-icon"
+										onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
+								</div>
+								<div class="profile-info-name">创建结束时间：</div>
+								<div class="profile-info-value form-group">
+									<input type="text" name="endTime" id="endTime"
+										placeholder="结束时间"
+										class="input-large form-control date-icon"
+										onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
+								</div>
+							</div>
+						</div>
+					</form>
+					<div class="btn-group hidden-xs" id="tutorSalaryToolbar"
+						role="group">
+						<button type="button" id="grid-tutorSalary-search-btn" title="搜索"
+							class="btn btn-outline btn-default">
+							<i class="glyphicon glyphicon-search" aria-hidden="true"></i>
+						</button>
+						<button type="button" id="grid-tutorSalary-reset-btn" title="重置"
+							class="btn btn-outline btn-default">
+							<svg class="icon" aria-hidden="true">
+                                  <use xlink:href="#icon-zhongzhi"></use>
+                              </svg>
+						</button>
+					</div>
+					<table id="tutorSalaryTable" data-mobile-responsive="false">
+						<thead>
+							<tr>
+								<th data-formatter="boostrapTableSortFormatter">序号</th>
+								<th data-field="realName">导师名称</th>
+								<th data-field="beforSalary">调整前薪资</th>
+								<th data-field="endSalary">调整后薪资</th>
+								<th data-field="changeTime">调整时间</th>
+								<th data-field="changeOp">调整人</th>
+								<th data-field="changeExplain">调整说明</th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+
+	/** ===== 导师基本信息 ===== **/
+	function getTutorInfo() {
+		var tutorId = $(".tabs-container #tutor").val();
+		$.ajax({
+			type : "POST",
+			url : "${ctx.contextPath}/d-admin/mem/tutor/getTutor",
+			data : "tutorId=" + tutorId,
+			dataType : "json",
+			success : function(data) {
+				$("#tab-1 #loginAccount").html(data.loginAccount);
+				$("#tab-1 #realName").html(data.realName);
+				$("#tab-1 #sexStr").html(data.sexStr);
+				
+				$("#tab-1 #bindMobile").html(data.bindMobile);
+				$("#tab-1 #tutorSalaryStr").html(data.tutorSalaryStr);
+				$("#tab-1 #industryName").html(data.industryName);
+				
+				$("#tab-1 #country").html(data.country);
+				$("#tab-1 #newlyJob").html(data.newlyJob);
+				$("#tab-1 #position").html(data.position);
+				$("#tab-1 .panel-body").show();
+			},
+			complete : function() {
+			}
+		});
+	}
+
+	/** ===== 定制课列表 ===== **/
+	var lessonCustomTable;
+	function findCustomPaging() {
+		$("#grid-custom-form #tutorId").val($(".tabs-container #tutor").val());
+		customTable = jQuery.extend({}, boostrapTableParams);
+		customTable.queryParams = "customTableQueryParams";
+		customTable.toolbar = "#customToolbar";
+
+		var newUrl = "${ctx.contextPath}/d-admin/lesson/custom/findPagingByUserId";
+		if (isEmpty(lessonCustomTable)) {
+			initGridSearch("grid-custom-search-btn", "grid-custom-form",
+					"customTableQueryParams"); // 初始化grid搜索
+			// table分页参数配置
+			customTable.url = newUrl;
+			lessonCustomTable = $("#customTable").bootstrapTable(customTable);
+		} else {
+			$("#customTable").bootstrapTable("refresh", "");
+		}
+		$("#tab-2 .panel-body").show();
+	}
+	// bootstrap-table用户订单分页查询时的参数封装
+	function customTableQueryParams(params) {
+		if (isEmpty(params)) { // 点击搜索按钮时
+			var options = $("#customTable").bootstrapTable('getOptions');
+			$("#customTable").bootstrapTable('refreshOptions', {
+				pageNumber : 1,
+				sortName : "",
+			});
+		} else { // 点击分页时
+			return boostrapTableSearchParams("grid-custom-form", params);
+		}
+	}
+	
+	/** ===== 网课列表 ===== **/
+	var lessonPublicTable;
+	function findPublicPaging() {
+		$("#grid-public-form #tutorId").val($(".tabs-container #tutor").val());
+		var publicTable = jQuery.extend({}, boostrapTableParams);
+		publicTable.queryParams = "publicTableQueryParams";
+		publicTable.toolbar = "#publicToolbar";
+
+		var newUrl = "${ctx.contextPath}/d-admin/lesson/public/findPaging";
+		if (isEmpty(lessonPublicTable)) {
+			initGridSearch("grid-public-search-btn", "grid-public-form", "publicTableQueryParams"); // 初始化grid搜索
+			// table分页参数配置
+			publicTable.url = newUrl;
+			lessonPublicTable = $("#publicTable").bootstrapTable(publicTable);
+		} else {
+			$("#publicTable").bootstrapTable("refresh", "");
+		}
+		$("#tab-3 .panel-body").show();
+	}
+	// bootstrap-table用户订单分页查询时的参数封装
+	function publicTableQueryParams(params) {
+		if (isEmpty(params)) { // 点击搜索按钮时
+			var options = $("#publicTable").bootstrapTable('getOptions');
+			$("#publicTable").bootstrapTable('refreshOptions', {
+				pageNumber : 1,
+				sortName : "",
+			});
+		} else { // 点击分页时
+			return boostrapTableSearchParams("grid-public-form", params);
+		}
+	}
+
+	/** === 导师薪资调整记录 === **/
+	var TutorSalaryTable;
+	function findTutorSalaryPaging() {
+		$("#grid-tutorSalary-form #tutorId").val($(".tabs-container #tutor").val());
+		
+		$('.input-daterange').datepicker({
+			todayBtn : "linked",
+			endDate : new Date(),
+			setDate : new Date(),
+			clearBtn : true,
+			autoclose : true
+		});
+		
+		var tutorSalaryTable = jQuery.extend({}, boostrapTableParams);
+		tutorSalaryTable.queryParams = "tutorSalaryTableQueryParams";
+		tutorSalaryTable.toolbar = "#tutorSalaryToolbar";
+
+		var newUrl = "${ctx.contextPath}/d-admin/mem/tutor/findTutorSalaryPaging";
+		if (isEmpty(TutorSalaryTable)) {
+			initGridSearch("grid-tutorSalary-search-btn", "grid-tutorSalary-form", "tutorSalaryTableQueryParams"); // 初始化grid搜索
+			// table分页参数配置
+			tutorSalaryTable.url = newUrl;
+			TutorSalaryTable = $("#tutorSalaryTable").bootstrapTable(tutorSalaryTable);
+		} else {
+			$("#tutorSalaryTable").bootstrapTable("refresh", "");
+		}
+		$("#tab-4 .panel-body").show();
+	}
+	// bootstrap-table用户订单分页查询时的参数封装
+	function tutorSalaryTableQueryParams(params) {
+		if (isEmpty(params)) { // 点击搜索按钮时
+			var options = $("#tutorSalaryTable").bootstrapTable('getOptions');
+			$("#tutorSalaryTable").bootstrapTable('refreshOptions', {
+				pageNumber : 1,
+				sortName : "",
+			});
+		} else { // 点击分页时
+			return boostrapTableSearchParams("grid-tutorSalary-form", params);
+		}
+	}
+</script>

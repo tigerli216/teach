@@ -1,0 +1,390 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<div class="modal inmodal" id="form-modal" role="dialog"
+	aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button class="close" data-dismiss="modal" type="button">×</button>
+				<h4 id="modalHeaderMsg" class="modal-title"></h4>
+			</div>
+			<div class="modal-body">
+				<form id="form-edit" class="form-horizontal">
+					<input type="hidden" id="opId" name="opId" /> <input type="hidden"
+						id="orgIds" name="orgIds" /> <input type="hidden" id="roleIds"
+						name="roleIds" />
+
+					<div class="tabbable">
+						<ul id="myTab"
+							class="nav nav-tabs padding-12 tab-color-blue background-blue">
+							<li class="active"><a href="#baseInfo" data-toggle="tab"
+								aria-expanded="true"> <i class="fa fa-edit"></i> 基本信息
+							</a></li>
+
+							<li class=""><a href="#opeOrg" data-toggle="tab"
+								aria-expanded="false"> <i class="fa fa-folder-o"></i> 归属组织
+							</a></li>
+
+							<li class=""><a href="#opeRole" data-toggle="tab"
+								aria-expanded="false"> <i class="fa fa-lock"></i> 拥有角色
+							</a></li>
+						</ul>
+						<div class="tab-content">
+							<div class="tab-pane fade active in" id="baseInfo">
+								<div class="profile-user-info profile-user-info-striped">
+									<div class="profile-info-row">
+										<div class="profile-info-name">* 登录名：</div>
+										<div id="txtOpLoginName" class="profile-info-value form-group">
+											<input type="text" id="opLoginName" name="opLoginName"
+												class="input-large" />
+										</div>
+
+										<div class="profile-info-name">* 姓名：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" id="opName" name="opName"
+												class="input-large" />
+										</div>
+									</div>
+
+									<div class="profile-info-row">
+										<div id="txtpassword" class="profile-info-name">* 初始密码：</div>
+										<div class="profile-info-value form-group">
+											<input type="password" id="password" name="password"
+												class="input-large" />
+										</div>
+
+										<div id="txtconfirmPassword" class="profile-info-name">* 确认密码：</div>
+										<div class="profile-info-value form-group">
+											<input type="password" id="confirmPassword"
+												name="confirmPassword" class="input-large" />
+										</div>
+									</div>
+
+									<div class="profile-info-row">
+										<div class="profile-info-name">电子邮箱：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" id="email" name="email"
+												class="input-large" />
+										</div>
+
+										<div class="profile-info-name">QQ：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" id="qq" name="qq" class="input-large" />
+										</div>
+									</div>
+
+									<div class="profile-info-row">
+										<div class="profile-info-name">联系电话：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" id="telePhone" name="telePhone"
+												class="input-large" />
+										</div>
+
+										<div class="profile-info-name">移动电话：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" id="mobilePhone" name="mobilePhone"
+												class="input-large input-mask-phone" />
+										</div>
+									</div>
+
+									<div class="profile-info-row">
+										<div class="profile-info-name">证件类型：</div>
+										<div class="profile-info-value form-group">
+											<select id="identityType" name="identityType"
+												class="input-large">
+												<option value="1">身份证</option>
+											</select>
+										</div>
+
+										<div class="profile-info-name">证件号码：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" id="identityNo" name="identityNo"
+												class="input-large" />
+										</div>
+									</div>
+
+									<div class="profile-info-row">
+										<div class="profile-info-name">失效时间：</div>
+										<div class="profile-info-value form-group">
+											<input type="text" id="overdueTime" name="overdueTime"
+												class="input-large layer-date laydate-icon"
+												onclick="laydate()" />
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="tab-pane fade" id="opeOrg">
+								<div class="profile-user-info profile-user-info-striped">
+									<div class="profile-info-row">
+										<div class="profile-info-value">
+											<div id="opOrgTree" class="ztree"></div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="tab-pane fade" id="opeRole">
+								<div class="profile-user-info profile-user-info-striped">
+									<div class="profile-info-row">
+										<div class="profile-info-value">
+											<div id="opRoleTree" class="ztree"></div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+				<button type="button" class="btn btn-primary"
+					onClick="formSubmit();">保存</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(function() {
+		judgeVerification();
+		orgTree();
+		roleTree();
+	})
+
+	// 组织树
+	function orgTree() {
+		var setting = {
+			check : {
+				enable : true,
+				chkStyle : "radio",
+				radioType : "all"
+			},
+			data : {
+				simpleData : {
+					enable : true
+				}
+			}
+		};
+		$.ajax({
+			type : "POST",
+			url : "${ctx.contextPath}/d-admin/org/findOrganizationTree",
+			data : "treeOpen=true",
+			dataType : "json",
+			success : function(data) {
+				$.fn.zTree.init($("#opOrgTree"), setting, data);
+			},
+			complete : function() {
+				isEditInitForm = false;
+			}
+		});
+	}
+
+	// 选中组织
+	function orgCheck(orgList) {
+		var orgTreeObj = $.fn.zTree.getZTreeObj("opOrgTree");
+		var orgNodes = orgTreeObj.getCheckedNodes(true);
+		if (!isEmpty(orgNodes) && orgNodes.length > 0) {
+			for (var i = 0; i < orgNodes.length; i++) {
+				orgTreeObj.checkNode(orgNodes[i], false, false);
+			}
+		}
+		if (orgList != null && orgList.length > 0) {
+			for (var j = 0; j < orgList.length; j++) {
+				var node = orgTreeObj.getNodeByParam("id", orgList[j].orgId);
+				if (!isEmpty(node)) {
+					orgTreeObj.checkNode(node, true, false);
+				}
+			}
+		}
+	}
+
+	// 角色树
+	function roleTree() {
+		var setting = {
+			check : {
+				enable : true,
+				chkboxType: { "Y": "s", "N": "ps" }
+			},
+			data : {
+				simpleData : {
+					enable : true
+				}
+			}
+		};
+		$.ajax({
+			type : "POST",
+			url : "${ctx.contextPath}/d-admin/role/findRoleTree",
+			data : "treeOpen=true",
+			dataType : "json",
+			success : function(data) {
+				$.fn.zTree.init($("#opRoleTree"), setting, data);
+				var roleTreeObj = $.fn.zTree.getZTreeObj("opRoleTree");
+// 				roleTreeObj.setting.check.chkboxType = {
+// 					"Y" : "ps",
+// 					"N" : ""
+// 				};
+			},
+			complete : function() {
+				isEditInitForm = false;
+			}
+		});
+	}
+
+	// 选择角色
+	function roleCheck(roleList) {
+		var roleTreeObj = $.fn.zTree.getZTreeObj("opRoleTree");
+		var roleNodes = roleTreeObj.getCheckedNodes(true);
+		if (!isEmpty(roleNodes) && roleNodes.length > 0) {
+			for (var i = 0; i < roleNodes.length; i++) {
+				roleTreeObj.checkNode(roleNodes[i], false, false)
+			}
+		}
+		if (roleList != null && roleList.length > 0) {
+			for (var j = 0; j < roleList.length; j++) {
+				var node = roleTreeObj.getNodeByParam("id", roleList[j].roleId);
+				if (!isEmpty(node)) {
+					roleTreeObj.checkNode(node, true, false);
+				}
+			}
+		}
+	}
+
+	// 表单提交
+	var isFormSubmit = false;
+	function formSubmit() {
+		if (isFormSubmit)
+			return;
+
+		if (!$('#form-edit').valid())
+			return;
+
+		var orgTreeObj = $.fn.zTree.getZTreeObj("opOrgTree");
+		var orgNodes = orgTreeObj.getCheckedNodes(true);
+		var orgIds = "";
+		for (var i = 0; i < orgNodes.length; i++) {
+			orgIds += orgNodes[i].id + ",";
+		}
+		var roleIds = "";
+		var roleTreeObj = $.fn.zTree.getZTreeObj("opRoleTree");
+		var roleNodes = roleTreeObj.getCheckedNodes(true);
+		for (var i = 0; i < roleNodes.length; i++) {
+			roleIds += roleNodes[i].id + ",";
+		}
+		$('#form-edit #orgIds').val(orgIds);
+		$('#form-edit #roleIds').val(roleIds);
+		isFormSubmit = true;
+		$.ajax({
+			type : "POST",
+			url : "${ctx.contextPath}/d-admin/operator/edit",
+			data : $("#form-edit").serialize(),
+			dataType : "json",
+			success : function(data) {
+				if (data.success) {
+					common_success("保存成功！");
+					$("#form-modal").modal("hide");
+					boostrapTableQueryParams(); // 刷新列表
+				} else {
+					common_error(data.errDesc);
+				}
+			},
+			complete : function() {
+				isFormSubmit = false;
+			}
+		});
+	}
+
+	// form表单校验
+	function judgeVerification() {
+		var icon = "<i class='fa fa-times-circle'></i> ";
+		$('#form-edit').validate({
+			rules : {
+				opLoginName : {
+					required : true,
+					maxlength : 20,
+					minlength : 4
+				},
+				opName : {
+					required : true,
+					maxlength : 32,
+					minlength : 2
+				},
+				email : {
+					maxlength : 32,
+					email : true
+				},
+				telePhone : {
+					minlength : 12,
+					maxlength : 13,
+					isTel : "#form-edit #telePhone"
+				},
+				mobilePhone : {
+					minlength : 11,
+					maxlength : 11,
+					isTel : "#form-edit #mobilePhone"
+				},
+				qq : {
+					minlength : 5,
+					maxlength : 13,
+					isQQ : "#form-edit #qq"
+				},
+				identityNo : {
+					isIdCardNo : "#form-edit #identityNo"
+				},
+				postcode : {
+					isZipCode : "#form-edit #postcode"
+				}
+			},
+
+			messages : {
+				opLoginName : {
+					required : icon + "操作员名不能为空！",
+					maxlength : icon + "最长为20个字符！",
+					minlength : icon + "最短为4个字符！"
+				},
+				password : {
+					required : icon + "密码不能为空！",
+					maxlength : icon + "密码最长为16个字符！",
+					minlength : icon + "密码最短为6个字符！"
+				},
+				confirmPassword : {
+					required : icon + "确认密码不能为空！",
+					maxlength : icon + "确认密码最长为16个字符！",
+					minlength : icon + "确认密码最短为6个字符！",
+					equalTo : icon + "两次输入密码不一致！"
+				},
+				opName : {
+					required : icon + "操作员名不能为空！",
+					maxlength : icon + "最长为32个字符！",
+					minlength : icon + "最短为2个字符！"
+				},
+				email : {
+					maxlength : icon + "最长为32个字符！",
+					email : icon + "邮箱格式不正确！"
+				},
+				telePhone : {
+					minlength : icon + "最少12个数字！",
+					maxlength : icon + "最长13个数字！",
+					isTell : icon + "电话格式不正确！"
+				},
+				mobilePhone : {
+					minlength : icon + "最少11个数字！",
+					maxlength : icon + "最长11个数字！",
+					isTell : icon + "手机格式不正确！"
+				},
+				qq : {
+					minlength : icon + "最少5个数字！",
+					maxlength : icon + "最长13个数字！",
+					isQQ : icon + "QQ号码格式不正确！"
+				},
+				identityNo : {
+					isIdCardNo : icon + "身份证格式不正确！"
+				},
+				postcode : {
+					isZipCode : icon + "邮政编码格式不正确！"
+				}
+			}
+		});
+	};
+</script>
